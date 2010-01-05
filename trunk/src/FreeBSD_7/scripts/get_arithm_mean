@@ -1,0 +1,17 @@
+#!/bin/bash
+
+sum=0
+
+if [ $# -le 1 ]
+then 
+	echo 0
+	exit 0
+fi
+
+for i in $@  
+do
+	[ ${i} = "nan" ] && continue
+	sum=$(echo ${sum} ${i} | awk '{print $1 + $2}')
+done
+
+echo $sum $# | awk '{printf "%.1f", $1 / $2}'

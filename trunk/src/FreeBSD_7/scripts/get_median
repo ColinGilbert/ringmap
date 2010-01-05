@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Length of input arrays
+len=$#
+
+# Sort input array
+arr=$(echo $@ | tr ' ' '\n' | sort -k1,1n | paste -s -d' '  -)
+
+# Compute Median
+res=$(echo $len | awk '{printf "%d", $1 / 2}')
+[ $(( $res + $res )) -lt $len ] && \
+	echo $(( $res + 1 )) ${arr} | awk '{imp=$1+1; print $imp}' || \
+	echo $(( $res + 1 )) ${arr} | awk '{imp=$1+1; print ($imp + $(imp-1))/2}'

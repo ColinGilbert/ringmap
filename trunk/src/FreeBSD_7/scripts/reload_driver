@@ -1,0 +1,17 @@
+#!/usr/local/bin/bash
+
+RINGMAP_DRIVER=if_ringmap.ko
+GENERIC_DRIVER=if_em.ko
+
+sleep 1
+
+if [ $1 = "ringmap" ]
+then
+	kldstat | grep ${RINGMAP_DRIVER} && kldunload ${RINGMAP_DRIVER}
+	kldload ../em/${RINGMAP_DRIVER}
+else 
+	echo "Do not reload generic drivar"
+	#kldstat | grep ${GENERIC_DRIVER} && kldunload ${GENERIC_DRIVER}
+	#kldload ${GENERIC_DRIVER}
+fi
+sleep 1

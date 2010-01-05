@@ -1,0 +1,93 @@
+#!/bin/sh
+
+OS=FreeBSD
+OS_VERSION=7
+
+DRIVER_HDR="fiveg_da.h"
+DRIVER_SRC_DIR="../em/"
+LIBPCAP_SRC_DIR="../libpcap/"
+USERCLIENTS_DIR="../userspace/"
+
+check_os() {
+	uname |grep $OS || { echo "Wrond OS" ; exit 1 ; }
+}
+
+make_driver() {
+	cd $DRIVER_SRC_DIR
+	make clean
+	make || { echo "Error by compiling of driver" ; return 1 ; }
+	cd -
+
+}
+
+make_libpcap() {
+
+	# Clean last build, make and install 
+	cd $LIBPCAP_SRC_DIR
+	cp ${DRIVER_SRC_DIR}${DRIVER_HDR} .
+	make clean
+	make || { echo "Error by compiling of libpcap" ; return 1 ; }
+	make install || { echo "Error by installing of libpcap" ; exit 1 ; }
+	cd -
+}
+
+make_userclients() {
+	cd ${USERCLIENTS_DIR}
+	cp ${DRIVER_SRC_DIR}${DRIVER_HDR} .
+	make ringmap
+}
+
+
+
+
+
+
+###################################
+### 		S T A R T           ###
+###################################
+
+# Check OS
+echo
+echo "CHECK OS:"
+echo "=================================================================="
+check_os
+echo "=================================================================="
+echo
+
+sleep 2
+
+# Build driver
+echo
+echo "MAKE DRIVER FOR CAPTURING WITH MAPPED BUFFERS:"
+echo "=================================================================="
+make_driver
+if [ $? -eq 1 ]
+then 
+	echo "Stop building! Exit!"
+	exit 1;
+fi
+echo "=================================================================="
+echo
+
+sleep 3
+
+# Build libpcap
+echo
+echo "MAKE libpcap FOR ringmap DRIVER:"
+echo "=================================================================="
+make_libpcap
+if [ $? -eq 1 ]
+then 
+	echo "Stop building! Exit!"
+	exit 1;
+fi
+
+# Build user agents
+echo 
+echo "MAKE USER LIBPCAP APPLICATIONS:"
+echo "=================================================================="
+make_userclients
+echo "=================================================================="
+echo
+echo "Ringmap Done."
+echo

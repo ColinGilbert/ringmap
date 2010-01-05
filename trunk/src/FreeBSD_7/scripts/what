@@ -1,0 +1,34 @@
+#!/bin/sh
+
+SRC_DIR="../em/"
+DRIVER="if_em.ko"
+LIBPCAP=$(ls /lib/libpcap*)
+PATTERN="fiveg"
+
+cd $SRC_DIR
+if [ -r $DRIVER ]
+then 
+	nm $DRIVER | grep $PATTERN >/dev/null
+	if [ $? -eq 1 ]
+	then 
+		echo "Generic Driver"
+	else
+		echo "Ringmap Driver"
+	fi
+else
+	echo "Driver doesn't compile"
+fi
+cd -
+
+if [ -r $LIBPCAP ]
+then 
+	readelf -s $LIBPCAP | grep $PATTERN >/dev/null
+	if [ $? -eq 1 ]
+	then 
+		echo "Generic Libpcap"
+	else 
+		echo "Ringmap Libpcap"
+	fi
+else 
+	echo "Libpcap doesn't installed"
+fi
