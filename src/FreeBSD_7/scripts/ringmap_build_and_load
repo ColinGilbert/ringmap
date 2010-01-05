@@ -1,0 +1,16 @@
+#!/bin/sh
+
+DRIVER=if_ringmap
+
+echo
+
+kldstat | grep ${DRIVER} > /dev/null 
+if [ $? -eq 0 ]
+then 
+	echo "Unload module"
+	kldunload ${DRIVER}.ko
+	sleep 1
+fi
+echo
+echo "Build and load ringmap driver"
+../scripts/ringmap_build && kldload ../em/${DRIVER}.ko

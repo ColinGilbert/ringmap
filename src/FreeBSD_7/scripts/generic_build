@@ -1,0 +1,55 @@
+#!/bin/sh
+
+OS=FreeBSD
+OS_VERSION=7
+
+check_os() {
+	uname |grep $OS || { echo "Wrond OS" ; exit 1 ; }
+}
+
+make_driver() {
+	cd /usr/src/sys/modules/em/
+	make clean
+	make
+	make install
+	cd -
+}
+
+make_libpcap() {
+	cd /usr/src/lib/libpcap/
+	make clean
+	make
+	make install
+	cd -
+}
+
+
+###################################
+### 		S T A R T           ###
+###################################
+
+# Check OS
+echo
+echo "CHECK OS:"
+echo "=================================================================="
+check_os
+echo "=================================================================="
+echo
+
+# Install driver
+echo
+echo "MAKE GENERIC DRIVER:"
+echo "=================================================================="
+make_driver
+echo "=================================================================="
+echo
+
+# Install libpcap
+echo
+echo "MAKE GENERIC libpcap:"
+echo "=================================================================="
+make_libpcap
+echo "=================================================================="
+echo
+echo "Generic Done."
+echo

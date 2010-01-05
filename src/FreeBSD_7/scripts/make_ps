@@ -1,0 +1,24 @@
+#!/bin/sh
+
+FILES=(em/fiveg_da.c em/fiveg_da.h em/if_em.c libpcap/fiveg_da_pcap.c userspace/fiveg_pcap.c scripts/cpusage.sh scripts/generic_build scripts/generic_build_and_load scripts/get_procid scripts/make_ps scripts/pktgen.sh scripts/reload_driver scripts/ringmap_build scripts/ringmap_build_and_load scripts/stop_capturing scripts/stop_cpusage scripts/tailfmessages scripts/create_grafik.sh scripts/create_plots.sh scripts/create_tables.sh scripts/do_all_results scripts/create_plots.sh)
+DIRS=$(ls ../)
+WHERE=../printables/
+
+[ ! -d ${WHERE} ] && mkdir ${WHERE}
+
+for dir in ${DIRS[*]}
+do 
+	[ ! -d ${WHERE}/${dir} ] && mkdir ${WHERE}/${dir}
+done
+
+for file in ${FILES[*]}
+do 
+	if [ ! -r ../${file} ]
+	then 
+		echo "File: "${file}" doesn't exists."
+		continue
+	fi
+	a2ps -f 7 -o ${WHERE}/${file}.ps ../${file} 
+done 
+
+exit 0
