@@ -48,13 +48,13 @@ int init_mmapped_capturing(const char *device, pcap_t *);
 void uninit_mmapped_capturing(pcap_t *);
 int pcap_read_ringmap(pcap_t *, int , pcap_handler , u_char *);
 int ringmap_stats(pcap_t *p, struct pcap_stat *ps);
-void fiveg_enable_capturing();
-void fiveg_disable_capturing();
+void ringmap_enable_capturing();
+void ringmap_disable_capturing();
 
 
 /* 
- * Check for existence of module.
- * Get descripor of /dev/fiveg_dev_em (open)
+ * Check if  module is loaded.
+ * Get descripor of /dev/ringmap (open)
  *
  * The name of linker file: MOD_NAME (fiveg_da.h)
  * Return: 	fileid 	- 	of kld file on success. 
@@ -183,7 +183,7 @@ init_mmapped_capturing(const char *device, pcap_t *p)
 	}
 
 	/* STOP CAPTURING */
-	fiveg_disable_capturing();
+	ringmap_disable_capturing();
 
 #if (__RINGMAP_DEB)
 	printf("[%s] Number of descriptors: %d \n", __func__, SLOTS_NUMBER);
@@ -337,7 +337,7 @@ init_mmapped_capturing(const char *device, pcap_t *p)
 	}
 
 	/* START CAPTURING */
-	fiveg_enable_capturing();
+	ringmap_enable_capturing();
 
 	return (0);
 }
@@ -350,7 +350,7 @@ uninit_mmapped_capturing(pcap_t *p)
 {
 	int tmp_res, i;
 
-	fiveg_disable_capturing();
+	ringmap_disable_capturing();
 
 	for (i = 0; i < SLOTS_NUMBER; i++){
 		tmp_res = munmap((void *)p->ring->slot[i].mbuf.user, sizeof(struct mbuf));
@@ -395,6 +395,8 @@ pcap_read_ringmap(pcap_t *p, int cnt, pcap_handler callback, u_char *user)
 
 again1: 
 	
+	// printf("user kern distance = %d\n", USER_TO_KERN_RING_DISTANCE(p->ring));
+
 	if ( !(USER_TO_KERN_RING_DISTANCE(p->ring)) ){
 		ioctl(ringmap_cdev_fd, IOCTL_SLEEP_WAIT);
 		goto again1;
@@ -418,7 +420,7 @@ again1:
 	if (cnt == -1)
 		cnt = USER_TO_KERN_RING_DISTANCE(p->ring);
 
-	for (ws = cnt; ws ;) 
+	for (ws = cnt; ws && (USER_TO_KERN_RING_DISTANCE(p->ring));) 
 	{
 		if (p->break_loop) {
 			p->break_loop = 0;
@@ -450,7 +452,7 @@ again1:
  * Set hardware registers to enabling pkts receive and interrupts on NIC
  */
 void 
-fiveg_enable_capturing()
+ringmap_enable_capturing()
 {
 	if (ringmap_cdev_fd > 0){
 		ioctl(ringmap_cdev_fd, IOCTL_ENABLE_RECEIVE);
@@ -467,7 +469,7 @@ fiveg_enable_capturing()
  * Set hardware registers to disabling pkts receive and interrupts on NIC
  */
 void 
-fiveg_disable_capturing()
+ringmap_disable_capturing()
 {
 	if (ringmap_cdev_fd > 0)
 		ioctl(ringmap_cdev_fd, IOCTL_DISABLE_RECEIVE);
