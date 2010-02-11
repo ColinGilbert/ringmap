@@ -1,3 +1,0 @@
-#!/bin/sh
-
-ps ax | grep cpusage | grep -v grep | grep -v $0 | awk '{print $1}' | xargs kill -ALRM
