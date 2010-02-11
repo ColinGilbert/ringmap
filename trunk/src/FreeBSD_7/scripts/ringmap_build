@@ -8,6 +8,7 @@ DRIVER_SRC_DIR="../em/"
 LIBPCAP_SRC_DIR="../libpcap/"
 USERCLIENTS_DIR="../userspace/"
 
+# schould check version of system.
 check_os() {
 	uname |grep $OS || { echo "Wrond OS" ; exit 1 ; }
 }
@@ -30,15 +31,6 @@ make_libpcap() {
 	make install || { echo "Error by installing of libpcap" ; exit 1 ; }
 	cd -
 }
-
-make_userclients() {
-	cd ${USERCLIENTS_DIR}
-	cp ${DRIVER_SRC_DIR}${DRIVER_HDR} .
-	make ringmap
-}
-
-
-
 
 
 
@@ -81,13 +73,3 @@ then
 	echo "Stop building! Exit!"
 	exit 1;
 fi
-
-# Build user agents
-echo 
-echo "MAKE USER LIBPCAP APPLICATIONS:"
-echo "=================================================================="
-make_userclients
-echo "=================================================================="
-echo
-echo "Ringmap Done."
-echo
