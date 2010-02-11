@@ -1,0 +1,18 @@
+generic_build -				script kompiliert und instaliert generic libpcap und em (e1000) Treiber
+							build and install generic libpcap and generic em (e1000) driver
+
+
+ringmap_build - 			kompiliert und installiert ringmap-libpcap und kompiliert ringmap-Treiber
+							build and install ringmap driver and ringmap libpcap
+
+
+ringmap_build_and_load - 	ringmap_build + load ringmap Treiber
+
+
+make_ps	-					create  in ../printables/ .ps-files  from ../em/, ../libpcap/, ../userspace/
+
+
+pktgen.sh -					For Linux kernel Packet generator
+
+
+
