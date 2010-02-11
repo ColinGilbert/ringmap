@@ -4,7 +4,7 @@
 #define RING_SAFETY_MARGIN 	3
 
 /* Max value for number of descriptors (a.k.a. slots in the ringbuffer) is 4096 */
-#define SLOTS_NUMBER		1024
+#define SLOTS_NUMBER		2048
 
 /* Prefix for name of device (for example /dev/ringmap_cdev_em0 will full name) */
 #define RINGMAP_DEVICE 			"ringmap_cdev_"
@@ -31,7 +31,8 @@
 #define SECS_TO_TICKS(secs)		(int)(hz / SECS_WAIT_USER)
 
 /* Driver have to work only with device */
-#define DEV_ID 	0x105E 
+// #define DEV_ID 	0x105E 
+#define DEV_ID 	0
 
 struct address {
 	bus_addr_t 	phys;
