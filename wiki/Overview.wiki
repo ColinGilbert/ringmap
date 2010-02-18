@@ -15,12 +15,12 @@ Problems by traffic capturing:
  * _libpcap_ library 
 
 = Goal of project =
-Implementing of new software for efficient packet capturing in FreeBSD with goal to  minimize CPU-load and packet loss. In other words implementing the new FreBSD packet capturing stack:
+Implementing of new software for efficient packet capturing in FreeBSD with goal to  minimize CPU-load and packet loss. In other words implementing the new FreeBSD packet capturing stack:
  * Network driver
  * new _libpcap_-functions for accessing to packets 
  * System calls to control the capturing
 
-The new implemented software have to be transparent for user space applications. It menas, each application, that use _libpcap_ for packet capturing shouldn't be changed for running with new network driver and new _libpcap_. 
+The new implemented software have to be transparent for user space applications. It means, each application, that use _libpcap_ for packet capturing shouldn't be changed for running with new network driver and new _libpcap_. 
 *ringmap* is the name of new capturing stack
 
 = Requirements =
