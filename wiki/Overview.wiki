@@ -21,7 +21,9 @@ Implementing of new software for efficient packet capturing in [http://www.freeb
  * System calls to control the capturing
 
 The new implemented software have to be transparent for user space applications. It means, each application, that use _libpcap_ for packet capturing shouldn't be changed for running with new network driver and new _libpcap_. 
-*ringmap* is the name of new capturing stack
+
+*ringmap* 
+ is the name of new FreeBSD capturing stack, that was implemented in this project.
 
 = Requirements =
 == Hardware ==
