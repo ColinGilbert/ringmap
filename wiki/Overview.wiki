@@ -12,7 +12,7 @@ Problems by traffic capturing:
 *Packet capturing stack:* the software that will for capturing used: 
  * Network driver
  * System or user space programs to analyze and filter received packets
- * _libpcap_ library 
+ * _[http://www.tcpdump.org/ libpcap]_ library 
 
 = Goal of project =
 Implementing of new software for efficient packet capturing in [http://www.freebsd.org FreeBSD] with goal to  minimize CPU-load and packet loss. In other words implementing the new FreeBSD packet capturing stack:
