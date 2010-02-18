@@ -15,7 +15,7 @@ Problems by traffic capturing:
  * _[http://www.tcpdump.org/ libpcap]_ library 
 
 = Goal of project =
-Implementing of new software for efficient packet capturing in [http://www.freebsd.org FreeBSD] with goal to  minimize CPU-load and packet loss. In other words implementing the new FreeBSD packet capturing stack:
+Implementing of new software for efficient packet capturing in [http://www.freebsd.org FreeBSD] with goal to  minimize CPU-load and packet loss. In other words implementing the new *FreeBSD packet capturing stack*:
  * Network driver
  * new _libpcap_-functions for accessing to packets 
  * System calls to control the capturing
