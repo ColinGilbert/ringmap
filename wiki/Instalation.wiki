@@ -1,13 +1,23 @@
 #summary How to install ringmap.
 
 = Requirements =
+== Hardware ==
+ * *[http://en.wikipedia.org/wiki/X86 x86]* or *[http://en.wikipedia.org/wiki/X86-64 x86-64]* - microprocessor architecture
+ * One of Intel Gigabit Ethernet Adapters:
+  * _82540EP/EM, 82541xx, 82544GC/EI, 82545GM/EM, 82546GB/EB, 82547xx_
 
-Add your content here.
+== Software == 
+ * FreeBSD-*7.x*, - *8.x*, *i386*-Kernel
+ * *em*-driver for Intel GbE adapters
+  * have to be [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html compiled and installed as module]
 
 
-= Details =
+= Installing ringmap =
+ # go to _scripts_ directory 
+ # run *ringmap_build_and_load* shell script
+  * *ringmap* network driver and *ringmap* libpcap will build and installed
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+= Back to generic = 
+ # go to _scripts_ directory 
+ # run *generic_build_and_load* shell script
+  * *generic* network driver and *generic* libpcap will build and installed
