@@ -1,0 +1,32 @@
+#summary One-sentence summary of this page.
+
+= Motivation =
+
+Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately it is often impossible to capture whole traffic from the network link. But not only hardware is a reason of packet loss. The inefficient implemented software can cause high CPU-load and thereby packet loss.
+
+Problems by traffic capturing: 
+ * Packet loss
+ * Large CPU-load
+
+= Definitions = 
+*Packet capturing stack:* the software that will for capturing used: 
+ * Network driver
+ * System or user space programs to analyze and filter received packets
+ * _libpcap_ library 
+
+= Goal of project =
+Implementing of new software for efficient packet capturing in FreeBSD with goal to  minimize CPU-load and packet loss. In other words implementing the new FreBSD packet capturing stack:
+ * Network driver
+ * new _libpcap_-functions for accessing to packets 
+ * System calls to control the capturing
+
+The new implemented software have to be transparent for user space applications. It menas, each application, that use _libpcap_ for packet capturing shouldn't be changed for running with new network driver and new _libpcap_. 
+*ringmap* is the name of new capturing stack
+
+= Requirements =
+== Hardware ==
+ * Intel Gigabit Ethernet Adapter (*PCI* or *PCIe*)
+
+== Software == 
+ * FreeBSD-*7.x* -,*8.x*
+ * *em*-driver for Intel GbE adapters 
