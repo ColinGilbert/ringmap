@@ -33,6 +33,6 @@ The new implemented software have to be transparent for user space applications.
 
 
 == Software == 
- * FreeBSD-*7.x* -, *8.x*, *i386*-Kernel
+ * FreeBSD-*7.x*, - *8.x*, *i386*-Kernel
  * *em*-driver for Intel GbE adapters
   * have to be [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html compiled and installed as module]
