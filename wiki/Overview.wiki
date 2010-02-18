@@ -10,8 +10,9 @@ Problems by traffic capturing:
 
 = Definitions = 
 *Packet capturing stack:* the software that will for capturing used: 
- * Network driver
+ * Network adapter driver
  * System or user space programs to analyze and filter received packets
+  * [http://en.wikipedia.org/wiki/Berkeley_Packet_Filter Berkeley Packet Filter]
  * _[http://www.tcpdump.org/ libpcap]_ library 
 
 = Goal of project =
