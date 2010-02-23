@@ -13,11 +13,12 @@
 
 
 = Installing ringmap =
- # go to _scripts_ directory 
+ # go to _[http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/scripts scripts/]_ directory 
  # run *ringmap_build_and_load* shell script
-  * *ringmap* network driver and *ringmap* libpcap will build and installed
+  * *ringmap* network driver will build and (kld-)loaded
+  * *ringmap*-libpcap will build and installed
 
 = Back to generic = 
- # go to _scripts_ directory 
+ # go to _[http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/scripts scripts/]_ directory 
  # run *generic_build_and_load* shell script
   * *generic* network driver and *generic* libpcap will build and installed
