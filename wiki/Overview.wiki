@@ -12,9 +12,10 @@ Problems by traffic capturing:
 = Definitions = 
 *Packet capturing stack:* the software that will for capturing used: 
  * Network adapter driver
- * System or user space programs to analyze and filter received packets
+ * Software to analyze and filter received packets
   * [http://en.wikipedia.org/wiki/Berkeley_Packet_Filter Berkeley Packet Filter]
- * _[http://www.tcpdump.org/ libpcap]_ library 
+ * Software to  accessing received packets from user space
+  * mostly based on _[http://www.tcpdump.org/ libpcap]_ library 
 
 = Goal of project =
 Implementing of new software for efficient packet capturing in [http://www.freebsd.org FreeBSD] with goal to  minimize CPU-load and packet loss. In other words implementing the new (*ringmap*) *FreeBSD packet capturing stack*:
