@@ -1,4 +1,5 @@
 #summary Draft version.
+#sidebar TableOfContents
 <wiki:toc max_depth="1" />
 
 = Introduction =
