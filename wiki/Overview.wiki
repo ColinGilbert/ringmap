@@ -19,7 +19,7 @@ Problems by traffic capturing:
 
 = Goal of project =
 Implementing of new software for efficient packet capturing in [http://www.freebsd.org FreeBSD] with goal to  minimize CPU-load and packet loss. In other words implementing the new (*ringmap*) *FreeBSD packet capturing stack*:
- * [http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/em Network driver]
+ * [http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/em new Network driver]
  * new _[http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/libpcap libpcap-functions]_ for accessing to packets 
  * System calls to control the capturing
 
