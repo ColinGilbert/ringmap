@@ -7,12 +7,12 @@
  * One of Intel Gigabit Ethernet Adapters:
   * _82540EP/EM, 82541xx, 82544GC/EI, 82545GM/EM, 82546GB/EB, 82547xx_
 
-= Software =
+== Software ==
  * FreeBSD-*7.x*, - *8.x*, *i386*-Kernel
  * *em*-driver for Intel GbE adapters
   * have to be [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html compiled and installed as module]
 
-== Download ==
+= Download =
 {{{
 svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
 }}}
