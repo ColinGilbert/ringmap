@@ -1,5 +1,5 @@
 #summary How to install ringmap.
-<wiki:toc max_depth="1" />
+<wiki:toc max_depth="2" />
 
 = Requirements =
 == Hardware ==
