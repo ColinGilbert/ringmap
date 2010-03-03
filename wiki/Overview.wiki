@@ -1,7 +1,7 @@
 #summary Draft version.
+<wiki:toc max_depth="1" />
 
 = Introduction =
-
 Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately it is often impossible to capture whole traffic from the network link. But not only hardware is a reason of packet loss. The inefficient implemented software can cause high CPU-load and thereby packet loss.
 
 Problems by traffic capturing: 
