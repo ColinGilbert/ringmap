@@ -12,6 +12,10 @@
  * *em*-driver for Intel GbE adapters
   * have to be [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html compiled and installed as module]
 
+== Download ==
+{{{
+svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
+}}}
 
 = Installing ringmap =
  # go to _[http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/scripts scripts/]_ directory 
