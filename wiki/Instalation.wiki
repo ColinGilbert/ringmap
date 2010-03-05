@@ -21,9 +21,9 @@ svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
  # go to _[http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/scripts scripts/]_ directory 
  # run *ringmap_build_and_load* shell script
   * *ringmap* network driver will build and (kld-)loaded
-  * *ringmap*-libpcap will build and installed
+  * *ringmap*-libpcap will build and be installed
 
 = Back to generic = 
  # go to _[http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/scripts scripts/]_ directory 
  # run *generic_build_and_load* shell script
-  * *generic* network driver and *generic* libpcap will build and installed
+  * *generic* network driver and *generic* libpcap will build and be installed
