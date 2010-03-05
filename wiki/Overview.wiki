@@ -3,38 +3,38 @@
 <wiki:toc max_depth="1" />
 
 = Introduction =
-Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately it is often impossible to capture whole traffic from the network link. But not only hardware is a reason of packet loss. The inefficient implemented software can cause high CPU-load and thereby packet loss.
+Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately, at line-rate speeds, it is often impossible to capture every packet arriving at a network interface. Hardware may not be the only bottleneck however, as inefficient software is also to blame for poor resources usage and resulting packet loss during capture.
 
-Problems by traffic capturing: 
+Problems arising during packet capturing: 
  * Packet loss
- * Large CPU-load
+ * High CPU-load
 
 = Definitions = 
-*Packet capturing stack:* the software that will for capturing used: 
+*Packet capturing stack* (the software used for capturing packets): 
  * Network adapter driver
  * Software to analyze and filter received packets
   * [http://en.wikipedia.org/wiki/Berkeley_Packet_Filter Berkeley Packet Filter]
- * Software to  accessing received packets from user space
+ * Software to  access received packets from user-space
   * mostly based on _[http://www.tcpdump.org/ libpcap]_ library 
 
-= Goal of project =
-Implementing of new software for efficient packet capturing in [http://www.freebsd.org FreeBSD] with goal to  minimize CPU-load and packet loss. In other words implementing the new (*ringmap*) *FreeBSD packet capturing stack*:
+= Project Goal =
+Implement new software components for efficient packet capturing in [http://www.freebsd.org FreeBSD] while  minimizing CPU-load and packet loss. These components are realized as the new (*ringmap*) *FreeBSD packet capturing stack*:
  * [http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/em new Network driver]
- * [http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/libpcap new libpcap-functions] for accessing to packets 
+ * [http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/libpcap new libpcap-functions] for accessing packets 
  * [http://code.google.com/p/ringmap/source/browse/trunk/src/FreeBSD_7/em/fiveg_da.c#58 System calls] to control the capturing
 
-The new implemented software have to be transparent for user space applications. It means, each application, that use _libpcap_ for packet capturing shouldn't be changed for running with new network driver and new _libpcap_. 
+The new implemented software must be transparent for user-space applications. Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with new network driver and new _libpcap_. 
 
 
 
 = Requirements =
 == Hardware ==
  * *[http://en.wikipedia.org/wiki/X86 x86]* or *[http://en.wikipedia.org/wiki/X86-64 x86-64]* - microprocessor architecture
- * One of Intel Gigabit Ethernet Adapters:
+ * One of the following Intel Gigabit Ethernet Adapters:
   * _82540EP/EM, 82541xx, 82544GC/EI, 82545GM/EM, 82546GB/EB, 82547xx_
 
 
 == Software == 
  * FreeBSD-*7.x*, - *8.x*, *i386*-Kernel
  * *em*-driver for Intel GbE adapters
-  * have to be [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html compiled and installed as module]
+  * must be [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html compiled and installed as module]
