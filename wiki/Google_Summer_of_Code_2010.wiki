@@ -12,7 +12,7 @@ This page contains a list of ideas for the [http://code.google.com/soc/ GSoC]-Pr
 
 == Porting the ringmap capturing stack to FreeBSD-8 ==
 
-Technical Contact: ....
+Technical Contact: Jan Böttger
 
 At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would be to port the existing codebase to FreeBSD-8.x. The porting effort would involve both the driver and libpcap source code.
 
@@ -22,6 +22,8 @@ Requirements:
 
 
 == Porting ringmap to 10GbE Intel Network Adapters ==
+
+Technical Contact: Jan Böttger
 
 Motivation:
  * 10gbit networks are in operation
@@ -35,6 +37,8 @@ Requirements:
 
 Goals:
  * Achieve a working and tested driver for use on 10 Gigabit Ethernet adapter.
+
+
 
 == Optimizing the storage of captured packets on the hard drive ==
 
