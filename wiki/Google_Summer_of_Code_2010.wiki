@@ -1,17 +1,19 @@
 #summary Project Ideas for Google Summer of Code 2010
 
+<wiki:toc max_depth="1" />
+
 = Introduction =
 Auf diese Seite sind die Ideen für den [http://code.google.com/soc/ GSoC]-Programm vorgestellt. Mit der Teilnahme am GSoC wollen wir in unserem Projekt folgende Ziele erreichen: 
  * Weiterentwicklung des ringmap-Projektes
  * Portierung des ringmap-Codes auf die andere Hardware-Architekturen
  * Implementierung der neuen Features
 
-<wiki:toc max_depth="1" />
+= Idea-List = 
 
-= Porting ringmap Capturing Stack to FreeBSD-8 =
+== Porting ringmap Capturing Stack to FreeBSD-8 ==
 
-= Porting ringmap to 10Gb Intel Network Adapters =
+== Porting ringmap to 10Gb Intel Network Adapters ==
 
-= Optimizing the storing captured Packets to the hard drive =
+== Optimizing the storing captured Packets to the hard drive ==
 
-= Implementig Load-Balancing functionality for ixgb driver =
+== Implementig Load-Balancing functionality for ixgb driver ==
