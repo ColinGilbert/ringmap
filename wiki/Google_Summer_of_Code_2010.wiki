@@ -11,7 +11,7 @@ Auf diese Seite sind die Ideen für den [http://code.google.com/soc/ GSoC]-Progr
 = Idea-List = 
 
 == Porting ringmap Capturing Stack to FreeBSD-8 ==
-Zur Zeit ist ringmap nur für FreeBSD-7.x einsetzbar. Die Aufgabe besteht daran, den ringmap-Code auf FreeBSD-8.x zu portieren.  
+Zur Zeit ist ringmap nur für FreeBSD-7.x einsetzbar. Die Aufgabe besteht daran, den ringmap-Code auf FreeBSD-8.x zu portieren.  Dabei soll sowohl den Treiber-Code als auch den libpcap-Code für FreeBSD-8 angepasst.
 
 == Porting ringmap to 10GbE Intel Network Adapters ==
 Die Implementierung 
