@@ -1,7 +1,10 @@
 #summary Project Ideas for Google Summer of Code 2010
 
 = Introduction =
-Auf diese Seite sind die Ideen für den [http://code.google.com/soc/ GSoC]-Programm vorgestellt.
+Auf diese Seite sind die Ideen für den [http://code.google.com/soc/ GSoC]-Programm vorgestellt. Mit der Teilnahme am GSoC wollen wir den ringmap-Projekt die folgende Ziele erreichen: 
+ * Weiterentwicklung des ringmap-Projektes
+ * Portierung des ringmap-Codes auf die andere Hardware-Architekturen
+ * Implementierung der neuen Features
 
 <wiki:toc max_depth="1" />
 
