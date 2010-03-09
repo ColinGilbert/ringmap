@@ -23,16 +23,13 @@ Implement new software components for efficient packet capturing in [http://www.
  * [http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/libpcap new libpcap-functions] for accessing packets by using *ringmap* driver. 
  * [http://code.google.com/p/ringmap/source/browse/trunk/src/FreeBSD_7/em/fiveg_da.c#58 System calls] to control the capturing
 
-The new implemented software must be transparent for user-space applications. Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with new network driver and new _libpcap_. 
-
-
+The new implemented software must be transparent for user-space applications. Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with new *ringmap* network driver and new modificated _libpcap_. 
 
 = Requirements =
 == Hardware ==
  * *[http://en.wikipedia.org/wiki/X86 x86]* or *[http://en.wikipedia.org/wiki/X86-64 x86-64]* - microprocessor architecture
  * One of the following Intel Gigabit Ethernet Adapters:
   * _82540EP/EM, 82541xx, 82544GC/EI, 82545GM/EM, 82546GB/EB, 82547xx_
-
 
 == Software == 
  * FreeBSD-*7.x*, - *8.x*, *i386*-Kernel
