@@ -3,29 +3,29 @@
 <wiki:toc max_depth="2" />
 
 = Introduction =
-Auf diese Seite sind die Ideen für den [http://code.google.com/soc/ GSoC]-Programm vorgestellt. Mit der Teilnahme am GSoC wollen wir in unserem Projekt folgende Ziele erreichen: 
- * Weiterentwicklung des ringmap-Projektes
- * Portierung des ringmap-Codes auf die andere Hardware-Architekturen
- * Implementierung der neuen Features
+This page contains a list of ideas for the [http://code.google.com/soc/ GSoC]-Program. We hope to achieve through participation in the GSoC the following goals:
+ * Furthering the development of the ringmap Project
+ * Porting the ringmap codebase to new, different hardware architectures
+ * Implementing new features into ringmap
 
 = Idea-List = 
 
-== Porting ringmap Capturing Stack to FreeBSD-8 ==
+== Porting the ringmap capturing stack to FreeBSD-8 ==
 
 Technical Contact: ....
 
-Zur Zeit ist ringmap nur für FreeBSD-7.x einsetzbar. Die Aufgabe besteht daran, den ringmap-Code auf FreeBSD-8.x zu portieren.  Dabei soll sowohl den Treiber-Code als auch den libpcap-Code für FreeBSD-8 angepasst.
+At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would be to port the existing codebase to FreeBSD-8.x. The porting effort would involve both the driver and libpcap source code.
 
 Requirements:
     * Strong knowledge of C.
     * Understanding of kernel debugging.
-    * Knowledge 
+
 
 == Porting ringmap to 10GbE Intel Network Adapters ==
 Die ringmap-Implementierung basiert zur Zeit auf *em*-Treiber für 1GbE Intel Netzwerkadapters. Die Aufgabe besteht daran, den *ixgb* Treiber für 10GB Intel network adapter zu analysieren und den ringmap-Code in den Treiber anzupassen. 
 
-== Optimizing the storing captured Packets to the hard drive ==
+== Optimizing the storage of captured packets on the hard drive ==
 
 
   
-== Implementig Load-Balancing functionality for ixgb driver ==
+== Implementing Load-Balancing functionality for ixgb driver ==
