@@ -22,7 +22,19 @@ Requirements:
 
 
 == Porting ringmap to 10GbE Intel Network Adapters ==
-Die ringmap-Implementierung basiert zur Zeit auf *em*-Treiber für 1GbE Intel Netzwerkadapters. Die Aufgabe besteht daran, den *ixgb* Treiber für 10GB Intel network adapter zu analysieren und den ringmap-Code in den Treiber anzupassen. 
+
+Motivation:
+ * 10gbit networks are in operation
+ * Monitoring and capturing hardware is expensive
+ * A monitoring and capturing solution utilizing commodity hardware is appealing
+
+Requirements:
+ * Improving the BSD capturing performance (see thesis as reference)
+ * The development platform and testbed is provided by FG INET at TU-Berlin
+ * Measurement results will be made available
+
+Goals:
+ * Achieve a working and tested driver for use on 10 Gigabit Ethernet adapter.
 
 == Optimizing the storage of captured packets on the hard drive ==
 
