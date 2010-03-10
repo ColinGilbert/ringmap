@@ -4,7 +4,7 @@
 
 = Introduction =
 This page contains a list of ideas for the [http://code.google.com/soc/ GSoC]-Program. We hope to achieve through participation in the GSoC the following goals:
- * Continuing the development of the [http://code.google.com/p/ringmap/ ringmap] Project
+ * Continuing the development the [http://code.google.com/p/ringmap/ ringmap] Project
  * Porting the ringmap codebase to new, different hardware architectures
  * Implementing new features into ringmap
 
@@ -20,11 +20,11 @@ In the context of the [http://code.google.com/p/ringmap/ ringmap Project], we ha
 
 ==== Goal ====
 The *ringmap* software stack is momentarily usable only with Intel 1Gb Ethernet Adapters (See Requirements: [http://code.google.com/p/ringmap/wiki/Overview#Requirements]). Our goal is therefore, to modify the ringmap capturing stack for the 10Gb Ethernet Intel network adapter. The following will be expected from the student:
- * Understand and analyze of the code from *[http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+8.0-RELEASE ixgb]* and the *ringmap* driver
+ * Understand and analyze the code from *[http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+8.0-RELEASE ixgb]* and the *ringmap* driver
  * Porting of the *ringmap* code to *ixgb*
  * Extensive documentation of the complete work
 
-The hardware infrastructure and testebed for implementation and testing will be provided by the department of Intelligent Networks at TU-Berlin, [http://www.net.t-labs.tu-berlin.de/ FG INET]
+The hardware infrastructure and testbed for implementation and testing will be provided by the department of Intelligent Networks at TU-Berlin, [http://www.net.t-labs.tu-berlin.de/ FG INET]
 
 ==== Requirements ====
  * Strong knowledge of C.
@@ -36,7 +36,9 @@ The hardware infrastructure and testebed for implementation and testing will be 
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
 ==== Goal ====
-At the present time, *ringmap* can be run only on FreeBSD-*7.x*. Our task here would be to port the existing code base to FreeBSD-*8.x*. The porting effort would involve both the driver and libpcap source code, with a stronger emphasis on libpcap. The student is also expected to conduct a full performance analysis and evaluation between the standard packet capturing stack of FreeBSD-*8* and *ringmap*. The hardware infrastructure and testbed for implementation and testing will be provided by the department of Intelligent Networks at TU-Berlin, [http://www.net.t-labs.tu-berlin.de/ FG INET]  
+At the present time, *ringmap* can be run only on FreeBSD-*7.x*. Our task here would be to port the existing code base to FreeBSD-*8.x*. The porting effort would involve both the driver and libpcap source code, with a stronger emphasis on libpcap. The student is also expected to conduct a full performance analysis and evaluation between the standard packet capturing stack of FreeBSD-*8* and *ringmap*. 
+
+The hardware infrastructure and testbed for implementation and testing will be provided by the department of Intelligent Networks at TU-Berlin, [http://www.net.t-labs.tu-berlin.de/ FG INET]  
 
 ==== Requirements ====
  * Strong knowledge of C.
