@@ -10,27 +10,16 @@ This page contains a list of ideas for the [http://code.google.com/soc/ GSoC]-Pr
 
 = Idea-List = 
 
-== Porting the ringmap capturing stack to FreeBSD-8 ==
-
-Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
-
-At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would be to port the existing codebase to FreeBSD-8.x. The porting effort would involve both the driver and libpcap source code.
-
-Requirements:
-    * Strong knowledge of C.
-    * Understanding of BSD kernel programming and debugging.
-
-
 == Porting ringmap to 10GbE Intel Network Adapters ==
 
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
-=== Motivation ===
+==== Motivation ====
 Die 10Gbit Uebertragungsraten sind Heutztutage ein Realitaet. Die spezielle Hardware, welche fuer Trafik-Monitoring und fuer Paket-Capturing bei solchen Daten-Raten benoetigt wird ist sehr teuer. Die konvenzionelle Hardware ist nicht mehr in der Lage die Pakete aus dem voll ausgelasteten 10Gbit Link vollkommen zu capturen.  Die Gruende fuer die paketverluste liegen sowohl in der limitierten Hardware-Performanze als auch in der Ineffizienz der fuer Capturing benoetigten Software.
 
 Im Ramen des [http://code.google.com/p/ringmap/ ringmap-Projektes] haben wir einen neuen Paket-Capturing-Stack entwickelt, der auf dem *em*-Treiber und der *libpcap*-Library basiert. Der ringmap erlaubt ein effizientes Capturing mit sehr kleinen Paketverlusten (unter 0.02%) und sehr kleiner Systemmload (unter 12%) beim capturen der Verkehr mit der Datenrate bis zu 1GBit/sec. Unter gleichen Bedingungen, beim Benutzen der standard Capturing-Software bei FreeBSD-7, werden bis zu 100% aller Paketen verloren und die systemload beträgt dabei bis zu 100%. 
 
-=== Goal ===
+==== Goal ====
 Die ringmap-Software ist aber nur mit Intel *1Gbit* Eternet Adapters benutzbar ([http://code.google.com/p/ringmap/wiki/Overview#Requirements siehe Requirements]). *Unser Ziel* ist es, den ringmap-Packet-Capturing-Stack für das Einsetzen auf *10GbE* Intel network adapters anzupassen. Dafür wird  *ixgb*-Treiber für 10GbE Intel adapters als Basis genommen. Vom Studenten wird folgendes erwartet: 
  * Analysieren und Verstehen des Codes vom *ixgb*- und *ringmap*-Treibers
  * Portieren des *ringmap*-Codes in *ixgb*. Dabei sollen in *ixgb* die entsprechede Änderungen vorgenommen werden. 
@@ -39,13 +28,23 @@ Die ringmap-Software ist aber nur mit Intel *1Gbit* Eternet Adapters benutzbar (
 Die Hardware Infrastruktur und Testbd für Implementieren und Testen wird von [http://www.net.t-labs.tu-berlin.de/ FG INET] zur Verfügung gestellt.
 
 
-=== Requirements ===
+==== Requirements ====
  * Strong knowledge of C.
  * Understanding of BSD kernel programming and debugging.
 
 
 
-== Optimizing the storage of captured packets on the hard drive ==
+
+
+== Porting the ringmap capturing stack to FreeBSD-8 ==
+
+Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
+
+At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would be to port the existing codebase to FreeBSD-8.x. The porting effort would involve both the driver and libpcap source code.
+
+==== Requirements ====
+    * Strong knowledge of C.
+    * Understanding of BSD kernel programming and debugging.
 
   
 == Implementing Load-Balancing functionality for ixgb driver ==
