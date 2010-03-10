@@ -39,7 +39,7 @@ Die Hardware Infrastruktur und Testbd für Implementieren und Testen wird von [h
 
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
-At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would be to port the existing codebase to FreeBSD-8.x. The porting effort would involve both the driver and libpcap source code.
+At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would be to port the existing codebase to FreeBSD-8.x. The porting effort would involve both the driver and libpcap source code. Die Hardware Infrastruktur und Testbd für Implementieren und Testen wird von FG INET zur Verfügung gestellt. 
 
 ==== Requirements ====
     * Strong knowledge of C.
