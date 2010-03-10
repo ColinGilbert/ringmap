@@ -26,7 +26,7 @@ Requirements:
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
 === Motivation ===
-Die 10Gbit Uebertragungsraten sind Heutztutage ein Realitaet. Die spezielle Hardware, welche fuer Trafik-Monitoring und fuer Paket-Capturing bei solchen Daten-Raten benoetigt wird ist sehr teuer. Die konvenzionelle Hardware ist nicht mehr in der Lage die Pakete aus dem voll ausgelasteten 10Gbit Link vollkommen zu capturen.  Die Gruende dafuer fuer die paketverluste liegen sowohl in der limitierten Hardware-Performanze als auch in der Ineffizienz der fuer Capturing benoetigten Software.
+Die 10Gbit Uebertragungsraten sind Heutztutage ein Realitaet. Die spezielle Hardware, welche fuer Trafik-Monitoring und fuer Paket-Capturing bei solchen Daten-Raten benoetigt wird ist sehr teuer. Die konvenzionelle Hardware ist nicht mehr in der Lage die Pakete aus dem voll ausgelasteten 10Gbit Link vollkommen zu capturen.  Die Gruende fuer die paketverluste liegen sowohl in der limitierten Hardware-Performanze als auch in der Ineffizienz der fuer Capturing benoetigten Software.
 
 Im Ramen des [http://code.google.com/p/ringmap/ ringmap-Projektes] haben wir einen neuen Paket-Capturing-Stack entwickelt, der auf dem *em*-Treiber und der *libpcap*-Library basiert. Mit dem ringmap haben wir sehr gute Ergebnisse erreicht: beim Capturing der kleinsten 64-Bytes Paketen mit der Datenrate 700 Mbit sind folgende Paketverluste und Systemload entstanden:
  * Die Paketverluste liegen unter 0.02%
