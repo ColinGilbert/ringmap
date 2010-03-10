@@ -18,11 +18,6 @@ Transfer rates of 10Gbit/sec are a common reality. The specialized hardware requ
 
 In the context of the [http://code.google.com/p/ringmap/ ringmap Project], we have developed a brand new packet capturing stack, based on the *em*-driver and the *libcap* library. The ringmap capturing stack already allows for efficient capturing at 1GBit/sec with very low packet loss rates (under 0.02%) and low system load (under 12%). Under similar conditions, the standard capturing software under FreeBSD-7 would generate a system load close to 100% and result in close to 100% packet loss.
 
-
-Die 10Gb Uebertragungsraten sind Heutztutage ein Realitaet. Die spezielle Hardware, welche fuer Trafik-Monitoring und fuer Paket-Capturing bei solchen Daten-Raten benoetigt wird ist sehr teuer. Die konvenzionelle Hardware ist nicht mehr in der Lage die Pakete aus dem voll ausgelasteten 10Gb Link vollkommen zu capturen.  Die Gruende fuer die paketverluste liegen sowohl in der limitierten Hardware-Performanze als auch in der Ineffizienz der fuer Capturing benoetigten Software.
-
-Im Ramen des [http://code.google.com/p/ringmap/ ringmap-Projektes] haben wir einen neuen Paket-Capturing-Stack entwickelt, der auf dem *em*-Treiber und der *libpcap*-Library basiert. Der ringmap erlaubt ein effizientes Capturing mit sehr kleinen Paketverlusten (unter 0.02%) und sehr kleiner Systemmload (unter 12%) beim capturen der Verkehr mit der Datenrate bis zu 1GBit/sec. Unter gleichen Bedingungen, beim Benutzen der standard Capturing-Software bei FreeBSD-7, werden bis zu 100% aller Paketen verloren und die systemload beträgt dabei bis zu 100%. 
-
 ==== Goal ====
 The ringmap software stack is momentarily usable on with Intel 1Gb Ethernet Adapters (See Requirements: [http://code.google.com/p/ringmap/wiki/Overview#Requirements). Our goal is therefore, to modify the ringmap capturing stack for the 10Gb Ethernet Intel network adapter. The following will be expected from the student:
  * Understanding and Analysis of the code from *ixgb* and the *ringmap* driver
@@ -31,27 +26,16 @@ The ringmap software stack is momentarily usable on with Intel 1Gb Ethernet Adap
 
 The hardware infrastructure and testebed for implementation and testing will be provided by the department of Intelligent Networks at TU-Berlin, [http://www.net.t-labs.tu-berlin.de/ FG INET]
 
-Die ringmap-Software ist aber nur mit Intel 1Gb Eternet Adapters benutzbar ([http://code.google.com/p/ringmap/wiki/Overview#Requirements siehe Requirements]). Unser Ziel ist es, den ringmap-Packet-Capturing-Stack für das Einsetzen auf 10GbE Intel network adapters anzupassen. Dafür wird  *ixgb*-Treiber für 10GbE Intel adapters als Basis genommen. Vom Studenten wird folgendes erwartet: 
- * Analysieren und Verstehen des Codes vom *ixgb*- und *ringmap*-Treibers
- * Portieren des *ringmap*-Codes in *ixgb*. Dabei sollen in *ixgb* die entsprechede Änderungen vorgenommen werden. 
- * Ausführliches Dokumentieren der Arbeit. 
-
-Die Hardware Infrastruktur und Testbd für Implementieren und Testen wird von [http://www.net.t-labs.tu-berlin.de/ FG INET] zur Verfügung gestellt.
-
-
 ==== Requirements ====
  * Strong knowledge of C.
  * Understanding of BSD kernel programming and debugging.
-
-
-
 
 
 = 2. Porting the ringmap capturing stack to FreeBSD-8 =
 
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
-At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would be to port the existing codebase to FreeBSD-8.x. The porting effort would involve both the driver and libpcap source code. Die Hardware Infrastruktur und Testbd für Implementieren und Testen wird von FG INET zur Verfügung gestellt. 
+At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would be to port the existing codebase to FreeBSD-8.x. The porting effort would involve both the driver and libpcap source code. The hardware infrastructure and testebed for implementation and testing will be provided by the department of Intelligent Networks at TU-Berlin, [http://www.net.t-labs.tu-berlin.de/ FG INET]  
 
 ==== Requirements ====
     * Strong knowledge of C.
