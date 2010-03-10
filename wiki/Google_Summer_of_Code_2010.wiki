@@ -36,7 +36,7 @@ The hardware infrastructure and testebed for implementation and testing will be 
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
 ==== Goal ====
-At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would be to port the existing code base to FreeBSD-8.x. The porting effort would involve both the driver and libpcap source code, with a stronger emphasis on libpcap. The hardware infrastructure and testbed for implementation and testing will be provided by the department of Intelligent Networks at TU-Berlin, [http://www.net.t-labs.tu-berlin.de/ FG INET]  
+At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would be to port the existing code base to FreeBSD-8.x. The porting effort would involve both the driver and libpcap source code, with a stronger emphasis on libpcap. The student is also expected to conduct a full performance analysis and evaluation between the standard packet capturing stack of FreeBSD-8 and ringmap. The hardware infrastructure and testbed for implementation and testing will be provided by the department of Intelligent Networks at TU-Berlin, [http://www.net.t-labs.tu-berlin.de/ FG INET]  
 
 ==== Requirements ====
     * Strong knowledge of C.
