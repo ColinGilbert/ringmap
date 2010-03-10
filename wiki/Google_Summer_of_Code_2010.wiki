@@ -4,7 +4,7 @@
 
 = Introduction =
 This page contains a list of ideas for the [http://code.google.com/soc/ GSoC]-Program. We hope to achieve through participation in the GSoC the following goals:
- * Furthering the development of the ringmap Project
+ * Furthering the development of the [http://code.google.com/p/ringmap/ ringmap] Project
  * Porting the ringmap codebase to new, different hardware architectures
  * Implementing new features into ringmap
 
@@ -33,7 +33,7 @@ Im Ramen des [http://code.google.com/p/ringmap/ ringmap-Projektes] haben wir ein
 === Goal ===
 Die ringmap-Software ist aber nur mit Intel *1Gbit* Eternet Adapters benutzbar ([http://code.google.com/p/ringmap/wiki/Overview#Requirements siehe Requirements]). *Unser Ziel* ist es, den ringmap-Packet-Capturing-Stack für das Einsetzen auf *10GbE* Intel network adapters anzupassen. Dafür wird  *ixgb*-Treiber für 10GbE Intel adapters als Basis genommen. Vom Studenten wird folgendes erwartet: 
  * Analysieren und Verstehen des Codes vom *ixgb*- und *ringmap*-Treibers
- * Portieren des *ringmap*-Codes in *ixgb*. Dabei sollenb in *ixgb* die entsprechede Änderungen vorgenommen werden. 
+ * Portieren des *ringmap*-Codes in *ixgb*. Dabei sollen in *ixgb* die entsprechede Änderungen vorgenommen werden. 
  * Ausführliches Dokumentieren der Arbeit. 
 
 Die Hardware Infrastruktur und Testbd für Implementieren und Testen wird von [http://www.net.t-labs.tu-berlin.de/ FG INET] zur Verfügung gestellt.
