@@ -4,7 +4,7 @@
 
 = Introduction =
 This page contains a list of ideas for the [http://code.google.com/soc/ GSoC]-Program. We hope to achieve through participation in the GSoC the following goals:
- * Furthering the development of the [http://code.google.com/p/ringmap/ ringmap] Project
+ * Continuing the development of the [http://code.google.com/p/ringmap/ ringmap] Project
  * Porting the ringmap codebase to new, different hardware architectures
  * Implementing new features into ringmap
 
