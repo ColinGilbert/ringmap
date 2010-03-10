@@ -9,7 +9,7 @@ This page contains a list of ideas for the [http://code.google.com/soc/ GSoC]-Pr
  * Implementing new features into ringmap
 
 
-= Porting ringmap to 10GbE Intel Network Adapters =
+= 1. Porting ringmap to 10GbE Intel Network Adapters =
 
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
@@ -35,7 +35,7 @@ Die Hardware Infrastruktur und Testbd für Implementieren und Testen wird von [h
 
 
 
-= Porting the ringmap capturing stack to FreeBSD-8 =
+= 2. Porting the ringmap capturing stack to FreeBSD-8 =
 
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
@@ -46,7 +46,7 @@ At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would
     * Understanding of BSD kernel programming and debugging.
 
   
-= Implementing Load-Balancing functionality for ixgb driver =
+= 3. Implementing Load-Balancing functionality for ixgb driver =
 
 Technical Contact: Robin Sommer
 
