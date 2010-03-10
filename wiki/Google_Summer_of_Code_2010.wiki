@@ -40,7 +40,7 @@ At the present time, ringmap can be run only on FreeBSD-7.x. Our task here would
 
 ==== Requirements ====
  * Strong knowledge of C.
- * Understanding the libpcap   
+ * Understanding the libpcap.  
  * Understanding of BSD kernel programming.
 
   
