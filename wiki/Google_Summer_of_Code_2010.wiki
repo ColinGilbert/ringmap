@@ -10,8 +10,8 @@ Through participation in the [http://code.google.com/soc/ GSoC] we hope to achie
  * Porting the *ringmap* capturing stack to _*FreeBSD-8*_
  * Implementing new features into *ringmap*
 
-
-
+<br>
+<br>
 
 = "Ideas" list =
 == 1. Porting ringmap to 10GbE Intel Network Adapters ==
@@ -19,8 +19,6 @@ Through participation in the [http://code.google.com/soc/ GSoC] we hope to achie
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
 Transfer rates of 10Gbit/sec are a common reality. The specialized hardware required for traffic monitoring and packet capturing at such high data rates remains very expensive. At these rates, commodity hardware is no longer capable of capturing packets without high loss rates. The limiting factors are not only dependent on hardware performance, but also due to inefficiencies in the software capturing stack implementations.
-
-
 
 ==== Goal ====
 The *ringmap* software stack is momentarily usable only with Intel 1Gb Ethernet Adapters ([http://code.google.com/p/ringmap/wiki/Overview#Requirements see requirements]). Our goal is therefore, to modify the *ringmap* capturing stack for the 10Gb Ethernet Intel network adapter. The following will be expected from the student:
@@ -34,6 +32,7 @@ The hardware infrastructure and testbed for implementation and testing will be p
  * Strong knowledge of C.
  * Understanding of BSD kernel programming and debugging.
 
+<br>
 
 == 2. Porting the ringmap capturing stack to FreeBSD-8 ==
 
@@ -49,7 +48,8 @@ The hardware infrastructure and testbed for implementation and testing will be p
  * Understanding the libpcap.  
  * Understanding of BSD kernel programming.
 
-  
+<br>
+
 == 3. Implementing Load-Balancing functionality for ixgb driver ==
 
 Technical Contact: Robin Sommer
