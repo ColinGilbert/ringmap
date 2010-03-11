@@ -19,7 +19,7 @@ Transfer rates of 10Gbit/sec are a common reality. The specialized hardware requ
 In the context of the [http://code.google.com/p/ringmap/ ringmap Project], we have developed a brand new packet capturing stack, based on the *[http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+8.0-RELEASE em]*-driver and the *[http://www.freebsd.org/cgi/man.cgi?query=pcap&manpath=FreeBSD+8.0-RELEASE libcap]* library. The ringmap capturing stack already allows for efficient capturing at 1GBit/sec with very low packet loss rates (under 0.02%) and low system load (under 12%). Under similar conditions, the standard capturing software under FreeBSD-7 would generate a system load of up to 100% and result in up to 100% packet loss.
 
 ==== Goal ====
-The *ringmap* software stack is momentarily usable only with Intel 1Gb Ethernet Adapters (See Requirements: [http://code.google.com/p/ringmap/wiki/Overview#Requirements]). Our goal is therefore, to modify the ringmap capturing stack for the 10Gb Ethernet Intel network adapter. The following will be expected from the student:
+The *ringmap* software stack is momentarily usable only with Intel 1Gb Ethernet Adapters ([http://code.google.com/p/ringmap/wiki/Overview#Requirements see requirements]). Our goal is therefore, to modify the ringmap capturing stack for the 10Gb Ethernet Intel network adapter. The following will be expected from the student:
  * Understand and analyze the code from *[http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+8.0-RELEASE ixgb]* and the *ringmap* driver
  * Porting of the *ringmap* code to *ixgb*
  * Extensive documentation of the complete work
