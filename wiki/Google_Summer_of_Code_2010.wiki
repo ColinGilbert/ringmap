@@ -3,8 +3,8 @@
 <wiki:toc max_depth="2" />
 
 = Introduction =
-This page contains a list of ideas for the [http://code.google.com/soc/ GSoC]-Program. We hope to achieve through participation in the GSoC the following goals:
- * Continuing the development the [http://code.google.com/p/ringmap/ ringmap] Project
+This page contains a list of ideas for the [http://code.google.com/soc/ GSoC] program. We hope to achieve through participation in the GSoC the following goals:
+ * Implementation of a capturing stack for 10GbE (based on [http://code.google.com/p/ringmap/ ringmap])
  * Porting the ringmap codebase to new, different hardware architectures
  * Implementing new features into ringmap
 
