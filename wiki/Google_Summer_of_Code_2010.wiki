@@ -3,7 +3,7 @@
 <wiki:toc max_depth="2" />
 
 = Introduction =
-In the context of the [http://code.google.com/p/ringmap/ ringmap Project], we have developed a brand new packet capturing stack for _[http://www.frebsd.org FreeBSD]_, based on the *[http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+8.0-RELEASE em]*-driver and the *[http://www.freebsd.org/cgi/man.cgi?query=pcap&manpath=FreeBSD+8.0-RELEASE libcap]* library. The *ringmap* capturing stack already allows for efficient capturing at 1GBit/sec with very low packet loss rates (under 0.02%) and low system load (under 12%). Under similar conditions, the standard capturing software under FreeBSD-7 would generate a system load of up to 100% and result in up to 100% packet loss.
+In the context of the [http://code.google.com/p/ringmap/ ringmap Project], we have developed a brand new packet capturing stack for _[http://www.frebsd.org FreeBSD]_, based on the *[http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+8.0-RELEASE em]*-driver and the *[http://www.freebsd.org/cgi/man.cgi?query=pcap&manpath=FreeBSD+8.0-RELEASE libcap]* library. The *ringmap* capturing stack already allows for efficient capturing at 1GBit/sec with very low packet loss rates (under 0.02%) and low system load (under 12%). Under similar conditions, the standard capturing software under _FreeBSD-7.x_ would generate a system load of up to 100% and result in up to 100% packet loss.
 
 Through participation in the [http://code.google.com/soc/ GSoC] we hope to achieve  the following goals:
  * Implementation of a capturing stack for 10GbE (based on [http://code.google.com/p/ringmap/ ringmap])
