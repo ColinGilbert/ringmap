@@ -14,7 +14,7 @@ This page contains a list of ideas for the [http://code.google.com/soc/ GSoC]-Pr
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
 ==== Motivation ====
-Transfer rates of 10Gbit/sec are a common reality. The specialized hardware required for traffic monitoring and packet capturing at such high data rates remains very expensive. At these rates, comodity hardware is no longer capable of capturing packets without high loss rates. The limiting factors are not only dependent on hardware performance, but also due to inefficiencies in the software capturing stack implementations.
+Transfer rates of 10Gbit/sec are a common reality. The specialized hardware required for traffic monitoring and packet capturing at such high data rates remains very expensive. At these rates, commodity hardware is no longer capable of capturing packets without high loss rates. The limiting factors are not only dependent on hardware performance, but also due to inefficiencies in the software capturing stack implementations.
 
 In the context of the [http://code.google.com/p/ringmap/ ringmap Project], we have developed a brand new packet capturing stack, based on the *[http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+8.0-RELEASE em]*-driver and the *[http://www.freebsd.org/cgi/man.cgi?query=pcap&manpath=FreeBSD+8.0-RELEASE libcap]* library. The ringmap capturing stack already allows for efficient capturing at 1GBit/sec with very low packet loss rates (under 0.02%) and low system load (under 12%). Under similar conditions, the standard capturing software under FreeBSD-7 would generate a system load close to 100% and result in close to 100% packet loss.
 
@@ -38,7 +38,7 @@ Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böt
 ==== Goal ====
 At the present time, *ringmap* can be run only on FreeBSD-*7.x*. Our task here would be to port the existing code base to FreeBSD-*8.x*. The porting effort would involve both the driver and libpcap source code, with a stronger emphasis on libpcap. The student is also expected to conduct a full performance analysis and evaluation between the standard packet capturing stack of FreeBSD-*8* and *ringmap*. 
 
-The hardware infrastructure and testbed for implementation and testing will be provided by the department of Intelligent Networks at TU-Berlin, [http://www.net.t-labs.tu-berlin.de/ FG INET]  
+The hardware infrastructure and testbed for implementation and testing will be provided by the research group Intelligent Networks at TU-Berlin ([http://www.net.t-labs.tu-berlin.de/ FG INET])  
 
 ==== Requirements ====
  * Strong knowledge of C.
