@@ -15,7 +15,6 @@ Through participation in the [http://code.google.com/soc/ GSoC] we hope to achie
 
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
-==== Motivation ====
 Transfer rates of 10Gbit/sec are a common reality. The specialized hardware required for traffic monitoring and packet capturing at such high data rates remains very expensive. At these rates, commodity hardware is no longer capable of capturing packets without high loss rates. The limiting factors are not only dependent on hardware performance, but also due to inefficiencies in the software capturing stack implementations.
 
 
