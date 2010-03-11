@@ -50,8 +50,26 @@ The hardware infrastructure and testbed for implementation and testing will be p
 
 <br>
 
-== 3. Implementing Load-Balancing functionality for ringmap stack ==
+== 3. Implementing Load-Balancing functionality ==
 
 Technical Contact: Robin Sommer
 
-...
+Modern network interface cards can split an incoming packet stream
+across a set of receive queues, which can then be processed
+independently by a set of threads running on separate CPU cores. We
+want to leverage this capability for high-performance packet
+capturing by making each receive queue available to the user-land as
+a virtual *libpcap* interface. Doing so will allow for easy
+parallelization of libpcap-based applications. 
+
+
+==== Goal ====
+Our goal is to implement this approach as part of FreeBSD's [ixgb
+driver for 10Gb/s network cards that are based on Intel's 82599
+Ethernet controllers. As a second step, we want to integrate the
+adapted driver with *ringmap* capturing stack.
+
+==== Requirements ====
+ * Strong knowledge of C.
+ * Understanding the libpcap.  
+ * Understanding of BSD kernel programming and debugging.
