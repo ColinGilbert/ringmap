@@ -10,6 +10,9 @@ Through participation in the [http://code.google.com/soc/ GSoC] we hope to achie
  * Porting the *ringmap* capturing stack to _*FreeBSD-8*_
  * Implementing new features into *ringmap*
 
+
+
+
 = "Ideas" list =
 == 1. Porting ringmap to 10GbE Intel Network Adapters ==
 
