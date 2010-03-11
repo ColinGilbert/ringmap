@@ -52,7 +52,7 @@ The hardware infrastructure and testbed for implementation and testing will be p
 
 == 3. Implementing Load-Balancing functionality ==
 
-Technical Contact: Robin Sommer
+Technical Contact: [http://www.icir.org/robin/ Robin Sommer]
 
 Modern network interface cards can split an incoming packet stream
 across a set of receive queues, which can then be processed
@@ -64,7 +64,7 @@ parallelization of libpcap-based applications.
 
 
 ==== Goal ====
-Our goal is to implement this approach as part of FreeBSD's [ixgb
+Our goal is to implement this approach as part of _FreeBSD's_ *ixgb*
 driver for 10Gb/s network cards that are based on Intel's 82599
 Ethernet controllers. As a second step, we want to integrate the
 adapted driver with *ringmap* capturing stack.
