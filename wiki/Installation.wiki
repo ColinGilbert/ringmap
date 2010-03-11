@@ -9,8 +9,8 @@
 
 == Software ==
  * FreeBSD-*7.x*, - *8.x*, *i386*-Kernel
- * *em*-driver for Intel GbE adapters
-  * have to be [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html compiled and installed as module]
+ * *em*, *igb*, *ixgb* drivers for Intel GbE adapters
+  * must be [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html compiled and installed as module]
 
 = Download =
 {{{
