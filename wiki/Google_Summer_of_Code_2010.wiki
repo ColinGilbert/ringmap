@@ -10,8 +10,8 @@ Through participation in the [http://code.google.com/soc/ GSoC] we hope to achie
  * Porting the *ringmap* capturing stack to _*FreeBSD-8*_
  * Implementing new features into *ringmap*
 
-
-= 1. Porting ringmap to 10GbE Intel Network Adapters =
+= "Ideas" list =
+== 1. Porting ringmap to 10GbE Intel Network Adapters ==
 
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
@@ -32,7 +32,7 @@ The hardware infrastructure and testbed for implementation and testing will be p
  * Understanding of BSD kernel programming and debugging.
 
 
-= 2. Porting the ringmap capturing stack to FreeBSD-8 =
+== 2. Porting the ringmap capturing stack to FreeBSD-8 ==
 
 Technical Contact: [http://www.net.t-labs.tu-berlin.de/people/jan.shtml Jan Böttger]
 
@@ -47,7 +47,7 @@ The hardware infrastructure and testbed for implementation and testing will be p
  * Understanding of BSD kernel programming.
 
   
-= 3. Implementing Load-Balancing functionality for ixgb driver =
+== 3. Implementing Load-Balancing functionality for ixgb driver ==
 
 Technical Contact: Robin Sommer
 
