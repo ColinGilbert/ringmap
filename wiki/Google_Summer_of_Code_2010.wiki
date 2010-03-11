@@ -50,7 +50,7 @@ The hardware infrastructure and testbed for implementation and testing will be p
 
 <br>
 
-== 3. Implementing Load-Balancing functionality for ixgb driver ==
+== 3. Implementing Load-Balancing functionality for ringmap stack ==
 
 Technical Contact: Robin Sommer
 
