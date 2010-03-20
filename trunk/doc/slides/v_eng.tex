@@ -4,8 +4,6 @@
 \usepackage{graphics}
 \usepackage{textcomp}
 \usepackage{url}
-%\usepackage{wrapfig}
-%\usepackage{picins}
 \graphicspath{./pics/}
 \usetheme{INET}
 \title{Improving FreeBSD Packet Capturing}
@@ -42,10 +40,9 @@
 \subsection*{Problem}
 \begin{frame}
 \frametitle{Problem}
-\textbf{Problems during capturing}
+\textbf{Problems arising during packet capturing:}
 \begin{itemize}
-	\item High CPU load
-	\item Packets loss
+	\item High CPU-load and packet loss
 		\begin{itemize}
 			\item \ldots by high bit rates  \newline
 		\end{itemize}
@@ -53,7 +50,7 @@
 \begin{figure}[H] 
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/sysload_generic_slide}}
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/pktlos_generic_slide}}
-	\caption{CPU load and packet loss by capturing of  64 bytes packets with the standard FreeBSD Capturing software (Bezier lines)}
+	\caption{CPU-load and packet loss by capturing of  64 bytes packets with the standard FreeBSD Capturing software (Bezier lines)}
 \end{figure}
 \end{frame}
 
@@ -71,7 +68,7 @@
 			\item etc\ldots\newline
 \end{itemize}
 \begin{small}
-	\item [$\Rightarrow$] The capturing software stack for FreeBSD was
+	\item [$\Rightarrow$] may be the capturing software for FreeBSD was
 		developed at a time when  network data-rates were low enough relative
 		to hardware processing resources such that capturing loss problems did
 		not arise.
@@ -165,59 +162,18 @@
 \end{itemize}
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\begin{frame}
-%\frametitle{FreeBSD-Packet-Capturing-Stack}
-%\begin{columns}
-%\column[t]{0.5\textwidth}
-%\only<4->{\textbf{Userspace-Anwendung:}}
-%			\begin{itemize}
-%				\item<4->Systemaufrufe oder \textbf{Libpcap}
-%					\begin{itemize}
-%						\item <4->Paketzugriff
-%						\item <4->Setzen der Filterregeln
-%					\end{itemize}
-%			\end{itemize}
-%\only<3->{\textbf{Berkley-Packet-Filter (BPF):}}
-%				\begin{itemize}
-%					\item <3->Software zur Paket-Filterung
-%				\end{itemize}
-%\textbf{Netzwerktreiber:}
-%		\begin{itemize}
-%			\item <1->Kernel-Thread
-%					\begin{itemize}
-%						\item<2->$\Rightarrow$ Protokoll-Stack
-%						\item<2->$\Rightarrow$ Berkley-Packet-Filter
-%					\end{itemize}
-%			\item <1->Interrupt-Service-Routine (\textbf{ISR})
-%					\begin{itemize}
-%						\item <1->Herausf. der Interrupt-Ursache
-%						\item <1->Planen der Kernel-Threads
-%					\end{itemize}
-%		\end{itemize}
-%\column[t]{0.5\textwidth}
-%\vspace{-2em}
-%\begin{figure}
-%	\only<1>{\includegraphics [height=65mm,width=54mm]{pics/PCS_funcs_Treiber}}
-%	\only<2>{\includegraphics [height=65mm,width=54mm]{pics/PCS_funcs_KT}}
-%	\only<3>{\includegraphics [height=65mm,width=54mm]{pics/PCS_funcs_BPF}}
-%	\only<4>{\includegraphics [height=65mm,width=54mm]{pics/PCS_funcs}}
-%\end{figure}
-%\end{columns}
-%\end{frame}
-
 \subsection*{Capturing}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 	\begin{center}
-	\huge{Weg eines Paketes beim Capturing im RAM}
+	\huge{The way of the packet during capturing}
 	\end{center}
 \end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{FreeBSD-Packet-Capturing-Stack}
+\frametitle{FreeBSD Packet Capturing Stack}
 \begin{columns}
 \column[t]{0.5\textwidth}
 \vspace{0em}
@@ -253,19 +209,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %	Description of Task, Goal, Aufgabenstellung
-\section{L"osungsansatz}
+\section{Approach to a solution}
 
 \begin{frame}
 	\begin{center}
-	\huge{L"osungsansatz}
+	\huge{Approach to a solution}
 	\end{center}
 \end{frame}
 
 
-\subsection*{Definitionen}
+\subsection*{Capturing stacks}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Packet-Capturing-Stacks}
+\frametitle{Packet Capturing Stacks}
 \textbf{ringmap:}
 \begin{itemize}
 	\item Der neue im Rahmen der Diplomarbeit entwickelte Packet-Capturing-Stack.
@@ -273,7 +229,7 @@
 \end{itemize}
 \textbf{generic:}
 \begin{itemize}
-	\item Standard Packet-Capturing-Stack im FreeBSD-\textbf{7.x}\newline
+	\item Standard Packet Capturing Stack in FreeBSD-\textbf{7.x}\newline
 \end{itemize}
 Wo finden die "Anderungen im \textbf{generic}-Stack statt ?
 \end{frame}
@@ -337,17 +293,17 @@ Wo finden die "Anderungen im \textbf{generic}-Stack statt ?
 \end{center}
 \end{frame}
 
-\section{Leistungsbewertung}
+\section{Performance evaluation}
 \begin{frame}
 	\begin{center}
-	\huge{Leistungsbewertung}
+	\huge{Performance evaluation}
 	\end{center}
 \end{frame}
 
-\subsection*{Ziel der Messungen}
+\subsection*{Goal of measurements}
 
 \begin{frame}
-\frametitle{Ziel der Messungen}
+\frametitle{Goal of measurements}
 \begin{itemize}
 	\item Leistungsbewertung von \textbf{ringmap}-Capturing-Stack
 		\begin{itemize}
@@ -385,10 +341,10 @@ Capturing in Abh"angigkeit von unterschiedlichen:\newline
 \normalcolor
 \end{frame}
 
-\subsection*{Messaufbau}
+\subsection*{Testbed}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Messaufbau}
+\frametitle{Testbed}
 \begin{center}
 \includegraphics [height=0.68\textheight]{pics/Messaufbau}
 \end{center}
@@ -534,15 +490,15 @@ F"ur jedes Experiment werden Datenstr"ome mit den unterschiedlichen Parametern  
 \end{center}
 \end{frame}
 
-\section{Zusammenfassung}
+\section{Summary}
 \begin{frame}
 	\begin{center}
-	\huge{Zusammenfassung}
+	\huge{Summary}
 	\end{center}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Erreichte Ziele}
+\frametitle{Achieved goals}
 \begin{itemize}
 	\item Verbesserung der Capturing-Performance
 		\begin{itemize}
@@ -567,7 +523,7 @@ F"ur jedes Experiment werden Datenstr"ome mit den unterschiedlichen Parametern  
 \end{frame}
 
 \begin{frame}
-\frametitle{Zuk"unftige Themen}
+\frametitle{Future works}
 \begin{itemize}
 	\item Performance-Vergleich mit FreBSD-8.x
 		\begin{itemize}
@@ -580,15 +536,6 @@ F"ur jedes Experiment werden Datenstr"ome mit den unterschiedlichen Parametern  
 		\end{itemize}
 \end{itemize}
 \end{frame}
-
-\subsection*{Fragen}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-	\begin{center}
-	\huge{Fragen}
-	\end{center}
-\end{frame}
-
 
 %\begin{frame}
 %\frametitle{Weg eines Paketes. Hardware View}
@@ -996,89 +943,3 @@ F"ur jedes Experiment werden Datenstr"ome mit den unterschiedlichen Parametern  
 %
 %
 \end{document}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Bericht: PCI Express - Die Grundlagen 
-% http://www.computerbase.de/artikel/hardware/mainboards/2004/bericht_pci_express_die_grundlagen/
-
-
-%\begin{frame}
-%\frametitle{Worum es geht}
-%{\large \textbf{Packet-Capturing (sniffing):}}\\
-%\begin{itemize} 
-%	\item Zuh"oren eines Netzwerk-Ger"ates f"ur Empfangen von Netzwerkpaketen
-%	\item Filtern bzw. Bearbeiten der empfangenen Pakete
-%	\item Aufzeichnen der Pakete
-%\end{itemize}
-%\end{frame}
-
-%	Analysis of Problem
-%\section{Analyse des Problem}
-%
-%\begin{frame}
-%\frametitle{Analyse des Problem}
-%	Was ist zu analysieren ?\newline \\
-%	\begin{itemize}
-%	\item Weg eines Paketes bei capturing
-%		\begin{itemize}
-%		\item Hardware View
-%		\item Software View: OS FreeBSD
-%		\end{itemize}
-%	\end{itemize}
-%	\begin{itemize}
-%	\item M"ogliche Ursachen des Paketverlustes
-%		\begin{itemize}
-%		\item Herausfinden von Engp"assen
-%		\end{itemize}
-%	\end{itemize}
-%\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%\begin{frame}
-%\frametitle{Ausgangszustand. Generic-Capturing-Stack: Probleme}
-%Performanz-Probleme beim \textbf{generic}-Packet-Capturing-Stack: \newline
-%\begin{itemize}
-%	\item Systemaufruf zum Kopieren des Paketes in den Userspace:
-%		\begin{itemize}
-%			\item Kontextwechsel 
-%		\end{itemize}
-%	\item Zu viele Paket-Kopie-Operationen im Kernelspace
-%		\begin{itemize}
-%			\item Paket-Puffer $\Rightarrow$ BPF-Puffer
-%			\item BPF-Puffer $\Rightarrow$ User-Puffer 
-%		\end{itemize}
-%	\item Speicherallozierungen
-%		\begin{itemize}
-%			\item Der Treiber alloziert den Speicher f"ur jedes 
-%				neue angekommene Paket
-%		\end{itemize}
-%
-%\end{itemize}
-%\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\begin{frame}
-%\frametitle{Eine m"ogliche L"osung: Zero-Copy-BPF-Buffers}
-%\begin{columns}
-%\column[t]{0.5\textwidth}
-%\vspace{-14em}
-%\begin{itemize}
-%	\item \textbf{BPF-Puffer} in den Userspace einblenden
-%	\item Kein Systemaufruf wird f"ur den Paketzugriff gebraucht
-%	\item Libpcap-Funktionen werden angepasst um auf die Pakete 
-%		im \emph{shared memory} zu zugreifen
-%\end{itemize}
-%\column[t]{0.6\textwidth}
-%	%\vspace{-20em}
-%%\begin{center}
-%	\includegraphics [height=0.65\textheight]{pics/2copy_new}
-%%\end{center}
-%\end{columns}
-%\end{frame}
-%
-
-
-
