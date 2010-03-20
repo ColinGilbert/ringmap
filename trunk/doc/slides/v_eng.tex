@@ -50,11 +50,11 @@
 \begin{figure}[H] 
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/sysload_generic_slide}}
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/pktlos_generic_slide}}
-	\caption{CPU-load and packet loss by capturing of  64 bytes packets with the standard FreeBSD Capturing software (Bezier lines)}
+	\caption{CPU-load and packet loss by capturing of  64 bytes packets with the standard FreeBSD Capturing software (Bezier curves)}
 \end{figure}
 \end{frame}
 
-\subsection*{Grund des Problems}
+\subsection*{The reason of the Problems}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{The reason of the Problems}
@@ -129,9 +129,19 @@
 \column[t]{0.5\textwidth}
 \vspace{-15em}
 \begin{enumerate}
-	\item \textbf{Receiving} network packets \newline
-	\item \textbf{Filtering} the received packets \newline
-	\item \textbf{Storing} the packets to the hard drive
+	\item \textbf{Receiving} network packets
+		\begin{itemize}
+			\item receive by network adapter
+			\item DMA transfer in RAM \newline
+		\end{itemize}
+	\item \textbf{Filtering} the received packets 
+		\begin{itemize}
+			\item using software to filter the traffic (e.g. \emph{BPF})\newline
+		\end{itemize}
+	\item \textbf{Storing} to the hard drive
+		\begin{itemize}
+			\item due to a system call (\emph{write()})
+		\end{itemize}
 \end{enumerate}
 \column[t]{0.5\textwidth}
 \includegraphics [width=0.82\textwidth, keepaspectratio]{pics/HardwareView}
@@ -173,34 +183,38 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{FreeBSD Packet Capturing Stack}
+\frametitle{FreeBSD-7 Packet Capturing Stack}
 \begin{columns}
 \column[t]{0.5\textwidth}
 \vspace{0em}
 \begin{itemize}
-\item <5->[3.]Zugriff auf Pakete
+\item <7-> Access packets
 	\begin{itemize}
-		\item <5->mit dem \emph{read}-Systemaufruf
-		\item <5->BPF-Puffer $\Rightarrow$ 	User-Puffer	\newline
+		\item <7->due to the \emph{read}-Syscall
+		\item <7->BPF-Buffer $\Rightarrow$ 	User-Buffer
 	\end{itemize}
-\item <3->[2.]Paket-Filterung
+\item <5-> Packet filtering
 	\begin{itemize}
-		\item <4->Filtern der Pakete und 
-		\item <4->Paket-Puffer $\Rightarrow$ BPF-Puffer \newline
+		\item <5->Filtering the packets 
+		\item <6->Packet-Buffer $\Rightarrow$ BPF-Buffer
 	\end{itemize}
-\item <1->[1.]DMA-Transfer
+\item <4-> Interrupt Service Routine
+\item <3-> Interrupt
+\item <2-> DMA-Transfer
 	\begin{itemize}
-		\item <1->Adapter-FIFO $\Rightarrow$ Paket-Ring-Puffer
+		\item <2->Adapter-FIFO $\Rightarrow$ Packet-Buffer
 	\end{itemize}
 \end{itemize}
 \column[t]{0.5\textwidth}
 \vspace{-2em}
 \begin{figure}
 	\only<1>{\includegraphics [height=64mm,width=60mm]{pics/3copy_0}}
-	\only<2>{\includegraphics [height=64mm,width=60mm]{pics/3copy_1}}
-	\only<3>{\includegraphics [height=64mm,width=60mm]{pics/3copy_1_1}}
-	\only<4>{\includegraphics [height=64mm,width=60mm]{pics/3copy_2}}
-	\only<5>{\includegraphics [height=64mm,width=60mm]{pics/3copy_3}}
+	\only<2>{\includegraphics [height=64mm,width=60mm]{pics/3copy_0.5.eps}}
+	\only<3>{\includegraphics [height=64mm,width=60mm]{pics/3copy_0.7.eps}}
+	\only<4>{\includegraphics [height=64mm,width=60mm]{pics/3copy_1}}
+	\only<5>{\includegraphics [height=64mm,width=60mm]{pics/3copy_1_1}}
+	\only<6>{\includegraphics [height=64mm,width=60mm]{pics/3copy_2}}
+	\only<7>{\includegraphics [height=64mm,width=60mm]{pics/3copy_3}}
 \end{figure}
 \end{columns}
 \end{frame}
@@ -224,29 +238,29 @@
 \frametitle{Packet Capturing Stacks}
 \textbf{ringmap:}
 \begin{itemize}
-	\item Der neue im Rahmen der Diplomarbeit entwickelte Packet-Capturing-Stack.
-	\item Baut auf dem \textbf{generic}-Stack auf, jedoch stark ver"andert.\newline
+	\item Our new packet capturing stack.
+	\item Based on \textbf{generic}-Stack, but "`a little"' changed.\newline
 \end{itemize}
 \textbf{generic:}
 \begin{itemize}
 	\item Standard Packet Capturing Stack in FreeBSD-\textbf{7.x}\newline
 \end{itemize}
-Wo finden die "Anderungen im \textbf{generic}-Stack statt ?
+\only<2>{Where the changes are taking place?}
 \end{frame}
 
 
-\subsection*{"Anderungen im generic-Stack}
+\subsection*{Changes in generic-Stack}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Was wird im generic ge"andert}
+\frametitle{What is in generic changed}
 \begin{columns}
 \column[t]{0.5\textwidth}
 \begin{itemize}
-	\item <2->TCP/IP-Stack Deaktivieren\newline
-	\item <3->Keine Optimierung f"ur Paketaufzeichnung\newline
-	\item <4->Kernel-Thread, BPF und Libpcap werden optimiert\newline
+	\item <2->Disable TCP/IP-Stack\newline
+	\item <3->No optimization for storing the packets\newline
+	\item <4->Kernel-Thread, BPF and Libpcap will be optimized\newline
 		\begin{itemize}
-			\item <4->ISR wird nicht ge"andert
+			\item <4->ISR is not changed
 		\end{itemize}
 \end{itemize}
 \column[t]{0.5\textwidth}
