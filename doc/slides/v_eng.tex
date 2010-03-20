@@ -87,14 +87,17 @@
 	\item Increase the capturing performance on FreeBSD
 		\begin{itemize}
 			\item Design and implementation the new capturing software to
-				minimize the \textbf{packet loss} and \textbf{cpu load} during capturing. \newline
+				minimize the \textbf{packet loss} and \textbf{cpu load} during capturing. \newline \newline
 		\end{itemize}
 \end{itemize}
 %\begin{large}
 \textbf{Conditions:}
 %\end{large}
 \begin{itemize}
-	\item Hardware: \emph{Intel Gigabit Ethernet Adapter}
+	\item Hardware: One of the following \emph{Intel GbE Adapters}
+		\begin{itemize}
+			\item \small{\emph{82540EP/EM, 82541xx, 82544GC/EI, 82545GM/EM, 82546GB/EB, 82547xx}}
+		\end{itemize}
 	\item Software:	\emph{FreeBSD-\textbf{7.x}}
 \end{itemize}
 \end{frame}
@@ -165,8 +168,8 @@
 			\item Access to the received packets
 			\item Initiates:
 				\begin{itemize}
-					\item Storing of packets to hard drive
-					\item Output packet information to the terminal
+					\item storing of packets to hard drive
+					\item output packet information to the terminal
 				\end{itemize}
 		\end{itemize}
 \end{itemize}
@@ -243,9 +246,11 @@
 \end{itemize}
 \textbf{generic:}
 \begin{itemize}
-	\item Standard Packet Capturing Stack in FreeBSD-\textbf{7.x}\newline
+	\item Standard Packet Capturing Stack in FreeBSD-\textbf{7.x}\newline \newline
 \end{itemize}
-\only<2>{Where the changes are taking place?}
+\begin{center}
+\only<2>{\Large{Where the changes are taking place?}}
+\end{center}
 \end{frame}
 
 
@@ -256,9 +261,9 @@
 \begin{columns}
 \column[t]{0.5\textwidth}
 \begin{itemize}
-	\item <2->Disable TCP/IP-Stack\newline
+	\item <2->Disabled TCP/IP-Stack\newline
 	\item <3->No optimization for storing the packets\newline
-	\item <4->Kernel-Thread, BPF and Libpcap will be optimized\newline
+	\item <4->Kernel-Thread, BPF and Libpcap will be changed\newline
 		\begin{itemize}
 			\item <4->ISR is not changed
 		\end{itemize}
