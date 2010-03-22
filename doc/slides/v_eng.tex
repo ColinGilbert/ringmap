@@ -277,20 +277,21 @@
 \end{columns}
 \end{frame}
 
-\subsection*{Vom generic zum ringmap}
+\subsection*{From generic to ringmap}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-\frametitle{Vom generic zum ringmap}
+\frametitle{From generic to ringmap}
 \begin{columns}
 \column[t]{0.5\textwidth}
 \vspace{-1em}
 \begin{itemize}
-	\item<2->Eliminieren Kopie-Vorg"ange und Systemaufrufe
-	\item<3->BPF-Puffer wird nicht mehr gebraucht
-	\item<4->Paket-Puffer in den Userspace einblenden
-	\item<5->BPF in den Userspace verschieben
-	\item<6->\textbf{ringmap}-Packet-Capturing-Stack
+	\item<1->\textbf{generic}
+	\item<2->Eliminate packet copies  and syscalls
+	\item<3->BPF-Buffer is then no necessary
+	\item<4->Mapping the Packet-Buffer to Userspace
+	\item<5->Move BPF to Userspace
+	\item<6->\textbf{ringmap}
 \end{itemize}
 \column[t]{0.5\textwidth}
 \vspace{-2em}
