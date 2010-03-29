@@ -3,13 +3,12 @@
 
 = Requirements =
 == Hardware ==
- * *[http://en.wikipedia.org/wiki/X86 x86]* or *[http://en.wikipedia.org/wiki/X86-64 x86-64]* - microprocessor architecture
- * One of Intel Gigabit Ethernet Adapters:
-  * _82540EP/EM, 82541xx, 82544GC/EI, 82545GM/EM, 82546GB/EB, 82547xx_
+ * Gigabit Ethernet adapters based on the following Intel controller chips:
+  * _82540, 82541ER, 82541PI, 82542, 82543, 82544, 82545, 82546, 82546EB, 82546GB, 82547, 82571, 82572 and 82573_
 
-== Software ==
- * FreeBSD-*7.x*, - *8.x*, *i386*-Kernel
- * *em*, *igb*, *ixgb* drivers for Intel GbE adapters
+== Software == 
+ * FreeBSD-*7.x*, *i386*-Kernel
+ * *em* driver for Intel GbE adapters
   * must be [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html compiled and installed as module]
 
 = Download =
