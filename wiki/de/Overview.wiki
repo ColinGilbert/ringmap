@@ -11,7 +11,7 @@ untersucht werden können.
 
 Die Hardwareressourcen eines Computers wie Bandbreite der internen Bussen,
 CPU-Zyklen-Rate und Speicher (RAM und Hintergrundspeicher) sind begrenzt. Das
-hat zur Folge, dass die Menge der ankommenden Paketen, die ein Computer pro
+hat zur Folge, dass die Menge der ankommenden Pakete, die ein Computer pro
 Zeitintervall bearbeiten und speichern kann, auch nicht unendlich groß ist.
 Die "Geschwindigkeit" des Datentransports zwischen einem  Peripherie-Gerät
 und RAM  ist durch die Bandbreite des Bussystem begrenzt. Die Anzahl der im RAM
