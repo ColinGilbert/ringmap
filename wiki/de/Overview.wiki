@@ -1,13 +1,42 @@
-#summary About Project.
+﻿#summary About Project.
 #sidebar TableOfContents
 <wiki:toc max_depth="1" />
 
-= Introduction =
-Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately, at line-rate speeds, it is often impossible to capture every packet arriving at a network interface. Hardware may not be the only bottleneck, however, as inefficient software is also to blame for poor resources usage and resulting packet loss during capture.
+= Einleitung =
+Paket-Capturing oder _Sniffing_ ist der Prozess des Abfangens von
+Netzwerkpaketen, mit dem Ziel diese zu speichern, zu analysieren und
+darzustellen. Aufgrund der limitierten Rechnerleistung und Ineffizienz der
+Software, kommt es leider oft dazu, dass nicht alle Pakete aus dem Netz
+untersucht werden können.
 
-Problems arising during packet capturing: 
- * Packet loss
- * High CPU-load
+Die Hardwareressourcen eines Computers wie Bandbreite der internen Bussen,
+CPU-Zyklen-Rate und Speicher (RAM und Hintergrundspeicher) sind begrenzt. Das
+hat zur Folge, dass die Menge der ankommenden Paketen, die ein Computer pro
+Zeitintervall bearbeiten und speichern kann, auch nicht unendlich groß ist.
+Die "Geschwindigkeit" des Datentransports zwischen einem  Peripherie-Gerät
+und RAM  ist durch die Bandbreite des Bussystem begrenzt. Die Anzahl der im RAM
+befindlichen Pakete, die sich pro Zeitintervall bearbeiten bzw.
+filtern lässt ist sowohl von der Leistung  des Prozessorbusses als auch von der
+CPU-Leistung abhängig. Wenn die empfangenen Pakete auf die Festplatte
+geschrieben werden sollen, geschieht dies auch nicht schneller, als es der
+Hintergrundspeicher erlaubt. Jede von den obengenannten Hardwarebegrenzungen
+kann Datenverluste bei Capturing verursachen, wenn die Rate der ankommenden
+Pakete über die Performance-Grenzen der darunterliegenden Hardwarekomponenten
+steigt.
+
+Aber nicht nur die Hardware stellt einen Flaschenhals für die Datenbearbeitung
+in einem Rechnersystem dar. Die Hardwareressourcen können von der Software
+ineffektiv benutzt werden. Zum Beispiel: wenn ein Programm wesentlich mehr
+Operationen ausführt, als zur Lösung des Problems nötig wären, dann erzeugt es
+einen unnötig hohe Systemlast und reduziert damit die Datenmengen, die es in
+einem Zeitintervall bearbeiten könnte.
+ 
+Das Ziel dieser Diplomarbeit ist es, die für Capturing relevante Komponente des
+Betriebssystem FreeBSD zu untersuchen, die potentiellen "Engstellen" in der
+Software, die zu den Datenverlusten führen können,  herauszufinden, und
+effiziente Algorithmen zur Erhöhung des Datendurchsatzes und Reduzierung der
+Systemauslates beim Capturing zu erarbeiten und zu implementieren.
+
 
 = Definitions = 
 *Packet capturing stack* (the software used for capturing packets): 
