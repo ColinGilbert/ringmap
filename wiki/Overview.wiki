@@ -5,13 +5,6 @@
 = Introduction =
 Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately, at line-rate speeds, it is often impossible to capture every packet arriving at a network interface. Hardware may not be the only bottleneck, however, as inefficient software is also to blame for poor resources usage and resulting packet loss during capture. The goal of this project is to develop the new packet capturing software for _FreeBSD_ and integrate it with the drivers for [http://www.intel.com/support/network/adapter/ Intel Gigabit Ethernet adapters] ([http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+8.0-RELEASE em], [http://www.freebsd.org/cgi/man.cgi?query=igb&manpath=FreeBSD+8.0-RELEASE igb], [http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+8.0-RELEASE ixgb], [http://www.freebsd.org/cgi/man.cgi?query=ixgbe&apropos=0&sektion=0&manpath=FreeBSD+8.0-RELEASE&format=html ixgbe]) and [http://www.tcpdump.org/ libpcap].
 
-= Definitions = 
-*Packet capturing stack* (the software used for capturing packets): 
- * Network adapter driver
- * Software to analyze and filter received packets
-  * [http://en.wikipedia.org/wiki/Berkeley_Packet_Filter Berkeley Packet Filter]
- * Software to  access received packets from user-space
-  * mostly based on _[http://www.tcpdump.org/ libpcap]_ library 
 
 = Project Goal =
 Implement new software components for efficient packet capturing at 1G (and [http://code.google.com/p/ringmap/wiki/Google_Summer_of_Code_2010#1._Porting_ringmap_to_10GbE_Intel_Network_Adapters in the future 10G]) in [http://www.freebsd.org FreeBSD] while  minimizing CPU-load and packet loss. These components are realized as the new (*ringmap*) *FreeBSD packet capturing stack*:
@@ -20,6 +13,17 @@ Implement new software components for efficient packet capturing at 1G (and [htt
  * System calls to control the capturing
 
 The new implemented software must be transparent for user-space applications. Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with the new *ringmap* network driver and new modified _libpcap_. 
+
+
+= Definitions = 
+*Packet capturing stack* (the software used for capturing packets): 
+ * Network adapter driver
+ * Software to analyze and filter received packets
+  * [http://en.wikipedia.org/wiki/Berkeley_Packet_Filter Berkeley Packet Filter]
+ * Software to  access received packets from user-space
+  * mostly based on _[http://www.tcpdump.org/ libpcap]_ library 
+
+
 
 = Requirements =
 == Hardware ==
