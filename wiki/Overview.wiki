@@ -24,7 +24,6 @@ The new implemented software must be transparent for user-space applications. Na
   * mostly based on _[http://www.tcpdump.org/ libpcap]_ library 
 
 
-
 = Requirements =
 == Hardware ==
  * Gigabit Ethernet adapters based on the following Intel controller chips:
