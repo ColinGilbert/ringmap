@@ -32,10 +32,11 @@ einen unnötig hohe Systemlast und reduziert damit die Datenmengen, die es in
 einem Zeitintervall bearbeiten könnte.
  
 Das Ziel dieser Diplomarbeit ist es, die für Capturing relevante Komponente des
-Betriebssystem FreeBSD zu untersuchen, die potentiellen "Engstellen" in der
-Software, die zu den Datenverlusten führen können,  herauszufinden, und
-effiziente Algorithmen zur Erhöhung des Datendurchsatzes und Reduzierung der
-Systemauslates beim Capturing zu erarbeiten und zu implementieren.
+Betriebssystem [http://www.freebsd.org  FreeBSD] zu untersuchen, die
+potentiellen "Engstellen" in der Software, die zu den Datenverlusten führen
+können,  herauszufinden, und effiziente Algorithmen zur Erhöhung des
+Datendurchsatzes und Reduzierung der Systemauslates beim Capturing zu
+erarbeiten und zu implementieren.
 
 
 = Definitions = 
