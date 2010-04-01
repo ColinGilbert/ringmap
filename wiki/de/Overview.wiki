@@ -9,22 +9,7 @@ darzustellen. Aufgrund der limitierten Rechnerleistung und Ineffizienz der
 Software, kommt es leider oft dazu, dass nicht alle Pakete aus dem Netz
 untersucht werden können.
 
-Die Hardwareressourcen eines Computers wie Bandbreite der internen Bussen,
-CPU-Zyklen-Rate und Speicher (RAM und Hintergrundspeicher) sind begrenzt. Das
-hat zur Folge, dass die Menge der ankommenden Pakete, die ein Computer pro
-Zeitintervall bearbeiten und speichern kann, auch nicht unendlich groß ist.
-Die "Geschwindigkeit" des Datentransports zwischen einem  Peripherie-Gerät
-und RAM  ist durch die Bandbreite des Bussystem begrenzt. Die Anzahl der im RAM
-befindlichen Pakete, die sich pro Zeitintervall bearbeiten bzw.
-filtern lässt ist sowohl von der Leistung  des Prozessorbusses als auch von der
-CPU-Leistung abhängig. Wenn die empfangenen Pakete auf die Festplatte
-geschrieben werden sollen, geschieht dies auch nicht schneller, als es der
-Hintergrundspeicher erlaubt. Jede von den obengenannten Hardwarebegrenzungen
-kann Datenverluste bei Capturing verursachen, wenn die Rate der ankommenden
-Pakete über die Performance-Grenzen der darunterliegenden Hardwarekomponenten
-steigt.
-
-Aber nicht nur die Hardware stellt einen Flaschenhals für die Datenbearbeitung
+Nicht nur die Hardware stellt einen Flaschenhals für die Datenbearbeitung
 in einem Rechnersystem dar. Die Hardwareressourcen können von der Software
 ineffektiv benutzt werden. Zum Beispiel: wenn ein Programm wesentlich mehr
 Operationen ausführt, als zur Lösung des Problems nötig wären, dann erzeugt es
