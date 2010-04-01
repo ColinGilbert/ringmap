@@ -31,7 +31,7 @@ Operationen ausführt, als zur Lösung des Problems nötig wären, dann erzeugt 
 einen unnötig hohe Systemlast und reduziert damit die Datenmengen, die es in
 einem Zeitintervall bearbeiten könnte.
  
-Das Ziel dieser Diplomarbeit ist es, die für Capturing relevante Komponente des
+Das Ziel dieses Projektes ist es, die für Capturing relevante Komponente des
 Betriebssystem [http://www.freebsd.org  FreeBSD] zu untersuchen, die
 potentiellen "Engstellen" in der Software, die zu den Datenverlusten führen
 können,  herauszufinden, und effiziente Algorithmen zur Erhöhung des
