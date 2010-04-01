@@ -3,11 +3,7 @@
 <wiki:toc max_depth="1" />
 
 = Introduction =
-Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately, at line-rate speeds, it is often impossible to capture every packet arriving at a network interface. Hardware may not be the only bottleneck, however, as inefficient software is also to blame for poor resources usage and resulting packet loss during capture.
-
-Problems arising during packet capturing: 
- * Packet loss
- * High CPU-load
+Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately, at line-rate speeds, it is often impossible to capture every packet arriving at a network interface. Hardware may not be the only bottleneck, however, as inefficient software is also to blame for poor resources usage and resulting packet loss during capture. The goal of this project is to develop the new packet capturing software for _FreeBSD_ and integrate it with the drivers for [http://www.intel.com/support/network/adapter/ Intel Gigabit Ethernet adapters] ([http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+8.0-RELEASE em], [http://www.freebsd.org/cgi/man.cgi?query=igb&manpath=FreeBSD+8.0-RELEASE igb], [http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+8.0-RELEASE ixgb], [http://www.freebsd.org/cgi/man.cgi?query=ixgbe&apropos=0&sektion=0&manpath=FreeBSD+8.0-RELEASE&format=html ixgbe]) and [http://www.tcpdump.org/ libpcap].
 
 = Definitions = 
 *Packet capturing stack* (the software used for capturing packets): 
