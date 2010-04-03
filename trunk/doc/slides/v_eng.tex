@@ -108,16 +108,13 @@
 \begin{itemize}
 	\item Eliminating the packet copy operations
 		\begin{itemize}
-			\item [$\Rightarrow$] by using shared memory buffers (\emph{memory \textbf{mapping}})\newline
+			\item by using shared memory buffers (\emph{memory \textbf{mapping}})\newline
 		\end{itemize}
 	\item Eliminating the memory allocations
 		\begin{itemize}
-			\item [$\Rightarrow$] by using \textbf{ring} buffers\newline
+			\item by using \textbf{ring} buffers\newline \newline
 		\end{itemize}
-	\item The name of our capturing stack: 
-		\begin{itemize}
-			\item $ring + mapping = \textbf{ringmap}$
-		\end{itemize}
+	\item<2->[$\Rightarrow$] $ring + mapping = \textbf{ringmap}$
 \end{itemize}
 \end{frame}
 
@@ -289,6 +286,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
+	\begin{center}
+	\huge{From generic to ringmap}
+	\end{center}
+\end{frame}
+
+\begin{frame}
 \frametitle{From generic to ringmap}
 \begin{columns}
 \column[t]{0.5\textwidth}
@@ -297,9 +300,9 @@
 	\item<1->\textbf{generic}
 	\item<2->Eliminate packet copies  and syscalls
 	\item<3->BPF-Buffer is then no necessary
-	\item<4->Mapping the Packet-Buffer to Userspace
-	\item<5->Move BPF to Userspace
-	\item<6->\textbf{ringmap}
+	\item<4->Mapping the Packet-Buffer to user-space
+	\item<5->Move BPF to Userspace\newline
+	\item<6->[$\Rightarrow$]\textbf{ringmap}
 \end{itemize}
 \column[t]{0.5\textwidth}
 \vspace{-2em}
@@ -324,7 +327,7 @@
 \section{Performance evaluation}
 \begin{frame}
 	\begin{center}
-	\huge{Performance evaluation}
+	\huge{Measurement and  performance evaluation}
 	\end{center}
 \end{frame}
 
@@ -333,36 +336,35 @@
 \begin{frame}
 \frametitle{Goal of measurements}
 \begin{itemize}
-	\item Leistungsbewertung von \textbf{ringmap}-Capturing-Stack
+	\item Performance of \textbf{ringmap} Capturing Stack
 		\begin{itemize}
-			\item CPU-Last und Paketverluste beim Capturing\newline
+			\item CPU-Load and packet loss during capturing\newline
 		\end{itemize}
-	\item Leistungsvergleich: \textbf{generic} vs. \textbf{ringmap}
+	\item Benchmarking: \textbf{generic} vs. \textbf{ringmap}
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Was wird gemessen ?}
-Gemessen werden  die \textbf{Paketverluste} und \textbf{CPU-Last} beim
-Capturing in Abh"angigkeit von unterschiedlichen:\newline
+\frametitle{What is measured ?}
+\textbf{packet loss} and \textbf{CPU-Load} as a function of :\newline
 \begin{itemize}
-	\item Verkehrsparameter
+	\item Traffic parameters
 		\begin{itemize}
-			\item Paketgr"o"se
-			\item Bit-Rate bzw. Paket-Rate
+			\item packet size
+			\item bit-rate and packet-rate
 		\end{itemize}
 
 \color{gray}
-	\item  Hardware-Komponenten
+	\item  Hardware components
 		\begin{itemize}
 \color{gray}
 			\item PCI vs. PCI-Express
-			\item Anzahl der CPUs
+			\item Number of CPUs
 		\end{itemize}
-	\item Treiber-Parameter
+	\item Driver parameters
 		\begin{itemize}
 \color{gray}
-			\item Gr"o"se des Paket-Puffers
+			\item Size of packet puffers 
 			\item etc\ldots
 		\end{itemize}
 \end{itemize}
