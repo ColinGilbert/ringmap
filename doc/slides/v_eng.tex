@@ -94,7 +94,7 @@
 \textbf{Conditions:}
 %\end{large}
 \begin{itemize}
-	\item Hardware: One of the following \emph{Intel GbE Adapters}
+	\item Hardware: One of the following \emph{Intel GbE Controllers}
 		\begin{itemize}
 			\item \small{\emph{82540EP/EM, 82541xx, 82544GC/EI, 82545GM/EM, 82546GB/EB, 82547xx}}
 		\end{itemize}
@@ -108,11 +108,15 @@
 \begin{itemize}
 	\item Eliminating the packet copy operations
 		\begin{itemize}
-			\item [$\Rightarrow$] by using shared memory buffers (\emph{memory mapping})\newline
+			\item [$\Rightarrow$] by using shared memory buffers (\emph{memory \textbf{mapping}})\newline
 		\end{itemize}
 	\item Eliminating the memory allocations
 		\begin{itemize}
-			\item [$\Rightarrow$] by using ring buffers
+			\item [$\Rightarrow$] by using \textbf{ring} buffers\newline
+		\end{itemize}
+	\item The name of our capturing stack: 
+		\begin{itemize}
+			\item $ring + mapping = \textbf{ringmap}$
 		\end{itemize}
 \end{itemize}
 \end{frame}
@@ -163,7 +167,7 @@
 		\begin{itemize}
 			\item Filtering the packets\newline
 		\end{itemize}
-	\item \textbf{Userspace application}
+	\item \textbf{User-space application}
 		\begin{itemize}
 			\item Access to the received packets
 			\item Initiates:
@@ -198,12 +202,12 @@
 	\end{itemize}
 \item <5-> Packet filtering
 	\begin{itemize}
-		\item <5->Filtering the packets 
+		\item <5->BPF 
 		\item <6->Packet-Buffer $\Rightarrow$ BPF-Buffer
 	\end{itemize}
 \item <4-> Interrupt Service Routine
 \item <3-> Interrupt
-\item <2-> DMA-Transfer
+\item <2-> DMA-Transfer:
 	\begin{itemize}
 		\item <2->Adapter-FIFO $\Rightarrow$ Packet-Buffer
 	\end{itemize}
@@ -242,7 +246,11 @@
 \textbf{ringmap:}
 \begin{itemize}
 	\item Our new packet capturing stack.
-	\item Based on \textbf{generic}-Stack, but "`a little"' changed.\newline
+	\item Based on \textbf{generic}-Stack: 		
+		\begin{itemize}
+			\item based on \emph{em} driver and \emph{libpcap}
+			\item but "`a little"' changed.\newline
+		\end{itemize}
 \end{itemize}
 \textbf{generic:}
 \begin{itemize}
@@ -304,10 +312,10 @@
 \end{columns}
 \end{frame}
 
-\subsection*{"Uberblick}
+\subsection*{Overview}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{"Uberblick: Kopie-Operationen}
+\frametitle{Overview}
 \begin{center}
 \includegraphics [height=65mm,width=115mm]{pics/Ueberblick_new}
 \end{center}
