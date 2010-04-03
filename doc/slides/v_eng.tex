@@ -336,7 +336,7 @@
 \begin{frame}
 \frametitle{Goal of measurements}
 \begin{itemize}
-	\item Performance of \textbf{ringmap} Capturing Stack
+	\item Conducting performance evaluations of \textbf{ringmap} capturing stack
 		\begin{itemize}
 			\item CPU-Load and packet loss during capturing\newline
 		\end{itemize}
@@ -382,49 +382,49 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Messaufbau}
-\only<1->{\textbf{Verkehrsgenerierung}}
+\frametitle{Measurement setup}
+\textbf{Traffic generation}
 \begin{itemize}
-	\item <1->Linux Kernel Packet Generator (\emph{pktgen})
+	\item Linux Kernel Packet Generator (\emph{pktgen})
 		\begin{itemize}
-			\item <1->Erzeugt Verkehr mit den unterschiedlichen Charakteristiken: 
+			\item generates network packets at very high speed with different: 
 				\begin{itemize}
-					\item <1->Paket-Gr"osse
-					\item <1->Bit-Rate bzw. Paket-Rate
-	%				\item <1->Paketenanzahl
+					\item packet sizes
+					\item bit-bate and packet-rate
 				\end{itemize}
 		\end{itemize}
 \end{itemize}
-\only<2->{\textbf{Capturing}}
+\textbf{Capturing}
 \begin{itemize}
-	\item <2->\textbf{ringmap} bzw. \textbf{generic}
-	\item <2->Libpcap-Anwendung
+	\item \textbf{ringmap} and \textbf{generic} stacks
+	\item Libpcap-application
 		\begin{itemize}
-			\item <2->Paketzugriff durch den Aufruf von \emph{pcap\_loop()}
-			\item <2->Z"ahlen der empfangenen Pakete
+			\item Packets access through call \emph{pcap\_loop()}
+			\item Counting the captured packets
 		\end{itemize}
 \end{itemize}
 \end{frame}
 
-\subsection*{Experimentbeschreibung}
+\subsection*{Experiment description}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Experiment-Parameter}
-F"ur jedes Experiment werden Datenstr"ome mit den unterschiedlichen Parametern  erzeugt: 
+\frametitle{Experiment parameters}
+For each experiment, data streams are generated with different parameters:
 \begin{itemize}
-	\item Konstante Parameter: 
+	\item Constant parameters: 
 		\begin{itemize}
-			\item Paket-L"ange
+			\item Packet size
 				\begin{itemize}
 					\item 64, 200, 300, 700, 1500
 				\end{itemize}
 		\end{itemize}
-	\item Variable Parameter: 
+	\item Variable parameters: 
 		\begin{itemize}
-			\item Bit-Rate bzw. Paket-Rate
+			\item bit-rate and packet-rate
 				\begin{itemize}
-					\item bis $1GBit/sec$
+					\item  $ > 1GBit/sec$
 				\end{itemize}
 		\end{itemize}
 \end{itemize}
@@ -433,40 +433,45 @@ F"ur jedes Experiment werden Datenstr"ome mit den unterschiedlichen Parametern  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Messwerte}
+\frametitle{Calculation of results}
 \begin{itemize}
 	\item System-Load
 		\begin{itemize}
-			\item Prozentueller Zeitanteil, den CPU im Systemmodus (\emph{protected mode}) verbringen
-			\item Interrupt-Load wird nich ber"ucksichtigt
+			\item Percentage proportion of time the CPU spent in system mode
+			\item Interrupt load is not considered
 				\begin{itemize}
-					\item bleibt immer gleich f"ur \textbf{generic} und \textbf{ringmap}
+					\item because of interrupt-throttling is always constant for \textbf{generic} and \textbf{ringmap}
 				\end{itemize}
 			\item $syst = 1 - intr - user - nice - idle$\newline
 		\end{itemize}
-	\item Paketverluste 
+	\item Packet loss
 		\begin{itemize}
-			\item Differenz zwischen den gesendeten und empfangenen Paketen
-			\item $Pakete_{loss} = Pakete_{send} - Pakete_{received}$
+			\item Difference between the generated and captured packets
+			\item $Packets_{loss} = Packets_{send} - Packets_{received}$
 		\end{itemize}
 \end{itemize}
 \end{frame}
 
-\subsection*{Ablauf des Experiments}
+\subsection*{Testing sequence}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Ablauf des Experiments}
+\frametitle{Testing sequence}
 \begin{enumerate}
-	\item \textbf{Starten des Capturing-Prozesses:}
+	\item Login to the Capturer to 
 		\begin{itemize}
-			\item Starten System-Last-Messung
+			\item start of capturing and 
+			\item system-load measurement applications 
 		\end{itemize}
-	\item \textbf{Generieren des Verkehrs:}
-		\begin{itemize}
-			\item mit einer bestimmten Paketmenge
-			\item mit einer bestimmten Bit-Rate bzw. Paket-Rate
-		\end{itemize}
-	\item \textbf{Stop Capturing- und Messung-Prozess}
+	\item Login to the Packet-Generator to 
+
+	\begin{itemize}
+		\item generate traffic with:
+				\begin{itemize}
+					\item a certain number of packets
+					\item a certain bit-rate and packet-rate
+				\end{itemize}
+	\end{itemize}
+	\item \textbf{Stop capturing- und Messung-Prozess}
 	\item \textbf{Speicherung der gemessenen Werte}
 \end{enumerate}
 \begin{itemize}
