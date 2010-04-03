@@ -479,7 +479,7 @@ For each experiment, data streams are generated with different parameters:
 	\item Storing of measured values
 \end{enumerate}
 \begin{itemize}
-	\item Each expensive is repeated five times
+	\item Each experiment is repeated five times
 	\item The mean and standard deviation is calculated
 \end{itemize}
 \end{frame}
@@ -494,28 +494,28 @@ For each experiment, data streams are generated with different parameters:
 			\item often kernel panics
 			\item [$\Rightarrow$] therefore max. $15000000 pkts$ per experiment\newline
 		\end{itemize}
-	\item Unm"oglich einen Verkehr mit einer beliebigen Paket- bzw. Bit-Rate zu erzeugen
+	\item Impossible to create traffic with any packet- or bit-rate
 		\begin{itemize}
-			\item Aufgrund von Interrupt-Throttling auf dem Paketgenerator-System
-			\item [$\Rightarrow$] deswegen nur bestimmte Messpunkte m"oglich\newline
+			\item because of Interrupt-Throttling
+			\item [$\Rightarrow$] therefore only certain measurement points \newline
 		\end{itemize}
 	\item Flow-Control
 		\begin{itemize}
-			\item begrenzt die Rate des erzeugten Verkehr
-			\item muss vor den Testabl"aufen abgeschaltet werden
+			\item limits the rate of generated traffic
+			\item [$\Rightarrow$] therefore must be switched off
 		\end{itemize}
 \end{itemize}
 \end{frame}
 
-\subsection*{Ergebnisse}
+\subsection*{Results}
 \begin{frame}
 	\begin{center}
-	\huge{Ergebnisse}
+	\huge{Results}
 	\end{center}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{generic vs. ringmap: Paketverluste}
+\frametitle{generic vs. ringmap: Packet loss}
 \begin{center}
 \includegraphics [height=0.81\textheight]{plots/pktloss_generic_vs_ringmap_mbs.eps}
 \end{center}
@@ -523,7 +523,7 @@ For each experiment, data streams are generated with different parameters:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{generic vs. ringmap: Systemload}
+\frametitle{generic vs. ringmap: System-load}
 \begin{center}
 \includegraphics [height=0.81\textheight]{plots/sysload_generic_vs_ringmap_mbs.eps}
 \end{center}
