@@ -76,11 +76,10 @@ To achieve this goal the next steps are:
  * Porting of the ringmap code to ixgbe
 
 I'm planning at first to split out the existing ringmap code into
-hardware-dependent and hardware-independent code. It has to be done because the
-currently ringmap code was implemented  only for em-driver and only for one
+hardware-dependent and hardware-independent code. This will first be
+done by splitting the data scructures and then the functions. It has to be done because the currently ringmap code was implemented  only for em-driver and only for one
 type of Ethernet controllers and as a result the hardware-dependent and
--independent data placed together in the same structures. This will first be
-done by splitting the data scructures and then the functions.  Moreover, I have
+-independent data placed together in the same structures.  Moreover, I have
 to extend the existing data structures to make the ringmap code more portable. 
 
 After that it will be started porting the ringmap functions to ixgbe-driver. In order 
