@@ -111,7 +111,7 @@ would involve both the driver and libpcap source code.
 
 ==== Measurements And Performance Comparison Between The Standard Packet Capturing Stack Of FreeBSD-8 And Ringmap ====
 
-For this part of work I deployed ready a tesbed network of three hosts and I
+For this part of work I deployed already a tesbed network of three hosts and I
 implemented the software for tests control and measurements:
 
  # *Traffic Generator Host*. With multiple network interfaces. OS Linux.
