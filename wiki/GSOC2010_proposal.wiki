@@ -10,7 +10,7 @@ Phone: 			+491629485320
 Availability:	30 hours per week
 				I would like to begin at 1 May
 
-= BIO =
+= Bio =
 Currently I am a student at the University of Technology Berlin, Germany. Last
 year in context of working on [http://code.google.com/p/ringmap/
 ringmap-Project] I implemented the software components for FreeBSD (kernel- and
@@ -25,17 +25,17 @@ My practical skills are mainly:
  	Revision control systems: 	svn, cvs
 
 
-= MENTORS =
+= Mentors =
 		Robert Watson 
 mail: 	rwatson@FreeBSD.org
 
 
-= PROJECT INFORMATION =
+= Project Information =
 
-== PROJECT TITLE ==
+== Project Title ==
 High Performance FreeBSD Packet Capturing
 
-== PROJECT DESCRIPTION ==
+== Project Description ==
 Packet capturing in high-speed networks is not an easy task due to the system
 limitations like RAM and system bus throughput. Unfortunately, it is often
 impossible to capture every packet arriving at a network interface.  Hardware
@@ -61,9 +61,9 @@ capturing stack and I have to achieve the following three goals:
 
 
 
-=== WHAT I PLAN TO DO IN ORDER TO ACHIEVE THE GOAL ===
+=== What I Plan To Do In Order To Achieve The Goal ===
 
-1. Porting ringmap to 10GbE Intel network adapter drivers:
+1. Porting Ringmap To 10gbe Intel Network Adapter Drivers:
 
 The ringmap software stack based currently on em-driver and is usable only with
 Intel 1Gb Ethernet Adapters. The goal is therefore, to modify the ringmap
@@ -106,14 +106,14 @@ controller, with a strong emphasis of DMA- and interrupt-functionality, and
 find differences which affect changing of the driver code.
 
 
-2. Porting the ringmap capturing stack to FreeBSD-8:
+2. Porting The Ringmap Capturing Stack To FreeBsd-8:
 
 At the present time, ringmap can be run only on FreeBSD-7.x. The task here
 would be to port the existing code base to FreeBSD-8.x. The porting effort
 would involve both the driver and libpcap source code.
 
 
-3. Measurements and performance comparison between the standard packet
+3. Measurements And Performance Comparison Between The Standard Packet
 capturing stack of FreeBSD-8 and ringmap.
 
 For this part of work I deployed ready a tesbed network of three hosts and I
@@ -126,7 +126,7 @@ Host 1. Traffic Generator Host with multiple network interfaces. OS Linux.
 			to generate traffics with different packet rates 
 			and packet lengths.  
 
-Host 2. Capturing Host: OS FreeBSD.
+Host 2. Capturing Host: Os FreeBsd.
 		Software:
 		- libpcap-based application for packet capturing
 		- scripts for system load measurement 
@@ -138,7 +138,7 @@ Host 3. Test Control Host: OS Linux.
 
 
 
-== PROJECT SCHEDULE ==
+== Project Schedule ==
 
 For the whole work I plan 13 weeks.
 
@@ -190,7 +190,7 @@ For the whole work I plan 13 weeks.
 -	*PROJECT DEADLINE! At the end of 13th week *
 
 
-=== SUPPORT ===
+== Support ==
 The hardware infrastructure and testbed for implementation and testing will
 be provided by the research group Intelligent Networks at the University of
 Technology in Berlin
