@@ -71,7 +71,7 @@ capturing stack for the 10Gb Ethernet Intel network adapters based on 82598 and
 82599 processors.
 To achieve this goal the next steps are:
  * Understand the functionality of 10GbE Intel controllers
- * Understand and analyze the code from ixgbe
+ * Understand and analyze the code from *ixgbe* driver
  * Porting of the ringmap code to ixgbe
 
 I'm planning at first to split out the existing ringmap code into
