@@ -47,7 +47,7 @@ blame for poor resources usage and resulting packet loss during capture.
 
 The new *ringmap* capturing stack for FreeBSD already allows on commodity
 hardware for efficient capturing at 1GBit/sec with very low packet loss and low
-system load. With Intel 1GbE cards and 64 bytes packets, ringmap is able to capture up to 700 Mbit/sec with only 0.02% loss (maximal) and a system load of under 12%. Under similar conditions, the standard capturing software of FreeBSD-7.x generates a system load of up to 100% and results in up to 100% packet loss. 
+system load (under 12%). Under similar conditions, the standard capturing software of FreeBSD-7.x generates a system load of up to 100% and results in up to 100% packet loss. 
 
 Like in "zero-copy BPF" implementation, the idea is to eliminate packet copy operations by using shared memory buffers. However, unlike the "zero-copy BPF" model, ringmap eliminates all packet copies during capturing:
 the network adapter's DMA buffer is mapped directly into the user-space. Ringmap also adapts _libpcap_ accordingly to provide user-space applications with access to the captured packets without any additional overhead.
