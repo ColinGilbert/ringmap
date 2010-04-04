@@ -144,14 +144,14 @@ For the whole work I plan 13 weeks.
  # Functionality Test
   * 1 week.
   * Functionality test and debugging of FreeBSD-8 ringmap capturing stack.
-  * *CODING PART DEADLINE! At the end of 9th week*
+  * *CODING PART DEADLINE at the end of 9th week*
  # Performance Test
   * 2 weeks.
   * Conducting performance analysis and evaluation between the standard packet capturing stack of FreeBSD-8 and ringmap. To achieving this goal will be several computers for generating of traffic together used in order to reach higher than 1Gibt/sec traffic.
  # Documentation
   * 2 weeks. 
   * Documentation and cosmetic debugging of ringmap
-  * *PROJECT DEADLINE! At the end of 13th week *
+  * *PROJECT DEADLINE at the end of 13th week*
 
 <br>
 
