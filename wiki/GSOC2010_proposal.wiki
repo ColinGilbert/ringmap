@@ -53,17 +53,18 @@ Like in "zero-copy BPF" implementation, the idea is to eliminate packet copy ope
 the network adapter's DMA buffer is mapped directly into the user-space. Ringmap also adapts _libpcap_ accordingly to provide user-space applications with access to the captured packets without any additional overhead.
 
 In the context of the GSoC-2010 I will continue developing ringmap packet
-capturing stack and I have to achieve the following three goals:
+capturing stack and I have to achieve the following goals:
 
- # Porting ringmap to 10GbE Intel network adapter drivers
- # Porting the ringmap capturing stack to FreeBSD-8
- # Measurements and performance comparison between the standard packet capturing stack of FreeBSD-8 and ringmap.
+ * Refactoring ringmap code in order to make it portable to other network adapters
+ * Porting ringmap to 10GbE Intel network adapter drivers
+ * Porting the ringmap capturing stack to FreeBSD-8
+ * Measurements and performance comparison between the standard packet capturing stack of FreeBSD-8 and ringmap.
 
 
 
 === What I Plan To Do In Order To Achieve These Goals ===
 
-==== 1. Porting Ringmap To 10gbe Intel Network Adapter Drivers ====
+==== Code Refactoring and Porting Ringmap To 10gbe Intel Network Adapter Drivers ====
 
 The ringmap software stack based currently on em-driver and is usable only with
 Intel 1Gb Ethernet Adapters. The goal is therefore, to modify the ringmap
@@ -102,14 +103,14 @@ controller with a strong emphasis of DMA- and interrupt-functionality and
 find differences which affect changing of the driver code.
 
 
-==== 2. Porting The Ringmap Capturing Stack To FreeBSD-8 ====
+==== Porting The Ringmap Capturing Stack To FreeBSD-8 ====
 
 At the present time, ringmap can be run only on FreeBSD-*7.x*. The task here
 would be to port the existing code base to FreeBSD-*8.x*. The porting effort
 would involve both the driver and libpcap source code.
 
 
-==== 3. Measurements And Performance Comparison Between The Standard Packet Capturing Stack Of FreeBSD-8 And Ringmap ====
+==== Measurements And Performance Comparison Between The Standard Packet Capturing Stack Of FreeBSD-8 And Ringmap ====
 
 For this part of work I deployed ready a tesbed network of three hosts and I
 implemented the software for tests control and measurements:
