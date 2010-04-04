@@ -328,7 +328,7 @@
 \section{Performance evaluation}
 \begin{frame}
 	\begin{center}
-	\huge{Measurement and  performance evaluation}
+	\huge{Measurements and performance evaluation}
 	\end{center}
 \end{frame}
 
@@ -425,7 +425,7 @@ For each experiment, data streams are generated with different parameters:
 		\begin{itemize}
 			\item bit-rate and packet-rate
 				\begin{itemize}
-					\item  $ > 1GBit/sec$
+					\item  $ < 1GBit/sec$
 				\end{itemize}
 		\end{itemize}
 \end{itemize}
@@ -447,7 +447,7 @@ For each experiment, data streams are generated with different parameters:
 		\end{itemize}
 	\item Packet loss
 		\begin{itemize}
-			\item Difference between the generated and captured packets
+			\item Difference between generated and captured packets
 			\item $Packets_{loss} = Packets_{send} - Packets_{received}$
 		\end{itemize}
 \end{itemize}
@@ -540,22 +540,22 @@ For each experiment, data streams are generated with different parameters:
 \begin{frame}
 \frametitle{Achieved goals}
 \begin{itemize}
-	\item Verbesserung der Capturing-Performance
+	\item Improving the Capturing-Performance
 		\begin{itemize}
-			\item Sehr geringe Systemload (unter $12\%$) und sehr kleine
-				Paketverluste (unter  $0.02\%$)
+			\item very low  system-load (under $12\%$) and very low
+				packet loss  (under  $0.02\%$)
 				\begin{itemize}
-					\item nur bei der Erfassung der kleinsten 64-Bytes-Pakete
-					\item nur bei maximal erreichte Paket-Rate ("uber $450000 pkts/sec$) 
+					\item only during capturing smallest  64-Bytes packets
+					\item for maximal reached packet-rate ($ > 450000 pkts/sec$) 
 				\end{itemize}
 		\end{itemize}
-	\item Stabilit"at und Benutzbarkeit der implementierten Software
+	\item Stability and usability of implemented software
 		\begin{itemize}
-			\item W"ahrend aller Tests keine \emph{kernel panics}, \emph{segmentation faults}, etc\ldots
-			\item Sehr einfache Einsetzbarkeit
+			\item during all experiments no\emph{kernel panics}, \emph{segmentation faults}, etc\ldots
+			\item very simple install and uninstall
 				\begin{itemize}
-					\item Zwei Shell-Skripte zum Installieren bzw. Deinstallieren des 
-						\emph{ringmap}-Capturing-Stacks
+					\item two Shell-Scripts to installing  and deinstalling the   
+						\emph{ringmap} Capturing Stacks
 				\end{itemize}
 			\item Jede Libpcap-Anwendung ist benutzbar
 		\end{itemize}
