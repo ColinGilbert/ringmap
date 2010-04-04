@@ -157,7 +157,7 @@ For the whole work I plan 13 weeks.
 
 == Support ==
 The hardware infrastructure and testbed for implementation and testing will
-be provided by the research group Intelligent Networks at the University of
+be provided by the research group Intelligent Networks ([http://www.net.t-labs.tu-berlin.de/ FG INET]) at the University of
 Technology in Berlin
 
 *The technical contact is:*<br>
