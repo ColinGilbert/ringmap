@@ -3,38 +3,40 @@
 <wiki:toc max_depth="2" />
 
 = Personal Data =
+||Name:||Alexandre Fiveg||
+||Email:||alexandre@net.t-labs.tu-berlin.de||
+||Phone:||+491629485320||
+||Availability:||30 hours per week||
+||Begin:||I would like to begin at 1 May||
 
-Name: 			Alexandre Fiveg
-Email:			alexandre@net.t-labs.tu-berlin.de
-Phone: 			+491629485320
-Availability:	30 hours per week
-				I would like to begin at 1 May
+<br>
 
 = Bio =
 Currently I am a student at the University of Technology Berlin, Germany. Last
-year in context of working on [http://code.google.com/p/ringmap/
-ringmap-Project] I implemented the software components for FreeBSD (kernel- and
+year in context of working on [http://code.google.com/p/ringmap ringmap]-Project I implemented the software components for FreeBSD (kernel- and
 user-space) for efficient packet capturing in high-speed networks.  While
 working on this project, I greatly increased my strength in C programming and
 my experience with FreeBSD kernel programming, especially with respect to
 network drivers.  Moreover during my study I have acquired a good theoretical
-knowledges of operating systems and computer networks.  
+knowledges of _operating systems_ and _computer networks_.  
 
 My practical skills are mainly:
-	Programming languages: 		C, Shell, Python
-	Operating systems: 			Linux, FreeBSD
- 	Revision control systems: 	svn, cvs
+ * Programming languages: C, Shell, Python
+ * Operating systems: Linux, FreeBSD
+ * Revision control systems: svn, cvs
 
+<br>
 
 = Mentors =
-		Robert Watson 
-mail: 	rwatson@FreeBSD.org
+||Name:||Robert Watson||
+||Mail:|| rwatson@FreeBSD.org||
 
+<br>
 
 = Project Information =
 
 == Project Title ==
-High Performance FreeBSD Packet Capturing
+*Ringmap* Capturing Stack for High Performance FreeBSD Packet Capturing
 
 == Project Description ==
 Packet capturing in high-speed networks is not an easy task due to the system
@@ -55,25 +57,24 @@ access to the captured packets without any additional overhead.
 In the context of the GSoC-2010 I will continue developing ringmap packet
 capturing stack and I have to achieve the following three goals:
 
-1. Porting ringmap to 10GbE Intel network adapter drivers
-2. Porting the ringmap capturing stack to FreeBSD-8
-3. Measurements and performance comparison between the standard packet
-	capturing stack of FreeBSD-8 and ringmap.
+ # Porting ringmap to 10GbE Intel network adapter drivers
+ # Porting the ringmap capturing stack to FreeBSD-8
+ # Measurements and performance comparison between the standard packet capturing stack of FreeBSD-8 and ringmap.
 
 
 
-=== What I Plan To Do In Order To Achieve The Goal ===
+=== What I Plan To Do In Order To Achieve These Goals ===
 
-1. Porting Ringmap To 10gbe Intel Network Adapter Drivers:
+==== 1. Porting Ringmap To 10gbe Intel Network Adapter Drivers ====
 
 The ringmap software stack based currently on em-driver and is usable only with
 Intel 1Gb Ethernet Adapters. The goal is therefore, to modify the ringmap
 capturing stack for the 10Gb Ethernet Intel network adapters based on 82598 and
 82599 processors.
 To achieve this goal the next steps are:
-	- Understand the functionality of 10GbE Intel controllers
-	- Understand and analyze the code from ixgbe
-    - Porting of the ringmap code to ixgbe
+ * Understand the functionality of 10GbE Intel controllers
+ * Understand and analyze the code from ixgbe
+ * Porting of the ringmap code to ixgbe
 
 I'm planning at first to split out the existing ringmap code into
 hardware-dependent and hardware-independent code. It has to be done because the
@@ -136,8 +137,7 @@ Host 3. Test Control Host: OS Linux.
 		Software:
 		- scripts for the central coordination of tests
 
-
-
+<br>
 
 == Project Schedule ==
 
@@ -190,6 +190,7 @@ For the whole work I plan 13 weeks.
 
 -	*PROJECT DEADLINE! At the end of 13th week *
 
+<br>
 
 == Support ==
 The hardware infrastructure and testbed for implementation and testing will
