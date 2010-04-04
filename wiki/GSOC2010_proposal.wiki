@@ -1,0 +1,202 @@
+﻿#summary My proposal for Google Summer of Code 2010
+
+<wiki:toc max_depth="2" />
+
+= Personal Data =
+
+Name: 			Alexandre Fiveg
+Email:			alexandre@net.t-labs.tu-berlin.de
+Phone: 			+491629485320
+Availability:	30 hours per week
+				I would like to begin at 1 May
+
+= BIO =
+Currently I am a student at the University of Technology Berlin, Germany. Last
+year in context of working on [http://code.google.com/p/ringmap/
+ringmap-Project] I implemented the software components for FreeBSD (kernel- and
+user-space) for efficient packet capturing in high-speed networks.  While
+working on this project, I greatly increased my strength in C programming and
+my experience with FreeBSD kernel programming, especially with respect to
+network drivers.  Moreover during my study I have acquired a good theoretical
+knowledges of operating systems and computer networks.  
+My practical skills are mainly:
+	Programming languages: 		C, Shell, Python
+	Operating systems: 			Linux, FreeBSD
+ 	Revision control systems: 	svn, cvs
+
+
+= MENTORS =
+		Robert Watson 
+mail: 	rwatson@FreeBSD.org
+
+
+= PROJECT INFORMATION =
+
+== PROJECT TITLE ==
+High Performance FreeBSD Packet Capturing
+
+== PROJECT DESCRIPTION ==
+Packet capturing in high-speed networks is not an easy task due to the system
+limitations like RAM and system bus throughput. Unfortunately, it is often
+impossible to capture every packet arriving at a network interface.  Hardware
+may not be the only bottleneck, however, as inefficient software is also to
+blame for poor resources usage and resulting packet loss during capture.
+
+The new "ringmap" capturing stack for FreeBSD already allows on commodity
+hardware for efficient capturing at 1GBit/sec with very low packet loss and low
+system load.  Like in "zero-copy BPF" implementation, the idea is to eliminate
+packet copy operations by using shared memory buffers. However, unlike the
+"zero-copy BPF" model, ringmap eliminates all packet copies during capturing:
+the network adapter's DMA buffer is mapped directly into the user-space.
+Ringmap also adapts libpcap accordingly to provide user-space applications with
+access to the captured packets without any additional overhead.
+
+In the context of the GSoC-2010 I will continue developing ringmap packet
+capturing stack and I have to achieve the following three goals:
+
+1. Porting ringmap to 10GbE Intel network adapter drivers
+2. Porting the ringmap capturing stack to FreeBSD-8
+3. Measurements and performance comparison between the standard packet
+	capturing stack of FreeBSD-8 and ringmap.
+
+
+
+=== WHAT I PLAN TO DO IN ORDER TO ACHIEVE THE GOAL ===
+
+1. Porting ringmap to 10GbE Intel network adapter drivers:
+
+The ringmap software stack based currently on em-driver and is usable only with
+Intel 1Gb Ethernet Adapters. The goal is therefore, to modify the ringmap
+capturing stack for the 10Gb Ethernet Intel network adapters based on 82598 and
+82599 processors.
+To achieve this goal the next steps are:
+	- Understand the functionality of 10GbE Intel controllers
+	- Understand and analyze the code from ixgbe
+    - Porting of the ringmap code to ixgbe
+
+I'm planning at first to split out the existing ringmap code into
+hardware-dependent and hardware-independent code. It has to be done because the
+currently ringmap code was implemented  only for em-driver and only for one
+type of Ethernet controllers and as a result the hardware-dependent and
+-independent data placed together in the same structures. This will first be
+done by splitting the datascructures and then the functions.  Moreover, I have
+to extend the existing data structures to make the ringmap code more portable. 
+
+After that I will begin porting the ringmap functions to ixgbe-driver.  To
+do it, I will first insert the "hooks" for ringmap
+functionalities into the ixgbe-driver code  (trough #ifdef). It should be: 
+	- Init hook:
+		Will be placed in the "attach" function of ixgbe driver. 
+	- Uninit hook:
+		Will be placed in the "detach" function of ixgbe driver
+	- Interrupt hooks: 
+		Multiple hooks that will be placed in the code of ixgbe that 
+		is executed as result of an packet receive interrupt.
+
+The first places where I will port the ringmap functions are "attach" and
+"detach" functions of ixgbe-driver. These function must in addition to their
+ordinary work be able to allocate and deallocate the ringmap data structures
+properly. After this step I will begin porting most complicated part of
+code, that has to be executed as a result of interrupt.
+
+While porting the driver there may appear some difficulties due to the
+differences between the 1Gb and 10Gb adapters. In this connection, before
+starting the work I have  to carefully study functionality of the 10G Intel
+controller, with a strong emphasis of DMA- and interrupt-functionality, and
+find differences which affect changing of the driver code.
+
+
+2. Porting the ringmap capturing stack to FreeBSD-8:
+
+At the present time, ringmap can be run only on FreeBSD-7.x. The task here
+would be to port the existing code base to FreeBSD-8.x. The porting effort
+would involve both the driver and libpcap source code.
+
+
+3. Measurements and performance comparison between the standard packet
+capturing stack of FreeBSD-8 and ringmap.
+
+For this part of work I deployed ready a tesbed network of three hosts and I
+implemented the software for tests control and measurements:
+
+Host 1. Traffic Generator Host with multiple network interfaces. OS Linux.
+	    Software: 
+		- pktgen module to generate network traffic
+		- shell script to control the pktgen module in order 
+			to generate traffics with different packet rates 
+			and packet lengths.  
+
+Host 2. Capturing Host: OS FreeBSD.
+		Software:
+		- libpcap-based application for packet capturing
+		- scripts for system load measurement 
+
+Host 3. Test Control Host: OS Linux.
+		Software:
+		- scripts for the central coordination of tests
+
+
+
+
+== PROJECT SCHEDULE ==
+
+For the whole work I plan 13 weeks.
+
+- 	Phase 1. Porting ringmap to 10Gb
+	4 weeks.
+
+		The bare minimum I want to achieve is the 10GbE driver for FreeBSD-7.
+		This also is the primary goal of this GSoC-2010 at any cost.
+
+
+- 	Phase 2. Functionality Test
+	2 weeks.
+
+		Functionality test and debugging of 10Gb ringmap capturing stack.
+
+
+- 	Phase 3. Porting ringmap to FreeBSD-8
+	1-2 weeks.
+
+		This step will be the port to FreeBSD-8, but it requires step 1 to be
+		finished (at least the coding part, but not necessarily all testing
+		work)
+
+
+-	Phase 4. Functionality Test
+	1 week.
+
+	Functionality test and debugging of FreeBSD-8 ringmap capturing stack.
+
+
+-	*CODING PART DEADLINE! At the end of 9th week*
+
+
+-	Phase 5. Performance Test
+	2 weeks.
+
+		Conducting performance analysis and evaluation between the standard packet
+		capturing stack of FreeBSD-8 and ringmap.
+		To achieving this goal will be several computers for generating of traffic
+		together used in order to reach higher than 1Gibt/sec traffic.
+
+
+- 	Phase 6. Documentation
+	2 weeks. 
+
+		Documentation and cosmetic debugging of ringmap
+
+
+-	*PROJECT DEADLINE! At the end of 13th week *
+
+
+=== SUPPORT ===
+The hardware infrastructure and testbed for implementation and testing will
+be provided by the research group Intelligent Networks at the University of
+Technology in Berlin
+
+The technical contact is:
+Jan Böttger (Boettger)
+mail : jan@net.t-labs.tu-berlin.de
+phone: +49 (0)30 8353 58516
+University of Technology Berlin, Germany
