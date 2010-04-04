@@ -81,19 +81,18 @@ hardware-dependent and hardware-independent code. It has to be done because the
 currently ringmap code was implemented  only for em-driver and only for one
 type of Ethernet controllers and as a result the hardware-dependent and
 -independent data placed together in the same structures. This will first be
-done by splitting the datascructures and then the functions.  Moreover, I have
+done by splitting the data scructures and then the functions.  Moreover, I have
 to extend the existing data structures to make the ringmap code more portable. 
 
 After that I will begin porting the ringmap functions to ixgbe-driver.  To
 do it, I will first insert the "hooks" for ringmap
-functionalities into the ixgbe-driver code  (trough #ifdef). It should be: 
-	- Init hook:
-		Will be placed in the "attach" function of ixgbe driver. 
-	- Uninit hook:
-		Will be placed in the "detach" function of ixgbe driver
-	- Interrupt hooks: 
-		Multiple hooks that will be placed in the code of ixgbe that 
-		is executed as result of an packet receive interrupt.
+functionalities into the ixgbe-driver code  (through #ifdef). It should be: 
+ * Init hook:
+  * Will be placed in the "attach" function of ixgbe driver. 
+ * Uninit hook:
+  * Will be placed in the "detach" function of ixgbe driver
+ * Interrupt hooks: 
+  * Multiple hooks that will be placed in the code of ixgbe that is executed as result of an packet receive interrupt.
 
 The first places where I will port the ringmap functions are "attach" and
 "detach" functions of ixgbe-driver. These function must in addition to their
@@ -108,34 +107,30 @@ controller, with a strong emphasis of DMA- and interrupt-functionality, and
 find differences which affect changing of the driver code.
 
 
-2. Porting The Ringmap Capturing Stack To FreeBsd-8:
+==== 2. Porting The Ringmap Capturing Stack To FreeBsd-8 ====
 
 At the present time, ringmap can be run only on FreeBSD-7.x. The task here
 would be to port the existing code base to FreeBSD-8.x. The porting effort
 would involve both the driver and libpcap source code.
 
 
-3. Measurements And Performance Comparison Between The Standard Packet
-capturing stack of FreeBSD-8 and ringmap.
+==== 3. Measurements and Performance Comparison Between The Standard Packet Capturing Stack of FreeBSD-8 and Ringmap ====
 
 For this part of work I deployed ready a tesbed network of three hosts and I
 implemented the software for tests control and measurements:
 
-Host 1. Traffic Generator Host with multiple network interfaces. OS Linux.
-	    Software: 
-		- pktgen module to generate network traffic
-		- shell script to control the pktgen module in order 
-			to generate traffics with different packet rates 
-			and packet lengths.  
+ # *Traffic Generator Host*. With multiple network interfaces. OS Linux.
+  * Software: 
+   * pktgen module to generate network traffic
+   * shell script to control the pktgen module in order to generate traffics with different packet rates and packet lengths.
+ # *Capturing Host.* Os FreeBSD.
+  * Software:
+   * _libpcap_-based application for packet capturing
+   * shell-scripts for system load measurement 
 
-Host 2. Capturing Host: Os FreeBsd.
-		Software:
-		- libpcap-based application for packet capturing
-		- scripts for system load measurement 
-
-Host 3. Test Control Host: OS Linux.
-		Software:
-		- scripts for the central coordination of tests
+ # *Test Control Host.* OS Linux.
+  * Software:
+   * scripts for the central coordination of tests
 
 <br>
 
