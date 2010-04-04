@@ -134,7 +134,7 @@ For the whole work I plan 13 weeks.
 
  # Porting ringmap to 10Gb
   * 4 weeks.
-  * The bare minimum I want to achieve is the 10GbE driver for FreeBSD-7. This also is the primary goal of this GSoC-2010 at any cost.
+  * The bare minimum I want to achieve is the 10GbE ringmap driver for FreeBSD-7. This also is the primary goal of this GSoC-2010 at any cost.
  # Functionality Test
   * 2 weeks.
   * Functionality test and debugging of 10Gb ringmap capturing stack.
