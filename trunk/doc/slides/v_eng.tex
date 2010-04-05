@@ -50,11 +50,11 @@
 \begin{figure}[H] 
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/sysload_generic_slide}}
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/pktlos_generic_slide}}
-	\caption{CPU-load and packet loss during capturing of 64 bytes packets with the standard FreeBSD-7 Capturing software (Bezier curves)}
+	\caption{CPU-load and packet loss during capturing 64-bytes packets with the standard FreeBSD-7 Capturing software (Bezier curves)}
 \end{figure}
 \end{frame}
 
-\subsection*{The reason of the Problems}
+\subsection*{The cause of the Problems}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{The reason of the Problems}
@@ -84,7 +84,7 @@
 \textbf{What is our goal ?}
 %\end{large}
 \begin{itemize}
-	\item Increase the capturing performance on FreeBSD
+	\item Increase the capturing performance in FreeBSD
 		\begin{itemize}
 			\item Design and implementation the new capturing software to
 				minimize the \textbf{packet loss} and \textbf{cpu load} during capturing. \newline \newline
@@ -135,12 +135,12 @@
 \begin{enumerate}
 	\item \textbf{Receiving} network packets
 		\begin{itemize}
-			\item receive by network adapter
+			\item receive at network adapter
 			\item DMA transfer in RAM \newline
 		\end{itemize}
 	\item \textbf{Filtering} the received packets 
 		\begin{itemize}
-			\item using software to filter the traffic (e.g. \emph{BPF})\newline
+			\item \emph{Berkeley Packet Filter (BPF)})\newline
 		\end{itemize}
 	\item \textbf{Storing} to the hard drive
 		\begin{itemize}
@@ -404,8 +404,8 @@
 	\item \textbf{ringmap} and \textbf{generic} stacks
 	\item Libpcap-application
 		\begin{itemize}
-			\item Packets access through call \emph{pcap\_loop()}
-			\item Counting the captured packets
+			\item accessing packets through call \emph{pcap\_loop()}
+			\item counting the captured packets
 		\end{itemize}
 \end{itemize}
 \end{frame}
