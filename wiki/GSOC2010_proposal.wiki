@@ -29,7 +29,7 @@ My practical skills are mainly:
 
 = Mentors =
 ||Name:||Robert Watson||
-||Mail:|| rwatson@FreeBSD.org||
+||Mail:|| rwatson(at)FreeBSD.org||
 
 <br>
 
@@ -162,6 +162,6 @@ Technology in Berlin
 
 *The technical contact is:*<br>
 Jan Böttger (Boettger)<br>
-mail : jan@net.t-labs.tu-berlin.de<br>
+mail : jan(at)net.t-labs.tu-berlin.de<br>
 phone: +49 (0)30 8353 58516<br>
 University of Technology Berlin, Germany<br>
