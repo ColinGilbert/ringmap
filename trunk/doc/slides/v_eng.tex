@@ -6,7 +6,7 @@
 \usepackage{url}
 \graphicspath{./pics/}
 \usetheme{INET}
-\title{Improving FreeBSD Packet Capturing}
+\title{Ringmap Capturing Stack for High Performance Packet Capturing in FreeBSD}
 \author[Alexandre Fiveg]{ Alexandre Fiveg \\
 \url{alexandre@net.t-labs.tu-berlin.de} }
 \institute[TU Berlin/DT Labs]{Technische Universtit\"at Berlin \\ Deutsche Telekom Laboratories}
@@ -71,7 +71,7 @@
 	\item [$\Rightarrow$] may be the capturing software for FreeBSD was
 		developed at a time when  network data-rates were low enough relative
 		to hardware processing resources such that capturing loss problems did
-		not arise.
+		not arise?
 \end{small}
 \end{itemize}
 \end{frame}
@@ -144,7 +144,7 @@
 		\end{itemize}
 	\item \textbf{Storing} to the hard drive
 		\begin{itemize}
-			\item due to a system call (\emph{write()})
+			\item due to the system call (\emph{write(2)})
 		\end{itemize}
 \end{enumerate}
 \column[t]{0.5\textwidth}
@@ -158,19 +158,19 @@
 \begin{itemize}
 	\item \textbf{Network driver}
 		\begin{itemize}
-			\item Receiving the packets\newline
+			\item Receiving packets\newline
 		\end{itemize}
 	\item \textbf{Berkley Packet Filter} (BPF)
 		\begin{itemize}
-			\item Filtering the packets\newline
+			\item Filtering packets\newline
 		\end{itemize}
 	\item \textbf{User-space application}
 		\begin{itemize}
-			\item Access to the received packets
+			\item Accessing received packets
 			\item Initiates:
 				\begin{itemize}
-					\item storing of packets to hard drive
-					\item output packet information to the terminal
+					\item storing packets to hard drive
+					\item output packets information to the terminal
 				\end{itemize}
 		\end{itemize}
 \end{itemize}
@@ -208,7 +208,7 @@
 	\begin{itemize}
 		\item <2->Adapter-FIFO $\Rightarrow$ Packet-Buffer
 	\end{itemize}
-\item <1-> Packet received and saved in Adapter-FIFO
+\item <1-> Packet is received and saved in Adapter-FIFO
 \end{itemize}
 \column[t]{0.5\textwidth}
 \vspace{-2em}
@@ -479,7 +479,7 @@ For each experiment, data streams are generated with different parameters:
 
 	\item Login to the Capturer to 
 		\begin{itemize}
-			\item Stop capturing- und measurement-applications
+			\item stop capturing- und measurement-applications
 		\end{itemize}
 	\item Storing of measured values
 \end{enumerate}
@@ -499,7 +499,7 @@ For each experiment, data streams are generated with different parameters:
 			\item often kernel panics
 			\item [$\Rightarrow$] therefore max. $15000000 pkts$ per experiment\newline
 		\end{itemize}
-	\item Impossible to create traffic with any packet- or bit-rate
+	\item Impossible to generate traffic with any packet- or bit-rate
 		\begin{itemize}
 			\item because of Interrupt-Throttling
 			\item [$\Rightarrow$] therefore only certain measurement points \newline
@@ -555,7 +555,7 @@ For each experiment, data streams are generated with different parameters:
 		\end{itemize}
 	\item Stability and usability of implemented software
 		\begin{itemize}
-			\item during all experiments no \emph{kernel panics} and \emph{segmentation faults}
+			\item during the all experiments, no \emph{kernel panics} and no \emph{segmentation faults} occurred
 			\item very simple install and uninstall
 				\begin{itemize}
 					\item two Shell-Scripts to installing  and deinstalling the   
@@ -569,18 +569,24 @@ For each experiment, data streams are generated with different parameters:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Future works}
-\begin{itemize}
-	\item Performance-Vergleich mit FreBSD-8.x
-		\begin{itemize}
-			\item W"ahrend der Lauf der Diplomarbeit war in Alpha-Stadium\newline
-		\end{itemize}
+\begin{enumerate}
+	\item Benchmarking:  \textbf{FreBSD-8.x} vs. \textbf{ringmap}
+	\item Refactoring the ringmap in order to make it portable to other network adapters
+	\item Porting the ringmap to FreeBSD-8
 	\item 10-GBit-Paket-Capturing
 		\begin{itemize}
-			\item Der Treiber f"ur Intel-Netzwerkadpter f"ur 10-Gigabit-Netzwerkanschlüsse hat 
-				eine "ahnliche Struktur und sollte sich portieren lassen. 
+			\item Porting ringmap to \emph{ixgbe} driver
 		\end{itemize}
-\end{itemize}
+	\item Multithreading
+\end{enumerate}
 \end{frame}
+
+\begin{frame}
+	\begin{center}
+	\huge{\ldots to be continued}
+	\end{center}
+\end{frame}
+
 
 %\begin{frame}
 %\frametitle{Weg eines Paketes. Hardware View}
