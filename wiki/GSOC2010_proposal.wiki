@@ -13,9 +13,7 @@
 
 = Bio =
 Currently I am a student at the University of Technology Berlin, Germany. Last
-year in context of working on [http://code.google.com/p/ringmap ringmap]-Project I implemented the software components for FreeBSD (kernel- and
-user-space) for efficient packet capturing in high-speed networks.  While
-working on this project, I greatly increased my strength in C programming and
+year in context of working on *ringmap*-Project I implemented the software components for FreeBSD (kernel- and user-space) for efficient packet capturing in high-speed networks.  While working on this project, I greatly increased my strength in C programming and
 my experience with FreeBSD kernel programming, especially with respect to
 network drivers.  Moreover during my study I have acquired a good theoretical
 knowledges of operating systems and computer networks.  
