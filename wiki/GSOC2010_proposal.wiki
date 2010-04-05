@@ -56,7 +56,7 @@ In the context of the GSoC-2010 I will continue developing ringmap packet
 capturing stack and I have to achieve the following goals:
 
  * Refactoring ringmap code in order to make it portable to other network adapters
- * Porting ringmap to 10GbE Intel network adapter drivers
+ * Porting ringmap to 10GbE Intel network adapters
  * Porting the ringmap capturing stack to FreeBSD-8
  * Measurements and performance comparison between the standard packet capturing stack of FreeBSD-8 and ringmap.
 
@@ -64,7 +64,7 @@ capturing stack and I have to achieve the following goals:
 
 === What I Plan To Do In Order To Achieve These Goals ===
 
-==== Code Refactoring and Porting Ringmap To 10gbe Intel Network Adapter Drivers ====
+==== Code Refactoring and Porting Ringmap To 10gbe Intel Network Adapters ====
 
 The ringmap software stack based currently on em-driver and is usable only with
 Intel 1Gb Ethernet Adapters. The goal is therefore, to modify the ringmap
