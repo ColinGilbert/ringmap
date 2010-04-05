@@ -64,7 +64,7 @@ capturing stack and I have to achieve the following goals:
 
 === What I Plan To Do In Order To Achieve These Goals ===
 
-==== Code Refactoring and Porting Ringmap To 10gbe Intel Network Adapters ====
+==== Code Refactoring and Porting Ringmap To 10GbE Intel Network Adapters ====
 
 The ringmap software stack based currently on em-driver and is usable only with
 Intel 1Gb Ethernet Adapters. The goal is therefore, to modify the ringmap
