@@ -42,7 +42,7 @@ The FreeBSD Project
 == Project Description ==
 Packet capturing in high-speed networks is not an easy task due to the system
 limitations such as RAM and system bus throughput. Unfortunately, it is often
-impossible to capture every packet arriving at a network interface.  Hardware
+impossible to capture every packet arriving at the network interface.  Hardware
 may not be the only bottleneck, however, as inefficient software is also to
 blame for poor resources usage and resulting packet loss during capture.
 
