@@ -98,7 +98,7 @@ The first places where I will port the ringmap functions are "attach" and
 
 While porting the driver there may appear some difficulties due to the
 differences between the 1Gb and 10Gb adapters. In this connection, before
-starting the work I have  to study carefully functionality of the 10G Intel
+starting the work I have  to study carefully functionality of the 10Gb Intel
 controller with a strong emphasis of DMA- and interrupt-functionality and
 find differences which affect changing of the driver code.
 
