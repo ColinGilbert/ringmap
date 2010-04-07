@@ -44,13 +44,13 @@
 \begin{itemize}
 	\item High bit rates and packet rates
 		\begin{itemize}
-			\item [$\Rightarrow$] high CPU-load and packet loss \newline
+			\item [$\Rightarrow$] high CPU load and packet loss \newline
 		\end{itemize}
 \end{itemize}
 \begin{figure}[H] 
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/sysload_generic_slide}}
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/pktlos_generic_slide}}
-	\caption{CPU-load and packet loss during capturing 64-bytes packets with the standard FreeBSD-7 Capturing software (Bezier curves)}
+	\caption{CPU load and packet loss during capturing 64-bytes packets with the standard FreeBSD-7 Capturing software (Bezier curves)}
 \end{figure}
 \end{frame}
 
@@ -68,7 +68,7 @@
 			\item etc\ldots\newline
 \end{itemize}
 \begin{small}
-	\item [$\Rightarrow$] may be the capturing software for FreeBSD was
+	\item [$\Rightarrow$] probably the capturing software for FreeBSD was
 		developed at a time when  network data-rates were low enough relative
 		to hardware processing resources such that capturing loss problems did
 		not arise?
@@ -81,7 +81,7 @@
 \begin{frame}
 \frametitle{Goal of the project}
 %\begin{large}
-\textbf{What is our goal ?}
+\textbf{Our goal:}
 %\end{large}
 \begin{itemize}
 	\item Increase the capturing performance in FreeBSD
@@ -142,7 +142,7 @@
 		\begin{itemize}
 			\item \emph{Berkeley Packet Filter (BPF)})\newline
 		\end{itemize}
-	\item \textbf{Storing} to the hard drive
+	\item \textbf{Storing} to the hard disk
 		\begin{itemize}
 			\item due to the system call (\emph{write(2)})
 		\end{itemize}
@@ -169,8 +169,8 @@
 			\item Accessing received packets
 			\item Initiates:
 				\begin{itemize}
-					\item storing packets to hard drive
-					\item output packets information to the terminal
+					\item Storing packets to hard drive
+					\item Output packets information to the terminal
 				\end{itemize}
 		\end{itemize}
 \end{itemize}
@@ -180,7 +180,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 	\begin{center}
-	\huge{How does Packet Capturing Work}
+	\huge{How does Packet Capturing Work ?}
 	\end{center}
 \end{frame}
 
@@ -247,7 +247,7 @@
 	\item Based on \textbf{generic}-Stack: 		
 		\begin{itemize}
 			\item based on \emph{em} driver and \emph{libpcap}
-			\item but "`a little"' changed.\newline
+			\item but slightly changed.\newline
 		\end{itemize}
 \end{itemize}
 \textbf{generic:}
@@ -263,7 +263,7 @@
 \subsection*{Changes in generic-Stack}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{What is in generic changed}
+	\frametitle{What did we change in \emph{generic}}
 \begin{columns}
 \column[t]{0.5\textwidth}
 \begin{itemize}
@@ -288,7 +288,7 @@
 
 \begin{frame}
 	\begin{center}
-	\huge{From generic to ringmap}
+		\huge{From \emph{generic} to \emph{ringmap}}
 	\end{center}
 \end{frame}
 
@@ -301,7 +301,7 @@
 \begin{itemize}
 	\item<1->\textbf{generic}
 	\item<2->Eliminate packet copies  and syscalls
-	\item<3->BPF-Buffer is then no necessary
+	\item<3->BPF-Buffer is then not necessary
 	\item<4->Mapping the Packet-Buffer to user-space
 	\item<5->Move BPF to Userspace\newline
 	\item<6->[$\Rightarrow$]\textbf{ringmap}
@@ -395,7 +395,7 @@
 			\item generates network packets at very high speed with different: 
 				\begin{itemize}
 					\item packet sizes
-					\item bit-bate and packet-rate
+					\item bit-rate and packet-rate
 				\end{itemize}
 		\end{itemize}
 \end{itemize}
@@ -440,7 +440,7 @@ For each experiment, data streams are generated with different parameters:
 \begin{frame}
 \frametitle{Calculation of results}
 \begin{itemize}
-	\item System-Load
+	\item System load
 		\begin{itemize}
 			\item Percentage proportion of time the CPU spent in system mode
 			\item Interrupt load is not considered
@@ -462,10 +462,10 @@ For each experiment, data streams are generated with different parameters:
 \begin{frame}
 \frametitle{Testing sequence}
 \begin{enumerate}
-	\item Login to the Capturer to 
+	\item Login to the capturer to 
 		\begin{itemize}
-			\item start of capturing and 
-			\item system-load measurement applications 
+			\item start of capturing 
+			\item start of system load measurement applications 
 		\end{itemize}
 	\item Login to the Packet-Generator to 
 
@@ -477,7 +477,7 @@ For each experiment, data streams are generated with different parameters:
 				\end{itemize}
 	\end{itemize}
 
-	\item Login to the Capturer to 
+	\item Login to the capturer to 
 		\begin{itemize}
 			\item stop capturing- und measurement-applications
 		\end{itemize}
@@ -546,8 +546,8 @@ For each experiment, data streams are generated with different parameters:
 \begin{itemize}
 	\item Improving the Capturing-Performance
 		\begin{itemize}
-			\item very low  system-load (under $12\%$) and very low
-				packet loss  (under  $0.02\%$)
+			\item very low  system load (below $12\%$) and very low
+				packet loss  (below  $0.02\%$)
 				\begin{itemize}
 					\item only during capturing smallest  64-Bytes packets
 					\item for maximal reached packet-rate ($ > 450000 pkts/sec$) \newline
@@ -561,7 +561,7 @@ For each experiment, data streams are generated with different parameters:
 					\item two Shell-Scripts to installing  and deinstalling the   
 						\emph{ringmap} Capturing Stacks
 				\end{itemize}
-			\item Libpcap-applications don't require modification in order to run with the ringmap
+			\item Libpcap-applications don't require modification in order to run with the \emph{ringmap}
 		\end{itemize}
 \end{itemize}
 \end{frame}
@@ -571,11 +571,11 @@ For each experiment, data streams are generated with different parameters:
 \frametitle{Future works}
 \begin{enumerate}
 	\item Benchmarking:  \textbf{FreBSD-8.x} vs. \textbf{ringmap}
-	\item Refactoring the ringmap in order to make it portable to other network adapters
-	\item Porting the ringmap to FreeBSD-8
+	\item Refactoring the \emph{ringmap} in order to make it portable to other network adapters
+	\item Porting the \emph{ringmap} to FreeBSD-8
 	\item 10-GBit-Paket-Capturing
 		\begin{itemize}
-			\item Porting ringmap to \emph{ixgbe} driver
+			\item Porting \emph{ringmap} to \emph{ixgbe} driver
 		\end{itemize}
 	\item Multithreading
 \end{enumerate}
@@ -583,7 +583,7 @@ For each experiment, data streams are generated with different parameters:
 
 \begin{frame}
 	\begin{center}
-	\huge{\ldots to be continued}
+	\huge{Project to be continued}
 	\end{center}
 \end{frame}
 
