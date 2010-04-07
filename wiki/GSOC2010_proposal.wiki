@@ -15,7 +15,7 @@
 Currently I am a student at the University of Technology Berlin, Germany. Last
 year in context of working on *ringmap*-Project I implemented the software components for FreeBSD (kernel- and user-space) for efficient packet capturing in high-speed networks.  While working on this project, I greatly increased my strength in C programming and
 my experience with FreeBSD kernel programming, especially with respect to
-network drivers.  Moreover during my study I have acquired a good theoretical
+network drivers.  Moreover, during my study I have acquired a good theoretical
 knowledges of operating systems and computer networks.  
 
 My practical skills are mainly:
@@ -30,7 +30,7 @@ The FreeBSD Project
 
 = Mentors =
 ||Name:||Robert Watson||
-||Mail:|| rwatson(at)FreeBSD.org||
+||Email:|| rwatson(at)FreeBSD.org||
 
 <br>
 
@@ -41,7 +41,7 @@ The FreeBSD Project
 
 == Project Description ==
 Packet capturing in high-speed networks is not an easy task due to the system
-limitations like RAM and system bus throughput. Unfortunately, it is often
+limitations such as RAM and system bus throughput. Unfortunately, it is often
 impossible to capture every packet arriving at a network interface.  Hardware
 may not be the only bottleneck, however, as inefficient software is also to
 blame for poor resources usage and resulting packet loss during capture.
@@ -50,7 +50,7 @@ The new *ringmap* capturing stack for FreeBSD already allows on commodity
 hardware for efficient capturing at 1GBit/sec with very low packet loss and low
 system load (under 12%). Under similar conditions, the standard capturing software of FreeBSD-7.x generates a system load of up to 100% and results in up to 100% packet loss. 
 
-Like in "zero-copy BPF" implementation, the idea is to eliminate packet copy operations by using shared memory buffers. However, unlike the "zero-copy BPF" model, ringmap eliminates all packet copies during capturing:
+Similar to "zero-copy BPF" implementation, the idea is to eliminate packet copy operations by using shared memory buffers. However, unlike the "zero-copy BPF" model, ringmap eliminates all packet copies during capturing:
 the network adapter's DMA buffer is mapped directly into the user-space. Ringmap also adapts _libpcap_ accordingly to provide user-space applications with access to the captured packets without any additional overhead.
 
 In the context of the GSoC-2010 I will continue developing ringmap packet
@@ -67,8 +67,8 @@ capturing stack and I have to achieve the following goals:
 
 ==== Code Refactoring and Porting Ringmap To 10GbE Intel Network Adapters ====
 
-The ringmap software stack based currently on em-driver and is usable only with
-Intel 1Gb Ethernet Adapters. The goal is therefore, to modify the ringmap
+The ringmap capturing stack is currently based on em-driver and is usable only with
+Intel 1Gb Ethernet Adapters. Therefore, the goal is to modify the ringmap
 capturing stack for the 10Gb Ethernet Intel network adapters based on 82598 and
 82599 processors.
 To achieve this goal the next steps are:
@@ -78,9 +78,9 @@ To achieve this goal the next steps are:
 
 I'm planning at first to split out the existing ringmap code into
 hardware-dependent and hardware-independent code. This will first be
-done by splitting the data scructures and then the functions. It has to be done because the currently ringmap code was implemented  only for em-driver and only for one
-type of Ethernet controllers and as a result the hardware-dependent and
--independent data placed together in the same structures.  Moreover, I have
+done by splitting the data scructures and then the functions. It has to be done because the present ringmap code was implemented  only for em-driver and only for one
+type of Ethernet controllers, and as a result the hardware-dependent and
+-independent data is placed together in the same structures.  Moreover, I have
 to extend the existing data structures to make the ringmap code more portable. 
 
 After that it will be started porting the ringmap functions to ixgbe-driver. In order 
