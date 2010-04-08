@@ -15,7 +15,7 @@
 Currently I am a student at the Berlin Institute of Technology, Berlin, Germany. Last
 year within the context of the *ringmap*-Project, I implemented the software components for FreeBSD (kernel- and user-space) for efficient packet capturing in high-speed networks.  While working on this project, I greatly increased my strength in C programming and
 my experience with FreeBSD kernel programming, especially with respect to
-network drivers.  Moreover, during my stidies I have acquired a solid theoretical
+network drivers.  Moreover, during my studies I have acquired a solid theoretical
 knowledge of operating systems and computer networks.  
 
 My practical skills are mainly:
