@@ -12,11 +12,11 @@
 <br>
 
 = Bio =
-Currently I am a student at the University of Technology Berlin, Germany. Last
-year in context of working on *ringmap*-Project I implemented the software components for FreeBSD (kernel- and user-space) for efficient packet capturing in high-speed networks.  While working on this project, I greatly increased my strength in C programming and
+Currently I am a student at the Berlin Institute of Technology, Berlin, Germany. Last
+year within the context of the *ringmap*-Project, I implemented the software components for FreeBSD (kernel- and user-space) for efficient packet capturing in high-speed networks.  While working on this project, I greatly increased my strength in C programming and
 my experience with FreeBSD kernel programming, especially with respect to
-network drivers.  Moreover, during my study I have acquired a good theoretical
-knowledges of operating systems and computer networks.  
+network drivers.  Moreover, during my stidies I have acquired a solid theoretical
+knowledge of operating systems and computer networks.  
 
 My practical skills are mainly:
  * Programming languages: C, Shell, Python
@@ -44,18 +44,18 @@ Packet capturing in high-speed networks is not an easy task due to the system
 limitations such as RAM and system bus throughput. Unfortunately, it is often
 impossible to capture every packet arriving at the network interface.  Hardware
 may not be the only bottleneck, however, as inefficient software is also to
-blame for poor resources usage and resulting packet loss during capture.
+blame for poor resources usage and the resulting packet loss during capture.
 
-The new *ringmap* capturing stack for FreeBSD already allows on commodity
-hardware for efficient capturing at 1GBit/sec with very low packet loss and low
-system load (under 12%). Under similar conditions,  with Intel 1GbE cards
-and 64 bytes packets, the standard capturing software of FreeBSD-7.x during capturing generates a system load of up to 100% and results in up to 100% packet loss. 
+The new *ringmap* capturing stack for FreeBSD already allows for efficient capturing at 1GBit/sec on commodity
+hardware with very low packet loss and low
+system load (under 12%). Under similar conditions, with Intel 1GbE cards
+and 64 bytes packets, the standard capturing software of FreeBSD-7.x during capturing generates a system load of up to 100% and results in close to 100% packet loss. 
 
-Similar to "zero-copy BPF" implementation, the idea is to eliminate packet copy operations by using shared memory buffers. However, unlike the "zero-copy BPF" model, ringmap eliminates all packet copies during capturing:
+Similar to "zero-copy BPF" implementation, our idea is to eliminate packet copy operations by using shared memory buffers. However, unlike the "zero-copy BPF" model, ringmap eliminates all packet copies during capturing:
 the network adapter's DMA buffer is mapped directly into the user-space. Ringmap also adapts _libpcap_ accordingly to provide user-space applications with access to the captured packets without any additional overhead.
 
-In the context of the GSoC-2010 I will continue developing ringmap packet
-capturing stack and I have to achieve the following goals:
+In the context of the GSoC-2010 I will continue developing the ringmap packet
+capturing stack and I plan to achieve the following goals:
 
  * Refactoring ringmap code in order to make it portable to other network adapters
  * Porting ringmap to 10GbE Intel network adapters
@@ -72,21 +72,21 @@ The ringmap capturing stack is currently based on em-driver and is usable only w
 Intel 1Gb Ethernet Adapters. Therefore, the goal is to modify the ringmap
 capturing stack for the 10Gb Ethernet Intel network adapters based on 82598 and
 82599 processors.
-To achieve this goal the next steps are:
+To achieve this goal the next steps are to:
  * Understand the functionality of 10GbE Intel controllers
  * Understand and analyze the code from *ixgbe* driver
- * Porting of the ringmap code to ixgbe
+ * Port the ringmap code to ixgbe
 
 I'm planning at first to split out the existing ringmap code into
 hardware-dependent and hardware-independent code. This will first be
-done by splitting the data scructures and then the functions. It has to be done because the present ringmap code was implemented  only for em-driver and only for one
-type of Ethernet controllers, and as a result the hardware-dependent and
--independent data is placed together in the same structures.  Moreover, I have
+done by splitting the data scructures and then the functions. This must be done because the present ringmap code was implemented  only for em-driver and only for one
+type of Ethernet controller, and as a result the hardware-dependent and
+-independent data is mixed together within the same structures.  Moreover, I have
 to extend the existing data structures to make the ringmap code more portable. 
 
-After that porting the ringmap functions to ixgbe-driver will be started . In order 
+Next, I will follow by porting the ringmap functions to the ixgbe-driver. In order 
 do it, I will first insert the "hooks" for ringmap
-functionalities into the ixgbe-driver code  (through #ifdef). It should be: 
+functionalities into the ixgbe-driver code  (through #ifdef). These should include: 
  * Init hook:
   * Will be placed in the "attach" function of ixgbe driver. 
  * Uninit hook:
@@ -95,13 +95,13 @@ functionalities into the ixgbe-driver code  (through #ifdef). It should be:
   * Multiple hooks that will be placed in the code of ixgbe that is executed as result of a packet receive interrupt.
 
 The first places where I will port the ringmap functions are "attach" and
-"detach" functions of ixgbe-driver. In addition to their ordinary tasks, these functions must be able to allocate and deallocate the ringmap data structures properly. After this step I will begin porting most complicated part of the code, that has to be executed as a result of interrupt.
+"detach" functions of ixgbe-driver. In addition to their ordinary tasks, these functions must be able to allocate and deallocate the ringmap data structures properly. After this step I will begin porting most complicated part of the code that has to be executed as a result of interrupt.
 
 While porting the driver there may appear some difficulties due to the
 differences between the 1Gb and 10Gb adapters. In this connection, before
-starting the work I have  to study carefully functionality of the 10Gb Intel
+starting the work I must study carefully the functionality of the 10Gb Intel
 controller with a strong emphasis of DMA- and interrupt-functionality and
-find differences which affect changing of the driver code.
+find differences which will impact changes to the driver code.
 
 
 ==== Porting The Ringmap Capturing Stack To FreeBSD-8 ====
@@ -149,7 +149,7 @@ I plan 13 weeks for the whole work .
   * *CODING PART DEADLINE at the end of 9th week*
  # Performance Test
   * 2 weeks.
-  * Conducting performance analysis and evaluation between the standard packet capturing stack of FreeBSD-8 and ringmap. To achieving this goal will be several computers for generating of traffic together used in order to reach higher than 1Gibt/sec traffic.
+  * Conducting performance analysis and evaluation between the standard packet capturing stack of FreeBSD-8 and ringmap. To perform effective performance evaluation, several servers for traffic generation will be used together in order to reach greater-than 1Gibt/sec traffic.
  # Documentation
   * 2 weeks. 
   * Documentation and cosmetic debugging of ringmap
@@ -159,11 +159,10 @@ I plan 13 weeks for the whole work .
 
 == Support ==
 The hardware infrastructure and testbed for implementation and testing will
-be provided by the research group Intelligent Networks ([http://www.net.t-labs.tu-berlin.de/ FG INET]) at the University of
-Technology in Berlin
+be provided by the research group Intelligent Networks ([http://www.net.t-labs.tu-berlin.de/ FG INET]) at the Berlin Institute of Technology
 
 *The technical contact is:*<br>
 Jan Böttger (Boettger)<br>
 Email : jan(at)net.t-labs.tu-berlin.de<br>
 phone: +49 (0)30 8353 58516<br>
-University of Technology Berlin, Germany<br>
+Berlin Institute of Technology, Berlin, Germany<br>
