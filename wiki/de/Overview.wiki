@@ -55,5 +55,5 @@ _libpcap_ implementiert:
 
 == Software == 
  * FreeBSD-*7.x*, *i386*-Kernel
- * *em*  driver for Intel GbE adapters
-  * must be [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html compiled and installed as module]
+ * *em*-Treiber für Intel GbE Adapters
+  * soll [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html als Module kompiliert und installiert werden]
