@@ -9,16 +9,9 @@ darzustellen. Aufgrund der limitierten Rechnerleistung und Ineffizienz der
 Software, kommt es leider oft dazu, dass nicht alle Pakete aus dem Netz
 untersucht werden können.
 
-Nicht nur die Hardware stellt einen Flaschenhals für die Datenbearbeitung
-in einem Rechnersystem dar. Die Hardwareressourcen können von der Software
-ineffektiv benutzt werden. Zum Beispiel: wenn ein Programm wesentlich mehr
-Operationen ausführt, als zur Lösung des Problems nötig wären, dann erzeugt es
-einen unnötig hohe Systemlast und reduziert damit die Datenmengen, die es in
-einem Zeitintervall bearbeiten könnte.
- 
-Das Ziel dieses Projektes ist es, die für Capturing relevante Komponente des
-Betriebssystem [http://www.freebsd.org  FreeBSD] zu untersuchen, die
-potentiellen "Engstellen" in der Software, die zu den Datenverlusten führen
+Im Rahmen dieses Projektes wird versucht, die für Capturing relevante
+Komponente des Betriebssystem [http://www.freebsd.org  FreeBSD] zu untersuchen,
+die potentiellen "Engstellen" in der Software, die zu den Datenverlusten führen
 können,  herauszufinden, und effiziente Algorithmen zur Erhöhung des
 Datendurchsatzes und Reduzierung der Systemauslates beim Capturing zu
 erarbeiten und zu implementieren.
