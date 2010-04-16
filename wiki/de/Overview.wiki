@@ -18,7 +18,8 @@ erarbeiten und zu implementieren.
 
 
 = Project Goal =
-Implement new software components for efficient packet capturing at 1G (and [http://code.google.com/p/ringmap/wiki/Google_Summer_of_Code_2010#1._Porting_ringmap_to_10GbE_Intel_Network_Adapters in the future 10G]) in [http://www.freebsd.org FreeBSD] while  minimizing CPU-load and packet loss. These components are realized as the new (*ringmap*) *FreeBSD packet capturing stack*:
+Implementierung der neuen Software-Komponenten für die effiziente Erfassung von Netzwerk-Pakete in FreeBSD. Die neue Software soll es möglich machen, die Paketverluste und CPU-Auslastung während Paketerfassung zu minimieren. Diese Software-Komponenten werden als der neue (_ringmap_) FreeBSD Packet Capturing Stack realisiert:
+
  * New network driver. Now based on *[http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+7.0-RELEASE em]* driver, but in the future on *[http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+7.0-RELEASE ixgb]* for 10G capturing
  * New *libpcap*-functions for accessing packets by using *ringmap* driver. 
  * System calls to control the capturing
