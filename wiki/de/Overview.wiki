@@ -17,7 +17,7 @@ Datendurchsatzes und Reduzierung der Systemauslates beim Capturing zu
 erarbeiten und zu implementieren.
 
 
-= Project Goal =
+= Projektziel =
 Implementierung der neuen Software-Komponenten für die effiziente Erfassung von
 Netzwerk-Paketen in FreeBSD. Die neue Software soll es möglich machen, die
 Paketverluste und CPU-Auslastung während Paketerfassung zu minimieren. Diese
@@ -28,8 +28,9 @@ Stack realisiert:
  * Die neue  _libpcap_-Funktionen für den Paketzugriff aus dem Userspace bei der Einsetzung des  _ringmap_-Treibers. 
  * Die Systemaufrufe zur Steuerung des Capturing-Prozesses
 
-The new implemented software must be transparent for user-space applications. Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with the new *ringmap* network driver and new modified _libpcap_. 
-
+Die implementierte Software  muss transparent für die User-Space-Anwendungen
+sein. Die Capturing-Anwendungen sollen ohne Modifizierung mit dem
+_ringmap_-Capturing-Stack anwendbar sein. 
 
 = Definitionen = 
 *Packet capturing stack* ist die Software, die für Capturing benötigt wird. Sie
@@ -48,8 +49,9 @@ _libpcap_ implementiert:
 = Hardware- und Software-Voraussetzungen =
 == Hardware ==
  * *[http://en.wikipedia.org/wiki/X86 x86]* or *[http://en.wikipedia.org/wiki/X86-64 x86-64]* - microprocessor architecture
- * Gigabit Ethernet adapters based on the following Intel controller chips:
+ * Gigabit Ethernet adapters mit den folgenden controller-chips von Intel:
   * _82540, 82541ER, 82541PI, 82542, 82543, 82544, 82545, 82546, 82546EB, 82546GB, 82547, 82571, 82572 and 82573_
+ * Die Portierung von _ringmap_ auf 10GbE Adapters ist im Progress.
 
 == Software == 
  * FreeBSD-*7.x*, *i386*-Kernel
