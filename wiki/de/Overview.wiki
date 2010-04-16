@@ -7,14 +7,12 @@ Paket-Capturing oder _Sniffing_ ist der Prozess des Abfangens von
 Netzwerkpaketen, mit dem Ziel diese zu speichern, zu analysieren und
 darzustellen. Aufgrund der limitierten Rechnerleistung und Ineffizienz der
 Software, kommt es leider oft dazu, dass nicht alle Pakete aus dem Netz
-untersucht werden können.
-
-Im Rahmen dieses Projektes wird versucht, die für Capturing relevante
-Komponente des Betriebssystem [http://www.freebsd.org  FreeBSD] zu untersuchen,
-die potentiellen "Engstellen" in der Software, die zu den Datenverlusten führen
-können,  herauszufinden, und effiziente Algorithmen zur Erhöhung des
-Datendurchsatzes und Reduzierung der Systemauslates beim Capturing zu
-erarbeiten und zu implementieren.
+untersucht werden können.  Im Rahmen dieses Projektes wird versucht, die für
+Capturing relevante Komponente des Betriebssystem [http://www.freebsd.org
+FreeBSD] zu untersuchen, die potentiellen "Engstellen" in der Software, die zu
+den Datenverlusten führen können,  herauszufinden, und effiziente Algorithmen
+zur Erhöhung des Datendurchsatzes und Reduzierung der Systemauslates beim
+Capturing zu erarbeiten und zu implementieren.
 
 
 = Projektziel =
@@ -56,3 +54,7 @@ _libpcap_ implementiert:
  * FreeBSD-*7.x*, *i386*-Kernel
  * *em*-Treiber für Intel GbE Adapters
   * soll [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html als Module kompiliert und installiert werden]
+
+
+= Ergebnisse =
+[http://ringmap.googlecode.com/files/ringmap_slides.pdf Siehe Präsentation]
