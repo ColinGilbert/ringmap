@@ -48,7 +48,6 @@ _libpcap_ implementiert:
 
 = Hardware- und Software-Voraussetzungen =
 == Hardware ==
- * *[http://en.wikipedia.org/wiki/X86 x86]* or *[http://en.wikipedia.org/wiki/X86-64 x86-64]* - microprocessor architecture
  * Gigabit Ethernet adapters mit den folgenden controller-chips von Intel:
   * _82540, 82541ER, 82541PI, 82542, 82543, 82544, 82545, 82546, 82546EB, 82546GB, 82547, 82571, 82572 and 82573_
  * Die Portierung von _ringmap_ auf 10GbE Adapters ist im Progress.
