@@ -8,11 +8,11 @@ Netzwerkpaketen, mit dem Ziel diese zu speichern, zu analysieren und
 darzustellen. Aufgrund der limitierten Rechnerleistung und Ineffizienz der
 Software, kommt es leider oft dazu, dass nicht alle Pakete aus dem Netz
 untersucht werden können.  Im Rahmen dieses Projektes wird versucht, die für
-Capturing relevante Komponente des Betriebssystem [http://www.freebsd.org
-FreeBSD] zu untersuchen, die potentiellen "Engstellen" in der Software, die zu
-den Datenverlusten führen können,  herauszufinden, und effiziente Algorithmen
-zur Erhöhung des Datendurchsatzes und Reduzierung der Systemauslates beim
-Capturing zu erarbeiten und zu implementieren.
+Capturing relevante Komponente des Betriebssystem [http://www.freebsd.org FreeBSD] 
+zu untersuchen, die potentiellen "Engstellen" in der Software, die zu den
+Datenverlusten führen können,  herauszufinden, und effiziente Algorithmen zur
+Erhöhung des Datendurchsatzes und Reduzierung der Systemauslates beim Capturing
+zu erarbeiten und zu implementieren.
 
 
 = Projektziel =
