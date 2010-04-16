@@ -3,9 +3,7 @@
 <wiki:toc max_depth="1" />
 
 = Introduction =
-Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately, at line-rate speeds, it is often impossible to capture every packet arriving at a network interface. Hardware may not be the only bottleneck, however, as inefficient software is also to blame for poor resources usage and resulting packet loss during capture. 
-
-Within the context of this project the new software components will be developed in order to improve the performance of packet capturing in _FreeBSD_.
+Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately, at line-rate speeds, it is often impossible to capture every packet arriving at a network interface. Hardware may not be the only bottleneck, however, as inefficient software is also to blame for poor resources usage and resulting packet loss during capture. Within the context of this project the new software components will be developed in order to improve the performance of packet capturing in _FreeBSD_.
 
 
 = Project Goal =
