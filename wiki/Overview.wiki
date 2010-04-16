@@ -1,4 +1,5 @@
 ﻿#summary About Project.
+#labels Phase-Requirements,Phase-Design
 #sidebar TableOfContents
 <wiki:toc max_depth="1" />
 
@@ -7,12 +8,12 @@ Packet capturing in high-speed networks is not an easy task due to the system li
 
 
 = Project Goal =
-Implement the new software components for efficient packet capturing at 1Gb and 10Gb in _FreeBSD_. The new software should make it possible to minimize packet loss and CPU load during packet capture. These software components have to be realized as the new (*ringmap*) *FreeBSD packet capturing stack*:
- * New network driver. Now based on *[http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+7.0-RELEASE em]* driver. In the future will port to *[http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+7.0-RELEASE ixgb]* and *[http://www.freebsd.org/cgi/man.cgi?query=ixgbe&manpath=FreeBSD+8.0-RELEASE ixgbe]* for 10G capturing
- * New *libpcap*-functions for accessing packets by using *ringmap* driver. 
+Implement the new software components for efficient packet capturing at 1Gb and 10Gb in _FreeBSD_. The new software should make it possible to minimize packet loss and CPU load during packet capture. These software components have to be realized as the new (_ringmap_) _FreeBSD packet capturing stack_:
+ * New network driver. Now based on [http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+7.0-RELEASE em] driver. In the future will port to [http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+7.0-RELEASE ixgb] and [http://www.freebsd.org/cgi/man.cgi?query=ixgbe&manpath=FreeBSD+8.0-RELEASE ixgbe] for 10G capturing
+ * New _libpcap_-functions for accessing packets by using _ringmap_ driver. 
  * System calls to control the capturing
 
-The new implemented software must be transparent for user-space applications. Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with the new *ringmap* network driver and new modified _libpcap_. 
+The new implemented software must be transparent for user-space applications. Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with the new _ringmap_ network driver and new modified _libpcap_. 
 
 
 = Definitions = 
