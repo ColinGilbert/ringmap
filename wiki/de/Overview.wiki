@@ -18,11 +18,15 @@ erarbeiten und zu implementieren.
 
 
 = Project Goal =
-Implementierung der neuen Software-Komponenten für die effiziente Erfassung von Netzwerk-Pakete in FreeBSD. Die neue Software soll es möglich machen, die Paketverluste und CPU-Auslastung während Paketerfassung zu minimieren. Diese Software-Komponenten werden als der neue (_ringmap_) FreeBSD Packet Capturing Stack realisiert:
+Implementierung der neuen Software-Komponente für die effiziente Erfassung von
+Netzwerk-Paketen in FreeBSD. Die neue Software soll es möglich machen, die
+Paketverluste und CPU-Auslastung während Paketerfassung zu minimieren. Diese
+Software-Komponenten werden als der neue (_ringmap_) FreeBSD Packet Capturing
+Stack realisiert:
 
- * New network driver. Now based on *[http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+7.0-RELEASE em]* driver, but in the future on *[http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+7.0-RELEASE ixgb]* for 10G capturing
- * New *libpcap*-functions for accessing packets by using *ringmap* driver. 
- * System calls to control the capturing
+ * Der neue _ringmap_-Netzwerktreiber. Im Moment basiert auf [http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+7.0-RELEASE em] treiber. (Die Portierung auf  [http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+7.0-RELEASE ixgb] für 10G capturing is im Gange)
+ * Die neue  _libpcap_-Funktionen für den Paketzugriff aus dem Userspace bei der Einsetzung des  _ringmap_-Treibers. 
+ * Die Systemaufrufe zur Steuerung des Capturing-Prozesses
 
 The new implemented software must be transparent for user-space applications. Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with the new *ringmap* network driver and new modified _libpcap_. 
 
