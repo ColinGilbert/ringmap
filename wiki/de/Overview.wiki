@@ -18,13 +18,13 @@ erarbeiten und zu implementieren.
 
 
 = Project Goal =
-Implementierung der neuen Software-Komponente für die effiziente Erfassung von
+Implementierung der neuen Software-Komponenten für die effiziente Erfassung von
 Netzwerk-Paketen in FreeBSD. Die neue Software soll es möglich machen, die
 Paketverluste und CPU-Auslastung während Paketerfassung zu minimieren. Diese
 Software-Komponenten werden als der neue (_ringmap_) FreeBSD Packet Capturing
 Stack realisiert:
 
- * Der neue _ringmap_-Netzwerktreiber. Im Moment basiert auf [http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+7.0-RELEASE em] treiber. (Die Portierung auf  [http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+7.0-RELEASE ixgb] für 10G capturing is im Gange)
+ * Der neue _ringmap_-Netzwerktreiber. Im Moment basiert auf [http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+7.0-RELEASE em]-Treiber. (Die Portierung auf  [http://www.freebsd.org/cgi/man.cgi?query=ixgb&manpath=FreeBSD+7.0-RELEASE ixgb] für 10G capturing ist im Gange)
  * Die neue  _libpcap_-Funktionen für den Paketzugriff aus dem Userspace bei der Einsetzung des  _ringmap_-Treibers. 
  * Die Systemaufrufe zur Steuerung des Capturing-Prozesses
 
