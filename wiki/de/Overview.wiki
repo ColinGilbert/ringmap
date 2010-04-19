@@ -31,7 +31,7 @@ sein. Die Capturing-Anwendungen sollen ohne Modifizierung mit dem
 _ringmap_-Capturing-Stack anwendbar sein. 
 
 = Definitionen = 
-*Packet capturing stack* ist die Software, die für Capturing benötigt wird. Sie
+*Packet-Capturing-Stack* ist die Software, die für Capturing benötigt wird. Sie
 kann  aus mehreren Komponenten bestehen. Im Betriebssystem FreeBSD sind diese
 Komponenten sowohl im Kern des Betriebssystem als auch in der Userspace-Library
 _libpcap_ implementiert:
@@ -41,12 +41,12 @@ _libpcap_ implementiert:
   * [http://en.wikipedia.org/wiki/Berkeley_Packet_Filter Berkeley Packet Filter]
  * Software für Paketzugriff 
   * meistens basiert auf _[http://www.tcpdump.org/ libpcap]_
-  * die empfangene Pakete können auch infolge der Systemaufrufe auf [http://www.freebsd.org/cgi/man.cgi?query=bpf&manpath=FreeBSD+8.0-RELEASE bpf]-device
+  * die empfangene Pakete können auch infolge der Systemaufrufe auf [http://www.freebsd.org/cgi/man.cgi?query=bpf&manpath=FreeBSD+8.0-RELEASE bpf]-device zugegriffen werden
 
 
 = Hardware- und Software-Voraussetzungen =
 == Hardware ==
- * Gigabit Ethernet adapters mit den folgenden controller-chips von Intel:
+ * Gigabit Ethernet Adapters mit den folgenden Controller-Chips von Intel:
   * _82540, 82541ER, 82541PI, 82542, 82543, 82544, 82545, 82546, 82546EB, 82546GB, 82547, 82571, 82572 and 82573_
  * Die Portierung von _ringmap_ auf 10GbE Adapters ist im Progress.
 
