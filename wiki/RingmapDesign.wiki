@@ -29,8 +29,8 @@ can be eliminated by using shared memory too [1].
 Our solution is to map DMA packet-buffers into the space of user process. This
 allows user space process to access the captured packets directly in
 its own address space without any additional overhead. So, the user space
-process has the access to all packets received from the network. Further, to filter the
-received packets in the user space the BPF of libpcap can be used.
+process has the access to all packets received from the network. To filter the
+received packets in the user space the BPF of _libpcap_ can be used.
 
 = Background =
 This chapter explains the software and hardware aspects relevant for packet capturing.
@@ -39,13 +39,14 @@ This chapter explains the software and hardware aspects relevant for packet capt
 When packets arrive at a network adapter, the adapter verifies the checksum, extracts
 the link-layer data and transfers the packets into the RAM using DMA. Next, generates
 the network adapter an interrupt. This interrupt calls the corresponding interrupt service
-routine (ISR) of adapter driver. The ISR usually checks only the cause of the interrupt and
-then, depending  on  number of received packets, plans one or more kernel-threads.
-The kernel-thread  checks the received packets, allocates structures (*mbufs*)
+routine (ISR) of adapter driver. The ISR usually checks only the cause of the interrupt and then, depending  on  number of received packets, plans one or more kernel-threads.
+The kernel-thread  checks the received packets, allocates structures (*[http://www.freebsd.org/cgi/man.cgi?query=mbuf&manpath=FreeBSD+8.0-RELEASE mbufs]*)
 for packets representation and passes packets to TCP/IP-protocol stack and to every *BPF*
-(one for each application which is capturing). The BPF applies the previously installed filters,
-and if the packet is accepted it is copied into the BPF-STORE/HOLD double buffer. Now the
-captured packets can be fetched through _read(2)_ on _/dev/bpf_ or using _libpcap_ functions.
+(one for each application which is capturing). The BPF applies the previously installed filters, and if the packet is accepted it is copied into the BPF-STORE/HOLD double buffer. Now the captured packets can be fetched through _read(2)_ on _/dev/bpf_ or using _libpcap_ functions.
+
+
+Figure 1 demonstrates the standard packet capturing stack in FreeBSD. 
+
 
 == Network Adapter ==
 This section describes how the packet reception works by supported network adapters.
