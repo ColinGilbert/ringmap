@@ -19,7 +19,7 @@ in FreeBSD. The memory buffers are allocated by the network driver for each
 packet received at the network interface. Also packets are filtered and one
 or more times copied within the RAM during capturing. These operations can
 cause high system load and packet loss while capturing at bit-rates
-closely to _1Gb/sec_ or greater  (see results chapter in the presentation).
+closely to _1Gb/sec_ or greater  (see results chapter in the[http://ringmap.googlecode.com/files/ringmap_slides.pdf ringmap presentation]).
 
 The main idea of our solution to this problem is eliminating packet copy
 operations by using shared memory buffers and eliminating memory allocations by
