@@ -43,7 +43,7 @@ This chapter explains the software and hardware aspects relevant for packet capt
 
 
 == Network Adapter ==
-This section describes how the packet reception works by supported network adapters.
+This section describes how the packet reception works by [Overview#Hardware supported network adapters].
 In the general case, for all network adapters, packet reception consists of recognizing the presence of a packet on the wire, storing the packet in the receive data FIFO on the adapter and transferring the data to a receive buffer in RAM. The differences between several adapters can appear among others  in DMA and interrupt functionalities.
 
 === GbE Intel Network Adapters ===
