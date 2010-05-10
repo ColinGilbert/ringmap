@@ -1,4 +1,4 @@
-#summary Explaining ringmap architecture.
+#summary Ringmap architecture.
 #labels Phase-Design,Phase-Implementation
 #sidebar TableOfContents
 <wiki:toc max_depth="2" />
