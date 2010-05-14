@@ -39,9 +39,6 @@ This chapter explains the software and hardware aspects relevant for packet capt
 *[http://ringmap.googlecode.com/files/FreeBSD_Capturing.png This figure]* demonstrates the standard packet capturing stack in FreeBSD. When packets arrive at a network adapter, the adapter verifies the checksum, extracts the link-layer data and transfers the packets into the RAM using DMA. Next, generates the network adapter an interrupt. This interrupt calls the corresponding interrupt service routine (ISR) of adapter driver. The ISR usually checks only the cause of the interrupt and then, depending  on  number of received packets, plans one or more kernel-threads. The kernel-thread  checks the received packets, allocates structures for packets representation (_[http://www.freebsd.org/cgi/man.cgi?query=mbuf&manpath=FreeBSD+8.0-RELEASE mbufs]_) and passes packets to TCP/IP-protocol stack and to every *BPF* (one for each application which is capturing). The BPF applies the previously installed filters, and if the packet is accepted it is copied into the BPF-STORE/HOLD double buffer. Now the captured packets can be fetched through _read(2)_ on _/dev/bpf_ or using _libpcap_ functions.
 
 
-
-
-
 == Network Adapter ==
 This section describes how the packet reception works by supported controllers.
 In the general case, for all network adapters, packet reception consists of recognizing the presence of a packet on the wire, storing the packet in the receive data FIFO on the adapter and transferring the data to a receive buffer in RAM. The differences between several adapters can appear among others  in DMA and interrupt functionalities.
@@ -61,3 +58,4 @@ To increase the performance of capturing we want to map packets buffers and some
 
 = External Links =
  # [http://www.FreeBSD.org/cgi/man.cgi?query=bpf&apropos=0&sektion=0&manpath=FreeBSD+8-current&format=html FreeBSD 8.x BPF(4) man page, including description of zero-copy BPF buffers]
+ # [http://www.seccuris.com/documents/whitepapers/20070517-devsummit-zerocopybpf.pdf Zero-Copy BPF Buffers]
