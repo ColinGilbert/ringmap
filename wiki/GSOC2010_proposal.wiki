@@ -3,9 +3,8 @@
 <wiki:toc max_depth="2" />
 
 = Personal Data =
-||Name:||Alexandre Fiveg||
-||Email:||alexandre(at)net.t-labs.tu-berlin.de||
-||Phone:||+491629485320||
+||Name:||Alexander Fiveg||
+||Email:||afiveg(at)freebsd.org||
 ||Availability:||30 hours per week||
 ||Start:||avaliable from 1 May||
 
@@ -29,8 +28,8 @@ My practical skills are mainly:
 The FreeBSD Project
 
 = Mentors =
-||Name:||Robert Watson||
-||Email:|| rwatson(at)FreeBSD.org||
+||Name:||Philip Paeps||
+||Email:|| philip(at)freebsd.org||
 
 <br>
 
