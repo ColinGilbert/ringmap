@@ -59,4 +59,4 @@ To increase the performance of capturing we want to map packets buffers and some
 = External Links =
  # [http://www.FreeBSD.org/cgi/man.cgi?query=bpf&apropos=0&sektion=0&manpath=FreeBSD+8-current&format=html FreeBSD 8.x BPF(4) man page, including description of zero-copy BPF buffers]
  # [http://www.seccuris.com/documents/whitepapers/20070517-devsummit-zerocopybpf.pdf Zero-Copy BPF Buffers]
- # [download.intel.com/design/network/manuals/8254x_GBe_SDM.pdf PCI/PCI-X Family of Gigabit Ethernet Controllers Software Developer’s Manual]
+ # [http://download.intel.com/design/network/manuals/8254x_GBe_SDM.pdf PCI/PCI-X Family of Gigabit Ethernet Controllers Software Developer’s Manual]
