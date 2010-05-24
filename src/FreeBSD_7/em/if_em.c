@@ -81,8 +81,8 @@
 #include <dev/pci/pcivar.h>
 #include <dev/pci/pcireg.h>
 
-#ifdef __FIVEG_DA__
-#include "fiveg_da.h"
+#ifdef __RINGMAP__
+#include "ringmap.h"
 #endif
 
 #include "e1000_api.h"
@@ -265,7 +265,7 @@ static void	em_tx_purge(struct adapter *);
 static int	em_allocate_receive_structures(struct adapter *);
 static int	em_allocate_transmit_structures(struct adapter *);
 
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 static int	em_rxeof(struct adapter *, int);
 #else
 int	em_rxeof(struct adapter *, int);
@@ -303,7 +303,7 @@ static void	em_82547_move_tail(void *);
 static int	em_dma_malloc(struct adapter *, bus_size_t,
 		    struct em_dma_alloc *, int);
 static void	em_dma_free(struct adapter *, struct em_dma_alloc *);
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 static void	em_print_debug_info(struct adapter *);
 #else
 void	em_print_debug_info(struct adapter *);
@@ -348,7 +348,7 @@ static void	em_add_rx_process_limit(struct adapter *, const char *,
 
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-#ifndef __FIVEG_DA__ 
+#ifndef __RINGMAP__ 
 static void	em_handle_rxtx(void *context, int pending);
 #else
 extern void	ringmap_handle_rxtx(void *context, int pending);
@@ -369,7 +369,7 @@ static poll_handler_t em_poll;
 
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 /* Print Vars saved in adapter structure */
 extern int 	ringmap_attach(struct adapter *);
 extern int 	ringmap_detach(struct adapter *);
@@ -394,7 +394,7 @@ static device_method_t em_methods[] = {
 	{0, 0}
 };
 
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 static driver_t em_driver = {
 	"em", em_methods, sizeof(struct adapter),
 };
@@ -407,14 +407,14 @@ static driver_t em_driver = {
 
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 static devclass_t em_devclass;
 #else
 devclass_t em_devclass;
 #endif
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
 
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 DRIVER_MODULE(em, pci, em_driver, em_devclass, 0, 0);
 MODULE_DEPEND(em, pci, 1, 1, 1);
 MODULE_DEPEND(em, ether, 1, 1, 1);
@@ -502,7 +502,7 @@ em_probe(device_t dev)
 	pci_subvendor_id = pci_get_subvendor(dev);
 	pci_subdevice_id = pci_get_subdevice(dev);
 
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 	if (DEV_ID) {
 		if (pci_device_id == DEV_ID)
 			return 0;
@@ -903,7 +903,7 @@ em_attach(device_t dev)
 
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 	if (ringmap_attach(adapter) < 0)
 		return (EIO);
 
@@ -915,7 +915,7 @@ em_attach(device_t dev)
 	INIT_DEBUGOUT2("[%s]:%s END.",__func__, device_get_nameunit(dev));
 #endif
 
-#endif /* __FIVEG_DA__ */
+#endif /* __RINGMAP__ */
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
 
 
@@ -965,7 +965,7 @@ em_detach(device_t dev)
 
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 		ringmap_detach(adapter);
 
 #if (__RINGMAP_DEB) 
@@ -1853,7 +1853,7 @@ em_handle_link(void *context, int pending)
 	EM_CORE_UNLOCK(adapter);
 }
 
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 /* Combined RX/TX handler, used by Legacy and MSI */
 static void
 em_handle_rxtx(void *context, int pending)
@@ -1949,7 +1949,7 @@ em_irq_fast(void *arg)
 	 */
 	em_disable_intr(adapter);
 
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 	RINGMAP_INTR(NOW SET rxtx_task IN QUEUE);
 	adapter->rm->ring.interrupts_counter++;
 
@@ -3032,7 +3032,7 @@ em_allocate_legacy(struct adapter *adapter)
 	 * Try allocating a fast interrupt and the associated deferred
 	 * processing contexts.
 	 */
-#ifndef __FIVEG_DA__ 
+#ifndef __RINGMAP__ 
 	TASK_INIT(&adapter->rxtx_task, 0, em_handle_rxtx, adapter);
 #else
 	TASK_INIT(&adapter->rxtx_task, 0, ringmap_handle_rxtx, adapter);
@@ -4552,7 +4552,7 @@ em_initialize_receive_unit(struct adapter *adapter)
 	E1000_WRITE_REG(&adapter->hw, E1000_RDH(0), 0);
 
 
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 	E1000_WRITE_REG(&adapter->hw, E1000_RDT(0), adapter->num_rx_desc - 1);
 #else
 	E1000_WRITE_REG(&adapter->hw, E1000_RDT(0), adapter->num_rx_desc - RING_SAFETY_MARGIN);
@@ -4627,7 +4627,7 @@ em_free_receive_structures(struct adapter *adapter)
  *  count < 0.
  *
  *********************************************************************/
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 static int
 #else
 int
@@ -4643,7 +4643,7 @@ em_rxeof(struct adapter *adapter, int count)
 
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 	struct ringmap *rm = adapter->rm;
 
 	RINGMAP_INTR(start);
@@ -4749,7 +4749,7 @@ em_rxeof(struct adapter *adapter, int count)
 		if (accept_frame) {
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 			/* 
 			 * We don't want to allocate buffer for new incomming frame 
 			 * We are working with ring buffer
@@ -4828,7 +4828,7 @@ skip:
 			ifp->if_ierrors++;
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-#ifndef __FIVEG_DA__ 
+#ifndef __RINGMAP__ 
 discard:
 #endif
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
@@ -4854,7 +4854,7 @@ discard:
 		bus_dmamap_sync(adapter->rxdma.dma_tag, adapter->rxdma.dma_map,
 		    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 			rm->ring.slot[i].ts = adapter->intr_ts;
 #endif
 
@@ -4873,7 +4873,7 @@ discard:
 			adapter->next_rx_desc_to_check = i;
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 /* ******************************************************
  * We dont want to do anything with protocol stack
  * We want to map mbufs and pkts in space of user process
@@ -4903,7 +4903,7 @@ discard:
 		i = adapter->num_rx_desc - 1;
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 	E1000_WRITE_REG(&adapter->hw, E1000_RDT(0), i);
 #endif
 #ifdef __DRIVER_CAPTURING
@@ -5418,7 +5418,7 @@ em_update_stats_counters(struct adapter *adapter)
  *  maintained by the driver and hardware.
  *
  **********************************************************************/
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 static void
 em_print_debug_info(struct adapter *adapter)
 #else

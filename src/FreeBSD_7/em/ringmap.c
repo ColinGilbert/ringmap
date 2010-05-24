@@ -26,7 +26,7 @@
 #include <vm/vm_param.h>
 #include <vm/vm_kern.h>
 
-#include "fiveg_da.h"
+#include "ringmap.h"
 
 #include "e1000_api.h"
 #include "if_em.h"

@@ -12,10 +12,10 @@ SHARED_SRCS += e1000_82540.c e1000_ich8lan.c e1000_82571.c e1000_osdep.c
 SHARED_SRCS += e1000_82575.c 
 
 # ringmap source code 
-SHARED_SRCS+=fiveg_da.c
+SHARED_SRCS+=ringmap.c
 
 # This macro will used for adding our ringmap-code in if_em files
-CFLAGS+=-D__FIVEG_DA__
+CFLAGS+=-D__RINGMAP__
 
 # Debug output. Uncommet it for debugging goals
 #CFLAGS+=-D__FIVEG_DA__DEB
