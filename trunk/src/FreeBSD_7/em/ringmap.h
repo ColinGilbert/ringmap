@@ -30,7 +30,7 @@
 /* Micro seconds to wait for user process */
 #define SECS_TO_TICKS(secs)		(int)(hz / SECS_WAIT_USER)
 
-/* Driver have to work only with device */
+/* Driver have to work only with device wich has the following device ID */
 // #define DEV_ID 	0x105E 
 #define DEV_ID 	0
 

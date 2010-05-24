@@ -23,7 +23,7 @@ CFLAGS+=-DHAVE_SNPRINTF -DHAVE_VSNPRINTF
 
 
 #######       FIVEG DA Block      #########
-SRCS+=fiveg_da_pcap.c
+SRCS+=ringmap_pcap.c
 #INCS+=fiveg_da.h
 CFLAGS+=-D__RINGMAP__
 #CFLAGS+=-lkvm
