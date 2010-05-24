@@ -107,7 +107,7 @@ static int odmlockid = 0;
 #include "gencode.h"	/* for "no_optimize" */
 
 
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 
 #include <machine/bus.h>
 #include "fiveg_da.h"
@@ -667,9 +667,9 @@ pcap_open_live(const char *device, int snaplen, int promisc, int to_ms,
 
 
 	/***********************************************************
-	 ***					 FIVEG DA                        *** 
+	 ***					 RINGMAP                         *** 
 	 ***********************************************************/
-#ifdef __FIVEG_DA__ 
+#ifdef __RINGMAP__ 
 
 
 	if (check_module(device) < 0)
@@ -680,7 +680,7 @@ pcap_open_live(const char *device, int snaplen, int promisc, int to_ms,
 		goto bad;
 
 
-#endif /* __FIVEG_DA__*/
+#endif /* __RINGMAP__*/
 	 /**********************************************************/
 
 
@@ -909,7 +909,7 @@ pcap_open_live(const char *device, int snaplen, int promisc, int to_ms,
 		}
 	}
 
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 	p->to_ms = to_ms;
 #endif
 
@@ -973,13 +973,13 @@ pcap_open_live(const char *device, int snaplen, int promisc, int to_ms,
 
 
 	/***********************************************************
-	 ***					 FIVEG DA                        *** 
+	 ***					 RINGMAP                         *** 
 	 ***********************************************************/
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 	promisc=1;
 #endif
 
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 	if (promisc) {
 		/* set promiscuous mode, okay if it fails */
 		if (ioctl(p->fd, BIOCPROMISC, NULL) < 0) {
@@ -1007,7 +1007,7 @@ pcap_open_live(const char *device, int snaplen, int promisc, int to_ms,
 	memset(p->buffer, 0x0, p->bufsize);
 #endif
 
-#endif /* __FIVEG_DA__*/
+#endif /* __RINGMAP__*/
 	 /**********************************************************/
 
 
@@ -1084,7 +1084,7 @@ pcap_open_live(const char *device, int snaplen, int promisc, int to_ms,
 	}
 
 
-#ifndef __FIVEG_DA__
+#ifndef __RINGMAP__
 	p->read_op = pcap_read_bpf;
 	p->stats_op = pcap_stats_bpf;
 	p->close_op = pcap_close_common;
