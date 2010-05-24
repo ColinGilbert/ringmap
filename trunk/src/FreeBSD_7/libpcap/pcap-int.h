@@ -52,7 +52,7 @@ extern "C" {
 #include <io.h>
 #endif
 
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 	struct e1000_hw_stats;
 #endif
 
@@ -210,7 +210,7 @@ struct pcap {
 	u_int *dlt_list;
 
 	struct pcap_pkthdr pcap_header;	/* This is needed for the pcap_next_ex() to work */
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 	int to_ms;
 	unsigned long long buffer_fill; 
 	unsigned long buffer_fill_average;

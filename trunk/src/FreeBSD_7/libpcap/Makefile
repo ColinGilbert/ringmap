@@ -24,8 +24,8 @@ CFLAGS+=-DHAVE_SNPRINTF -DHAVE_VSNPRINTF
 
 #######       FIVEG DA Block      #########
 SRCS+=fiveg_da_pcap.c
-INCS+=fiveg_da.h
-CFLAGS+=-D__FIVEG_DA__
+#INCS+=fiveg_da.h
+CFLAGS+=-D__RINGMAP__
 #CFLAGS+=-lkvm
 
 # Debugging output
