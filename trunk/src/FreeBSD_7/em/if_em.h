@@ -70,8 +70,8 @@
  */
 #define EM_MIN_RXD		80
 #define EM_MAX_RXD_82543	256
-#ifndef __FIVEG_DA__
-#define EM_MAX_RXD		4096
+#ifndef __RINGMAP__
+#define EM_MAX_RXD		2048
 #define EM_DEFAULT_RXD	EM_MAX_RXD_82543
 #else 
 #define EM_MAX_RXD		SLOTS_NUMBER
@@ -443,7 +443,7 @@ struct adapter {
 
 	struct e1000_hw_stats stats;
 
-#ifdef __FIVEG_DA__
+#ifdef __RINGMAP__
 	struct ringmap *rm;
 	struct timeval intr_ts;
 #endif 
