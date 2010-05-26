@@ -79,7 +79,7 @@ To achieve this goal the next steps are to:
 I'm planning at first to split out the existing ringmap code into
 hardware-dependent and hardware-independent code. This will first be
 done by splitting the data scructures and then the functions. This must be done because the present ringmap code was implemented  only for em-driver and only for one
-type of Ethernet controller, and as a result the hardware-dependent and
+type of Ethernet adapters, and as a result the hardware-dependent and
 -independent data is mixed together within the same structures.  Moreover, I have
 to extend the existing data structures to make the ringmap code more portable. 
 
