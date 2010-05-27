@@ -28,8 +28,10 @@
 
 #include "ringmap.h"
 
+#ifdef __E1000_RINGMAP__
 #include "e1000_api.h"
 #include "if_em.h"
+#endif
 
 /* V A R S   A N D   P O I N T E R S */
 extern devclass_t em_devclass;

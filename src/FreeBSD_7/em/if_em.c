@@ -488,10 +488,6 @@ em_probe(device_t dev)
 	em_vendor_info_t *ent;
 
 
-/*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-	RINGMAP_FUNC_DEBUG(start);
-/*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
-	
 	INIT_DEBUGOUT("em_probe: begin");
 
 	pci_vendor_id = pci_get_vendor(dev);
