@@ -1,0 +1,18 @@
+#!/bin/sh
+
+DRIVER=if_ringmap
+SCRIPTS_DIR="../scripts/"
+DRIVER_SRC_DIR="../em/"
+LIBPCAP_SRC_DIR="../libpcap/"
+
+echo
+echo "===> Install ringmap-libpcap:"
+echo
+cd $LIBPCAP_SRC_DIR 
+make install || { echo "Error by installing libpcap" ; exit 1 ; }
+cd -
+
+echo
+echo "===> kld-Load ringmap-driver"
+kldload ${DRIVER_SRC_DIR}/${DRIVER}.ko || exit 1
+echo
