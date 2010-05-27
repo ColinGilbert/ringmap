@@ -6,14 +6,14 @@
 /* Max value for number of descriptors (a.k.a. slots in the ringbuffer) is 4096 */
 #define SLOTS_NUMBER		2048
 
-/* Prefix for name of device (for example /dev/ringmap_cdev_em0 will full name) */
+/* Prefix for name of device (for example /dev/ringmap_cdev_0 will full name) */
 #define RINGMAP_DEVICE 			"ringmap_cdev_"
 
 /* Name of module to be loaded*/
 #define MOD_NAME 				"if_ringmap.ko"
 
 /* next both line soon will be depricated */
-#define PATH_TO_MODULE 			"/home/alexandre/alexandre-da/src/70/em/if_em.ko"
+// #define PATH_TO_MODULE 			"/home/alexandre/alexandre-da/src/70/em/if_em.ko"
 
 /* Max number of times we have to restart our timer to wating for user
  * capturing process */
@@ -40,28 +40,45 @@ struct address {
 	vm_offset_t	user;
 };
 
+/*
+ * This structure represents the ring slot. 
+ */
 struct ring_slot {
 	struct address 	descriptor;
 	struct address 	mbuf;
 	struct address	packet;
 
+
+	/* Next fields are for statistics */
+
+	/* Time stamp of packet which placed in the slot */
 	struct timeval	ts;
+
+	/* Interrupts number in which kontext the packet was received */
 	unsigned long long intr_num;
 
+	/* Packets counter */
 	unsigned long long cnt;
 };
 
+/*
+ * Packet ring buffer
+ */
 struct ring {
 
 	/*
-	 * kernrp - ring header. Should be changed ONLY in driver. And should be
-	 * synchronized with the hardware ring header register (RDH).
+	 * kernrp - ring HEAD. Should be changed ONLY in driver. And should be
+	 * synchronized with the hardware ring HEAD register (RDH).
 	 */
 	unsigned int kernrp;
 
+	/* 
+	 * userrp - ring TAIL. Should be incremented by user space software after
+	 * reading the slots with a new received packets
+	 */
 	unsigned int userrp;
 
-	/* Hardware Tail register */
+	/* This variable represents the value of Hardware TAIL register */
 	unsigned int hw_RDT;
 
 	/* Number of slots (descriptors a.k.a memory areas for frames) */
@@ -218,10 +235,10 @@ struct e1000_hw_stats {
 /* Number of descs (a.k.a. slots in ring buffer) */
 #define IOCTL_G_DNUM	_IOWR(RINGMAP_IOC_MAGIC, 1, unsigned int)
 
-/* Start capturing. Enable receive and interrupts on NIC */
+/* Start capturing. Enable packets receive and interrupts on NIC */
 #define IOCTL_ENABLE_RECEIVE	_IO(RINGMAP_IOC_MAGIC, 3)
 
-/* Stop Disable Receive and interrupts on NIC */
+/* Disable packets receive and interrupts on NIC */
 #define IOCTL_DISABLE_RECEIVE	_IO(RINGMAP_IOC_MAGIC, 4)
 
 /* Sleep and wait for new pkts in ring buffer */
