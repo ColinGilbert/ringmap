@@ -1,3 +1,7 @@
+#ifdef __E1000_RINGMAP__
+#include "ringmap_e1000.h"
+#endif
+
 /* Minimum distance to be kept between the userrp and RDT to provide a
  * guarantee  to userspace processes that the previous n buffer positions
  * behind userrp will  not be overwritten */
@@ -305,9 +309,9 @@ struct e1000_hw_stats {
 		(ringp)->user_wait_kern 	= 0;								\
 		(ringp)->interrupts_counter	= 0;								\
 		(ringp)->size   = SLOTS_NUMBER;							\
-		(ringp)->kernrp = E1000_READ_REG(&(adapter)->hw, E1000_RDH(0));	\
+		(ringp)->kernrp = RINGMAP_HW_READ_REG(&(adapter)->hw, E1000_RDH(0));	\
 		(ringp)->userrp = (ringp)->kernrp;								\
-		E1000_WRITE_REG(&(adapter)->hw, E1000_RDT(0), R_MODULO(((ringp)->userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER));	\
+		RINGMAP_HW_WRITE_REG(&(adapter)->hw, E1000_RDT(0), R_MODULO(((ringp)->userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER));	\
 	}while(0);
 
 /*  
