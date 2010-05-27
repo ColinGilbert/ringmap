@@ -3,16 +3,20 @@
 DRIVER=if_ringmap
 SCRIPTS_DIR="../scripts/"
 DRIVER_SRC_DIR="../em/"
+LIBPCAP_SRC_DIR="../libpcap/"
 
 echo
+echo "===> Build ringmap-driver and ringmap-libpcap"
+${SCRIPTS_DIR}/ringmap_build || { echo "STOP!" ; exit 1 ; }
 
+# Unload current ringmap module
 kldstat | grep ${DRIVER} > /dev/null 
 if [ $? -eq 0 ]
 then 
-	echo "Unload "${DRIVER}" module"
-	kldunload ${DRIVER}.ko
+	echo "===> Unload "${DRIVER}" module"
+	sudo kldunload ${DRIVER}.ko || { echo "Can not unload old module" ; exit 1 ; }
 	sleep 1
 fi
-echo
-echo "Build and load ringmap driver"
-${SCRIPTS_DIR}/ringmap_build && kldload ${DRIVER_SRC_DIR}/${DRIVER}.ko
+
+# Install ringmap-libpcap and kld-load ringmap-module
+sudo ${SCRIPTS_DIR}/ringmap_load

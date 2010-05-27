@@ -33,10 +33,10 @@
 
 
 /* Driver Kernel object file id */
-int if_em_ko_fileid = -1;
+// int if_em_ko_fileid = -1;
 
 /* to_ms parameter of pcap */
-int fiveg_to_ms = 0;
+// int fiveg_to_ms = 0;
 
 /* File descriptor of fiveg_cdev */
 int ringmap_cdev_fd = -1;

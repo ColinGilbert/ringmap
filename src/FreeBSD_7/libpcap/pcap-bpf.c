@@ -110,7 +110,7 @@ static int odmlockid = 0;
 #ifdef __RINGMAP__
 
 #include <machine/bus.h>
-#include "fiveg_da.h"
+// #include "fiveg_da.h"
 
 /* I hope after that we can compile BPF code in user space */
 int no_optimize=1;
@@ -121,7 +121,6 @@ extern int init_mmapped_capturing(const char *device, pcap_t *);
 extern void uninit_mmapped_capturing(pcap_t *);
 extern int pcap_read_ringmap(pcap_t *, int , pcap_handler , u_char *);
 extern int ringmap_stats(pcap_t *p, struct pcap_stat *ps);
-
 #endif
 
 
@@ -671,14 +670,12 @@ pcap_open_live(const char *device, int snaplen, int promisc, int to_ms,
 	 ***********************************************************/
 #ifdef __RINGMAP__ 
 
-
 	if (check_module(device) < 0)
 		goto bad;
 	if (fiveg_set_iface_promisc(device) < 0)
 		goto bad;
 	if (init_mmapped_capturing(device, p) < 0)
 		goto bad;
-
 
 #endif /* __RINGMAP__*/
 	 /**********************************************************/

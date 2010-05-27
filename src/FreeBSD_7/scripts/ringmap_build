@@ -3,7 +3,7 @@
 OS=FreeBSD
 OS_VERSION=7
 
-DRIVER_HDR="fiveg_da.h"
+DRIVER_HDR="ringmap.h"
 DRIVER_SRC_DIR="../em/"
 LIBPCAP_SRC_DIR="../libpcap/"
 USERCLIENTS_DIR="../userspace/"
@@ -16,22 +16,19 @@ check_os() {
 make_driver() {
 	cd $DRIVER_SRC_DIR
 	make clean
-	make || { echo "Error by compiling of driver" ; return 1 ; }
+	make || { echo "Error by compiling driver" ; return 1 ; }
 	cd -
 
 }
 
 make_libpcap() {
-
 	# Clean last build, make and install 
 	cd $LIBPCAP_SRC_DIR
-	cp ${DRIVER_SRC_DIR}${DRIVER_HDR} .
+	# cp ${DRIVER_SRC_DIR}${DRIVER_HDR} .
 	make clean
-	make || { echo "Error by compiling of libpcap" ; return 1 ; }
-	make install || { echo "Error by installing of libpcap" ; exit 1 ; }
+	make || { echo "Error by compiling libpcap" ; return 1 ; }
 	cd -
 }
-
 
 
 ###################################
