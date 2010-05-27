@@ -13,7 +13,7 @@ ${SCRIPTS_DIR}/ringmap_build || { echo "STOP!" ; exit 1 ; }
 kldstat | grep ${DRIVER} > /dev/null 
 if [ $? -eq 0 ]
 then 
-	echo "===> Unload "${DRIVER}" module"
+	echo ; echo "===> Unload "${DRIVER}" module"
 	sudo kldunload ${DRIVER}.ko || { echo "Can not unload old module" ; exit 1 ; }
 	sleep 1
 fi

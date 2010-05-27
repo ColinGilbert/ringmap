@@ -69,7 +69,7 @@ static struct cdevsw ringmap_devsw = {
 	/* 	close 	*/	.d_close 	= ringmap_close,
 	/* 	read 	*/	.d_read 	= ringmap_read,
 	/*	ioctl	*/	.d_ioctl	= ringmap_ioctl,
-	/* 	name 	*/	.d_name 	= "fiveg_cdev"
+	/* 	name 	*/	.d_name 	= "ringmap_cdev"
 };
 
 /*
