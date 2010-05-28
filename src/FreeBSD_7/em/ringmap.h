@@ -314,22 +314,12 @@ struct e1000_hw_stats {
 		RINGMAP_HW_WRITE_REG(&(adapter)->hw, E1000_RDT(0), R_MODULO(((ringp)->userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER));	\
 	}while(0);
 
-/*  
- * Set hardware USER pointer register (RDT) behind the 
- * user pointer on RING_SAFETY_MARGIN entities
- */
-#define SET_RDT(adapter)			\
-		do {						\
-		E1000_WRITE_REG(&adapter->hw, E1000_RDT(0), R_MODULO((adapter->rm->ring.userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER));	\
-		adapter->rm->ring.hw_RDT = R_MODULO((adapter->rm->ring.userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER);									\
-		} while(0);
-
 /* Increment USER pointer and set the hardware register (RDT) */
 #define INC_USER_POINTER_AND_SET_REG(userrp, ringp, adapter)			\
 	do {																\
 		INC_USER_POINTER(ringp);										\
 		FIVEG_MODULO((userrp), ((ringp)->userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER); \
-		E1000_WRITE_REG(&adapter->hw, E1000_RDT(0), (userrp));						\
+		RINGMAP_HW_WRITE_REG(&adapter->hw, E1000_RDT(0), (userrp));						\
 	} while(0);
 
 #endif
