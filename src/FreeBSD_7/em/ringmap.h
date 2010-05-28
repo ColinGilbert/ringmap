@@ -127,19 +127,12 @@ struct ringmap {
 
 	/* Now only one process can only one time open device */
 	uint32_t		open_cnt;
-
-	/* Timer for waiting for user capturing process */
-	struct callout 	ring_callout;
-
-	/* How many times was timer restarted */
-	unsigned int 	times_restart_callout;
 	
-
 	/* How many frames have seen driver in RAM */
-	unsigned long long pkts_counter;
+	unsigned long long 	pkts_counter;
 
 	/* Our ring that have to be mapped in space of user process */
-	struct ring 	ring;
+	struct ring 		ring;
 };
 
 #endif /* _KERNEL */
