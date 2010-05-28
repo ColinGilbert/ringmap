@@ -373,7 +373,6 @@ static poll_handler_t em_poll;
 /* Print Vars saved in adapter structure */
 extern int 	ringmap_attach(struct adapter *);
 extern int 	ringmap_detach(struct adapter *);
-extern void ringmap_wdog(void *);
 extern int 	ringmap_print_ring_pointers(struct adapter *);
 #endif
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/

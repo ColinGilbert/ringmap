@@ -46,7 +46,6 @@ int check_pointers(struct adapter *);
 int ringmap_attach(struct adapter *);
 int ringmap_detach(struct adapter*);
 struct adapter* get_adapter_struct(struct cdev *dev);
-void ringmap_wdog(void *);
 int ringmap_disable_receive(struct adapter *);
 int ringmap_enable_receive(struct adapter *adapter);
 int ringmap_enable_intr(struct adapter *);
@@ -78,8 +77,9 @@ static struct cdevsw ringmap_devsw = {
  * Will called from if_em.c before returning from 
  * em_attach() function.  
  */
-int ringmap_attach(struct adapter *a) {	struct adapter *adapter = a; struct
-	ringmap *rm;
+int ringmap_attach(struct adapter *a) {	
+	struct adapter *adapter = a; 
+	struct ringmap *rm;
 
 	RINGMAP_FUNC_DEBUG(begin);
 
@@ -92,23 +92,23 @@ int ringmap_attach(struct adapter *a) {	struct adapter *adapter = a; struct
 	MALLOC(rm, struct ringmap *, sizeof(struct ringmap), M_DEVBUF,
 			M_WAITOK|M_ZERO); 
 	
-	if (rm == NULL){ RINGMAP_ERROR(Can not allocate
-				space for ringmap structure); return (-1); }
+	if (rm == NULL) { 
+		RINGMAP_ERROR(Can not allocate space for ringmap structure); 
+		return (-1); 
+	}
 
 	rm->ringmap_dev = make_dev(&ringmap_devsw, device_get_unit(adapter->dev),
 			UID_ROOT, GID_WHEEL, 0666, RINGMAP_DEVICE"%s",
 			device_get_nameunit(adapter->dev));
 
+	rm->open_cnt = 0; 
+	rm->procp = NULL;
 
-	/* Init of timer that have to be start to wait for user space capturing
-	 * process */
-	callout_init(&rm->ring_callout, 1);
+	adapter->rm = rm; 
+	rm->adapter = adapter;
 
-	rm->open_cnt = 0; rm->procp = NULL;
-
-	adapter->rm = rm; rm->adapter = adapter;
-
-	RINGMAP_FUNC_DEBUG("end"); return (0);	}
+	RINGMAP_FUNC_DEBUG("end"); return (0);	
+}
 
 
 int
@@ -132,8 +132,6 @@ ringmap_detach(struct adapter *adapter)
 	/* May be any tasks in queue */
 	taskqueue_free(adapter->tq);
 	
-	callout_stop(&rm->ring_callout);
-
 	destroy_dev(rm->ringmap_dev);
 
 	FREE(rm, M_DEVBUF);
@@ -386,7 +384,7 @@ ringmap_ioctl (struct cdev *dev, u_long cmd, caddr_t data, int fflag, struct thr
 		/* Sleep and wait for new frames */
 		case IOCTL_SLEEP_WAIT:
 			rm->ring.user_wait_kern++;
-			SET_RDT(adapter);
+			RINGMAP_HW_WRITE_TAIL(adapter);
 			err_sleep = tsleep(rm, (PRI_MIN) | PCATCH, "ioctl", hz);
 		break;
 
@@ -429,34 +427,6 @@ ringmap_handle_rxtx(void *context, int pending)
 
 	if (rm->procp != NULL) {
 		wakeup(rm);
-
-		if (KERN_TO_USER_RING_DISTANCE(&rm->ring) <= RING_SAFETY_MARGIN)
-				callout_reset(&rm->ring_callout, SECS_TO_TICKS(SECS_WAIT_USER), ringmap_wdog, (void *)adapter);
-	}
-}
-
-void
-ringmap_wdog(void *arg)
-{
-	struct adapter *adapter;
-	struct ringmap *rm;
-
-	/* Dangerouse: it can very fast fill messages */
-	RINGMAP_INTR(start);
-
-	adapter = (struct adapter *)arg;
-	rm = adapter->rm;
-
-	/* Now we are waiting for user process. Update statistics */
-	rm->ring.kern_wait_user++;
-
-	if (KERN_TO_USER_RING_DISTANCE(&rm->ring) <= RING_SAFETY_MARGIN){
-		wakeup(rm);
-		if ((++rm->times_restart_callout) < RESTART_TIMER_COUNTER)
-			callout_reset(&rm->ring_callout, SECS_TO_TICKS(SECS_WAIT_USER), ringmap_wdog, (void *)adapter);
-	} else {
-		rm->times_restart_callout = 0;
-		SET_RDT(adapter); 		/* RDT = userrp - RING_SAFETY_MARGIN */
 	}
 }
 
@@ -478,7 +448,6 @@ get_adapter_struct(struct cdev *dev)
 int
 ringmap_disable_receive(struct adapter *adapter)
 {
-	uint32_t	rctl;
 
 	RINGMAP_FUNC_DEBUG(start);
 
@@ -486,8 +455,8 @@ ringmap_disable_receive(struct adapter *adapter)
 		printf(ERR_PREFIX"[%s] NULL pointer to adapter structure\n", __func__);
 		return (0);
 	}
-	rctl = E1000_READ_REG(&adapter->hw, E1000_RCTL);
-	E1000_WRITE_REG(&adapter->hw, E1000_RCTL, rctl & ~E1000_RCTL_EN);
+
+	RINGMAP_HW_DISABLE_RECEIVE(adapter);
 
 	return (1);
 }
@@ -500,7 +469,6 @@ ringmap_disable_receive(struct adapter *adapter)
 int
 ringmap_enable_receive(struct adapter *adapter)
 {
-	uint32_t	rctl;
 
 	RINGMAP_FUNC_DEBUG(start);
 
@@ -508,8 +476,8 @@ ringmap_enable_receive(struct adapter *adapter)
 		printf(ERR_PREFIX"[%s] NULL pointer to adapter structure\n", __func__);
 		return (0);
 	}
-	rctl = E1000_READ_REG(&adapter->hw, E1000_RCTL);
-	E1000_WRITE_REG(&adapter->hw, E1000_RCTL, rctl | E1000_RCTL_EN);
+	
+	RINGMAP_HW_ENABLE_RECEIVE(adapter);
 
 	return (1);
 }
@@ -518,19 +486,15 @@ ringmap_enable_receive(struct adapter *adapter)
 int
 ringmap_enable_intr(struct adapter *adapter)
 {
-	struct e1000_hw *hw;
-	uint32_t ims_mask = IMS_ENABLE_MASK;
-	
 	RINGMAP_FUNC_DEBUG(start);
 
 	if (adapter == NULL){
 		printf(ERR_PREFIX"[%s] NULL pointer to adapter structure\n", __func__);
 		return (0);
 	}
-	hw = &adapter->hw;
 
-	E1000_WRITE_REG(hw, E1000_IMS, ims_mask);
-	
+	RINGMAP_HW_ENABLE_INTR(adapter);
+
 	return (1);
 }
 
@@ -538,7 +502,6 @@ ringmap_enable_intr(struct adapter *adapter)
 int
 ringmap_disable_intr(struct adapter *adapter)
 {
-	struct e1000_hw *hw;
 	
 	RINGMAP_FUNC_DEBUG(start);
 
@@ -546,9 +509,8 @@ ringmap_disable_intr(struct adapter *adapter)
 		printf(ERR_PREFIX"[%s] NULL pointer to adapter structure\n", __func__);
 		return (0);
 	}
-	hw = &adapter->hw;
 
-	E1000_WRITE_REG(hw, E1000_IMC, 0xffffffff);
+	RINGMAP_HW_DISABLE_INTR(adapter);
 	
 	return (1);
 }
@@ -598,8 +560,8 @@ ringmap_print_ring_pointers(struct adapter *adapter)
 	unsigned int rdt, rdh;
 	struct ringmap *rm = adapter->rm;
 
-	rdh = E1000_READ_REG(&adapter->hw, E1000_RDH(0));
-	rdt = E1000_READ_REG(&adapter->hw, E1000_RDT(0));
+	rdh = RINGMAP_HW_READ_HEAD(adapter);
+	rdt = RINGMAP_HW_READ_TAIL(adapter);
 
 	printf("\n  +++++++++  RING POINTERS  ++++++++++++ \n");
 	printf("  +  RDH = %d (KERN POINTER)\n", rdh);
@@ -618,7 +580,7 @@ ringmap_disable_flowcontr(struct adapter *adapter)
 {
 	unsigned int ctrl; 
 
-	ctrl = E1000_READ_REG(&(adapter)->hw, E1000_CTRL);
+	ctrl = RINGMAP_HW_READ_REG(&(adapter)->hw, E1000_CTRL);
 	ctrl &= (~(E1000_CTRL_TFCE | E1000_CTRL_RFCE));
-	E1000_WRITE_REG(&(adapter)->hw, E1000_CTRL, ctrl);
+	RINGMAP_HW_WRITE_REG(&(adapter)->hw, E1000_CTRL, ctrl);
 }
