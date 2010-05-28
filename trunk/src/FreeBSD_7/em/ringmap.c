@@ -26,30 +26,25 @@
 #include <vm/vm_param.h>
 #include <vm/vm_kern.h>
 
-#include "ringmap.h"
 
 #ifdef __E1000_RINGMAP__
 #include "e1000_api.h"
 #include "if_em.h"
-#endif
 
-/* V A R S   A N D   P O I N T E R S */
 extern devclass_t em_devclass;
 extern int	em_rxeof(struct adapter *, int);
 extern void	em_print_debug_info(struct adapter *);
+#endif
+
+#include "ringmap.h"
 
 /* DON'T TOUCH IT */
 int fiveg_da_2009 = 1;
 
 /* F U N C T I O N S */
-int check_pointers(struct adapter *);
 int ringmap_attach(struct adapter *);
 int ringmap_detach(struct adapter*);
 struct adapter* get_adapter_struct(struct cdev *dev);
-int ringmap_disable_receive(struct adapter *);
-int ringmap_enable_receive(struct adapter *adapter);
-int ringmap_enable_intr(struct adapter *);
-int ringmap_disable_intr(struct adapter *);
 void ringmap_disable_flowcontr(struct adapter *);
 int ringmap_print_ring_pointers(struct adapter *);
 void ringmap_print_ring (struct adapter *adapter, int level);
@@ -83,10 +78,8 @@ int ringmap_attach(struct adapter *a) {
 
 	RINGMAP_FUNC_DEBUG(begin);
 
-	/* Disable pkts receive and interrupts while we set our structures */
-	ringmap_disable_intr(adapter);
-
-	if (check_pointers(adapter)){ return (-1); }
+	/* Disable interrupts while we set our structures */
+	RINGMAP_HW_DISABLE_INTR(adapter);
 
 	/* Alloc mem for ringmap structure */
 	MALLOC(rm, struct ringmap *, sizeof(struct ringmap), M_DEVBUF,
@@ -97,17 +90,31 @@ int ringmap_attach(struct adapter *a) {
 		return (-1); 
 	}
 
+	/* 
+	 * Create char device for communication with user space. User space process
+	 * wich want to capture should first open this device. Then, by syscalls 
+	 * on this device it will: 
+	 * - 	get physical adresses of packet buffers for mapping them in its 
+	 * 		virtual memory space 
+	 *
+	 * -	controll packet capturing: start, stop, sleep to wait for packets.
+	 */
 	rm->ringmap_dev = make_dev(&ringmap_devsw, device_get_unit(adapter->dev),
 			UID_ROOT, GID_WHEEL, 0666, RINGMAP_DEVICE"%s",
 			device_get_nameunit(adapter->dev));
 
-	rm->open_cnt = 0; 
+	/* Counts how many times the device will opened */
+	rm->open_cnt = 0;
+
+	/* Pointer to structure of process wich opened the device */	
 	rm->procp = NULL;
 
 	adapter->rm = rm; 
 	rm->adapter = adapter;
 
-	RINGMAP_FUNC_DEBUG("end"); return (0);	
+	RINGMAP_FUNC_DEBUG(end); 
+
+	return (0);	
 }
 
 
@@ -126,8 +133,8 @@ ringmap_detach(struct adapter *adapter)
 	rm = adapter->rm;
 	
 	/* Disable pkts receive and interrupts while we set our structures */
-	ringmap_disable_intr(adapter);
-	ringmap_disable_receive(adapter);
+	RINGMAP_HW_DISABLE_INTR(adapter);
+	RINGMAP_HW_DISABLE_RECEIVE(adapter);
 
 	/* May be any tasks in queue */
 	taskqueue_free(adapter->tq);
@@ -162,27 +169,18 @@ ringmap_open(struct cdev *dev, int flag, int otyp, struct thread *td)
 #endif 
 
 	/**
-	 **	Only one process only one time can open device !!!
+	 **	Only one process only one time can open our device !!!
 	 **/
 	if (!atomic_cmpset_int(&rm->open_cnt, 0, 1)){
 		RINGMAP_ERROR(Sorry! Device is opened!);
 		return (-EIO);
 	}
 	
-	/*
-	 * NULL pointers check
-	 */
-	if (check_pointers(adapter)) {
-		atomic_readandclear_int(&rm->open_cnt);
-		return (-EIO);
-	}
-
-	ringmap_disable_intr(adapter);
+	RINGMAP_HW_DISABLE_INTR(adapter);
 
 	/* Disable Flow Control */
-	ringmap_disable_flowcontr(adapter);
+	RINGMAP_HW_DISABLE_FLOWCONTR(adapter);
 
-	rm->times_restart_callout 	= 0;
     rm->procp = (struct proc *)td->td_proc;
 	rm->td = td;
 
@@ -191,9 +189,9 @@ ringmap_open(struct cdev *dev, int flag, int otyp, struct thread *td)
 	for (i = 0 ; i < SLOTS_NUMBER ; i ++)
 			rm->adapter->rx_desc_base[i].status = 0;
 
-	ringmap_enable_intr(adapter);
+	RINGMAP_HW_ENABLE_INTR(adapter);
 
-	RINGMAP_OUTPUT("end");
+	RINGMAP_FUNC_DEBUG(end);
 	return (0);
 }
 
@@ -203,10 +201,11 @@ ringmap_close(struct cdev *dev, int flag, int otyp, struct thread *td)
 {
 	struct adapter *adapter = (struct adapter *)get_adapter_struct(dev);
 	struct ringmap *rm = adapter->rm;
-	RINGMAP_OUTPUT("begin");
+
+	RINGMAP_FUNC_DEBUG(start);
 	
-	/* Disable pkts receive and interrupts while we set our structures */
-	ringmap_disable_intr(rm->adapter);
+	/* Disable interrupts while we set our structures */
+	RINGMAP_HW_DISABLE_INTR(adapter);
 
 #if (__RINGMAP_DEB) 
 	printf("[%s]: dev_t=%d, flag=%x, otyp=%x, iface=%s\n", __func__,
@@ -214,66 +213,19 @@ ringmap_close(struct cdev *dev, int flag, int otyp, struct thread *td)
 #endif 
 
 	/* After close there is no capturing process */
-	rm->times_restart_callout 	= 0;
 	rm->procp = NULL;
 	rm->td = NULL;
 
-	if (atomic_readandclear_int(&rm->open_cnt) > 1){
-		RINGMAP_WARN(More than one processes has opened the device);
-	}
+	atomic_readandclear_int(&rm->open_cnt); 
 
-	em_print_debug_info(adapter);
-
-	RINGMAP_OUTPUT("end");
+	RINGMAP_FUNC_DEBUG(end);
     return (0);
-}
-
-
-int 
-check_pointers(struct adapter *adapter)
-{
-	
-	if (adapter == NULL){
-		RINGMAP_ERROR("adapter = NULL. We don't have a pointer to adapter structure");
-		return (-1);
-	}
-
-	if (adapter->rx_buffer_area == NULL) {
-		RINGMAP_ERROR(rx_buffer_area is not allocated! Driver structures is not initialized);
-		RINGMAP_ERROR(INFO: rx_buffer_area - pointer to buffer with em_buffer structures);
-		RINGMAP_ERROR(INFO: em_buffer - contains the pointer (m_head) to mbuf);
-		RINGMAP_ERROR(INFO: All of these things should be allocated before we begin with capturing);
-		return (-1);
-	}
-	
-	if (adapter->rx_desc_base == NULL) {
-		RINGMAP_ERROR(rx_desc_base is not allocated! Driver structures is not initialized);
-		RINGMAP_ERROR(INFO: rx_desc_base - pointer to buffer with descriptor structures);
-		return (-1);
-	}
-
-	if (adapter->num_rx_desc == 0){
-		RINGMAP_ERROR(Number of descriptors = 0);
-		return (-1);
-	}
-
-	if (adapter->ifp == NULL){
-		RINGMAP_ERROR(ifnet structure is not allocated);
-		return (-1);
-	}
-	if (&adapter->stats == NULL){
-		RINGMAP_ERROR(NIC statistics structure is not alloced);
-		return (-1);
-	}
-
-	return (0);
 }
 
 
 int
 ringmap_read(struct cdev *dev, struct uio *uio, int ioflag)
 {
-	RINGMAP_FUNC_DEBUG(begin);
     int err = EIO, i;
 	struct adapter *adapter = (struct adapter *)get_adapter_struct(dev);
 	struct ringmap *rm = adapter->rm;
@@ -286,11 +238,6 @@ ringmap_read(struct cdev *dev, struct uio *uio, int ioflag)
 			__func__, dev2udev(dev), uio, ioflag);
 #endif 
 
-	/* Check important pointers and values: if NULL, 0 , etc */
-	if (check_pointers(adapter)) {
-		return (-err);
-	}
-
 	if (!(adapter->ifp->if_flags & IFF_DRV_RUNNING)) {
 		RINGMAP_WARN("ifnet interface is not running!");
 	}
@@ -298,7 +245,7 @@ ringmap_read(struct cdev *dev, struct uio *uio, int ioflag)
 	/* get the physical adresses structures that should be mapped in userland */
 	for(i = 0 ; i < SLOTS_NUMBER ; i++) {
 
-		if (rm->adapter->rx_buffer_area[i].m_head == NULL){
+		if (rm->adapter->rx_buffer_area[i].m_head == NULL) {
 #if (__RINGMAP_DEB) 
 			printf(WARN_PREFIX"[%s] mbuf for descriptor=%d is not allocated\n", __func__, i);
 			printf(WARN_PREFIX"[%s] The reason may be: ifnet structure for our network device not present or not initialized\n", __func__);
@@ -306,14 +253,14 @@ ringmap_read(struct cdev *dev, struct uio *uio, int ioflag)
 			return (-err);
 		}
 
-		rm->ring.slot[i].mbuf.kern = 	(vm_offset_t)			rm->adapter->rx_buffer_area[i].m_head;
-		rm->ring.slot[i].mbuf.phys = 	(bus_addr_t)	vtophys(rm->adapter->rx_buffer_area[i].m_head);
+		rm->ring.slot[i].mbuf.kern = (vm_offset_t)	rm->adapter->rx_buffer_area[i].m_head;
+		rm->ring.slot[i].mbuf.phys = (bus_addr_t)	vtophys(rm->adapter->rx_buffer_area[i].m_head);
 
-		rm->ring.slot[i].packet.kern = 	(vm_offset_t)			rm->adapter->rx_buffer_area[i].m_head->m_data;
-		rm->ring.slot[i].packet.phys =	(bus_addr_t)	vtophys(rm->adapter->rx_buffer_area[i].m_head->m_data);
+		rm->ring.slot[i].packet.kern = (vm_offset_t)	rm->adapter->rx_buffer_area[i].m_head->m_data;
+		rm->ring.slot[i].packet.phys = (bus_addr_t)		vtophys(rm->adapter->rx_buffer_area[i].m_head->m_data);
 
-		rm->ring.slot[i].descriptor.kern = 	(vm_offset_t)			&rm->adapter->rx_desc_base[i];
-		rm->ring.slot[i].descriptor.phys = 	(bus_addr_t)	vtophys(&rm->adapter->rx_desc_base[i]);
+		rm->ring.slot[i].descriptor.kern = (vm_offset_t)	&rm->adapter->rx_desc_base[i];
+		rm->ring.slot[i].descriptor.phys = (bus_addr_t)		vtophys(&rm->adapter->rx_desc_base[i]);
 
 #if (__RINGMAP_DEB)
 		ringmap_print_slot(adapter, i);
@@ -326,7 +273,7 @@ ringmap_read(struct cdev *dev, struct uio *uio, int ioflag)
 	uiomove(&rspp, sizeof(bus_addr_t), uio);
 	uiomove(&nic_statspp, sizeof(bus_addr_t), uio);
 
-	RINGMAP_OUTPUT(end);
+	RINGMAP_FUNC_DEBUG(end);
     return(0);
 }
 
@@ -340,10 +287,9 @@ ringmap_ioctl (struct cdev *dev, u_long cmd, caddr_t data, int fflag, struct thr
 
 	unsigned int *userp = NULL;
 
-	RINGMAP_OUTPUT(begin);
+	RINGMAP_FUNC_DEBUG(start);
 
 	switch( cmd ){
-
 
 		/* Tell to user number of descriptors */
 		case IOCTL_G_DNUM:
@@ -356,7 +302,6 @@ ringmap_ioctl (struct cdev *dev, u_long cmd, caddr_t data, int fflag, struct thr
 			}
 
 			unsigned int dn = (unsigned int)adapter->num_rx_desc;
-
 			copyout(&dn, userp, sizeof(unsigned int));
 
 		break; 
@@ -364,27 +309,27 @@ ringmap_ioctl (struct cdev *dev, u_long cmd, caddr_t data, int fflag, struct thr
 		/* Enable Receive and Interrupts */
 		case IOCTL_ENABLE_RECEIVE:
 			RINGMAP_IOCTL(IOCTL_ENABLE_RECEIVE);
-			ringmap_enable_intr(adapter);
-			ringmap_enable_receive(adapter);
+			RINGMAP_HW_ENABLE_INTR(adapter);
+			RINGMAP_HW_ENABLE_RECEIVE(adapter);
 		break;
 
 		/* Disable Receive and Interrupts */
 		case IOCTL_DISABLE_RECEIVE:
 			RINGMAP_IOCTL(IOCTL_DISABLE_RECEIVE);
-			ringmap_disable_intr(adapter);
-			ringmap_disable_receive(adapter);
+			RINGMAP_HW_DISABLE_INTR(adapter);
+			RINGMAP_HW_DISABLE_RECEIVE(adapter);
 		break;
 		
 		/* Disable Flow Control */
 		case IOCTL_DISABLE_FLOWCNTR:
 			RINGMAP_IOCTL(IOCTL_DISABLE_FLOWCNTR);
-			ringmap_disable_flowcontr(adapter);
+			RINGMAP_HW_DISABLE_FLOWCONTR(adapter);
 		break;
 
 		/* Sleep and wait for new frames */
 		case IOCTL_SLEEP_WAIT:
 			rm->ring.user_wait_kern++;
-			RINGMAP_HW_WRITE_TAIL(adapter);
+			RINGMAP_HW_SYNC_TAIL(adapter);
 			err_sleep = tsleep(rm, (PRI_MIN) | PCATCH, "ioctl", hz);
 		break;
 
@@ -398,7 +343,7 @@ ringmap_ioctl (struct cdev *dev, u_long cmd, caddr_t data, int fflag, struct thr
 			return (ENODEV);
 	}   	
         	
-	RINGMAP_OUTPUT(end);
+	RINGMAP_FUNC_DEBUG(end);
         	
 	return (err);
 }
@@ -423,7 +368,7 @@ ringmap_handle_rxtx(void *context, int pending)
 	printf("########################################################################\n\n");
 #endif
 
-	ringmap_enable_intr(adapter);
+	RINGMAP_HW_ENABLE_INTR(adapter);
 
 	if (rm->procp != NULL) {
 		wakeup(rm);
@@ -436,83 +381,8 @@ get_adapter_struct(struct cdev *dev)
 {
 	struct adapter *adapter;
 
-	adapter = (struct adapter *)devclass_get_softc(em_devclass, dev2unit(dev));
+	adapter = RINGMAP_GET_ADAPTER_STRUCT(adapter);
 	return (adapter);
-}
-
-
-/*
- * Return: 	1 - success
- * 			0 - otherwise
- */
-int
-ringmap_disable_receive(struct adapter *adapter)
-{
-
-	RINGMAP_FUNC_DEBUG(start);
-
-	if (adapter == NULL){
-		printf(ERR_PREFIX"[%s] NULL pointer to adapter structure\n", __func__);
-		return (0);
-	}
-
-	RINGMAP_HW_DISABLE_RECEIVE(adapter);
-
-	return (1);
-}
-
-
-/*
- * Return: 	1 - success
- * 			0 - otherwise
- */
-int
-ringmap_enable_receive(struct adapter *adapter)
-{
-
-	RINGMAP_FUNC_DEBUG(start);
-
-	if (adapter == NULL){
-		printf(ERR_PREFIX"[%s] NULL pointer to adapter structure\n", __func__);
-		return (0);
-	}
-	
-	RINGMAP_HW_ENABLE_RECEIVE(adapter);
-
-	return (1);
-}
-
-
-int
-ringmap_enable_intr(struct adapter *adapter)
-{
-	RINGMAP_FUNC_DEBUG(start);
-
-	if (adapter == NULL){
-		printf(ERR_PREFIX"[%s] NULL pointer to adapter structure\n", __func__);
-		return (0);
-	}
-
-	RINGMAP_HW_ENABLE_INTR(adapter);
-
-	return (1);
-}
-
-
-int
-ringmap_disable_intr(struct adapter *adapter)
-{
-	
-	RINGMAP_FUNC_DEBUG(start);
-
-	if (adapter == NULL){
-		printf(ERR_PREFIX"[%s] NULL pointer to adapter structure\n", __func__);
-		return (0);
-	}
-
-	RINGMAP_HW_DISABLE_INTR(adapter);
-	
-	return (1);
 }
 
 
@@ -578,9 +448,5 @@ ringmap_print_ring_pointers(struct adapter *adapter)
 void 
 ringmap_disable_flowcontr(struct adapter *adapter)
 {
-	unsigned int ctrl; 
-
-	ctrl = RINGMAP_HW_READ_REG(&(adapter)->hw, E1000_CTRL);
-	ctrl &= (~(E1000_CTRL_TFCE | E1000_CTRL_RFCE));
-	RINGMAP_HW_WRITE_REG(&(adapter)->hw, E1000_CTRL, ctrl);
+	RINGMAP_HW_DISABLE_FLOWCONTR(adapter);
 }
