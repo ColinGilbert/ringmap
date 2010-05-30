@@ -45,7 +45,6 @@ int fiveg_da_2009 = 1;
 int ringmap_attach(struct adapter *);
 int ringmap_detach(struct adapter*);
 struct adapter* get_adapter_struct(struct cdev *dev);
-void ringmap_disable_flowcontr(struct adapter *);
 int ringmap_print_ring_pointers(struct adapter *);
 void ringmap_print_ring (struct adapter *adapter, int level);
 void ringmap_print_slot(struct adapter *adapter, unsigned int slot_number);
@@ -163,6 +162,8 @@ ringmap_open(struct cdev *dev, int flag, int otyp, struct thread *td)
 	struct adapter *adapter = (struct adapter *)get_adapter_struct(dev);
 	struct ringmap *rm = adapter->rm;
 
+	RINGMAP_FUNC_DEBUG(start);
+
 #if (__RINGMAP_DEB) 
 	printf("[%s]: dev_t=%d, flag=%x, otyp=%x, iface=%s\n", __func__,
 	      dev2udev(dev), flag, otyp, device_get_nameunit(adapter->dev));
@@ -176,6 +177,7 @@ ringmap_open(struct cdev *dev, int flag, int otyp, struct thread *td)
 		return (-EIO);
 	}
 	
+	/* Disable interrupts of adapter */
 	RINGMAP_HW_DISABLE_INTR(adapter);
 
 	/* Disable Flow Control */
@@ -233,6 +235,8 @@ ringmap_read(struct cdev *dev, struct uio *uio, int ioflag)
 	/* Physical addres of ring and nic_statistics structures */
 	bus_addr_t nic_statspp, rspp; 
 
+	RINGMAP_FUNC_DEBUG(start);
+
 #if (__RINGMAP_DEB) 
     printf("[%s] dev_t=%d, uio=%p, ioflag=%d\n",
 			__func__, dev2udev(dev), uio, ioflag);
@@ -253,14 +257,14 @@ ringmap_read(struct cdev *dev, struct uio *uio, int ioflag)
 			return (-err);
 		}
 
-		rm->ring.slot[i].mbuf.kern = (vm_offset_t)	rm->adapter->rx_buffer_area[i].m_head;
-		rm->ring.slot[i].mbuf.phys = (bus_addr_t)	vtophys(rm->adapter->rx_buffer_area[i].m_head);
+		rm->ring.slot[i].mbuf.kern = (vm_offset_t) RINGMAP_GET_MBUF(rm->adapter, i);
+		rm->ring.slot[i].mbuf.phys = (bus_addr_t) vtophys(RINGMAP_GET_MBUF(rm->adapter, i));
 
-		rm->ring.slot[i].packet.kern = (vm_offset_t)	rm->adapter->rx_buffer_area[i].m_head->m_data;
-		rm->ring.slot[i].packet.phys = (bus_addr_t)		vtophys(rm->adapter->rx_buffer_area[i].m_head->m_data);
+		rm->ring.slot[i].packet.kern = (vm_offset_t) RINGMAP_GET_PACKET(rm->adapter, i);
+		rm->ring.slot[i].packet.phys = (bus_addr_t)	vtophys(RINGMAP_GET_PACKET(rm->adapter, i));
 
-		rm->ring.slot[i].descriptor.kern = (vm_offset_t)	&rm->adapter->rx_desc_base[i];
-		rm->ring.slot[i].descriptor.phys = (bus_addr_t)		vtophys(&rm->adapter->rx_desc_base[i]);
+		rm->ring.slot[i].descriptor.kern = (vm_offset_t) RINGMAP_GET_DESCRIPTOR(rm->adapter, i);
+		rm->ring.slot[i].descriptor.phys = (bus_addr_t)	vtophys(RINGMAP_GET_DESCRIPTOR(rm->adapter, i));
 
 #if (__RINGMAP_DEB)
 		ringmap_print_slot(adapter, i);
@@ -360,8 +364,10 @@ ringmap_handle_rxtx(void *context, int pending)
 #endif
 
 	if (ifp->if_drv_flags & IFF_DRV_RUNNING) {
+#ifdef __E1000_RINGMAP__
 		if (em_rxeof(adapter, adapter->rx_process_limit) != 0)
 			taskqueue_enqueue(adapter->tq, &adapter->rxtx_task);
+#endif
 	}
 
 #if (INTR_DEB) 	
@@ -442,11 +448,4 @@ ringmap_print_ring_pointers(struct adapter *adapter)
 	printf("  ++++++++++++++++++++++++++++++++++++++ \n\n");
 
 	return (0);
-}
-
-
-void 
-ringmap_disable_flowcontr(struct adapter *adapter)
-{
-	RINGMAP_HW_DISABLE_FLOWCONTR(adapter);
 }
