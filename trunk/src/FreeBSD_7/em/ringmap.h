@@ -16,23 +16,8 @@
 /* Name of module to be loaded*/
 #define MOD_NAME 				"if_ringmap.ko"
 
-/* next both line soon will be depricated */
-// #define PATH_TO_MODULE 			"/home/alexandre/alexandre-da/src/70/em/if_em.ko"
-
-/* Max number of times we have to restart our timer to wating for user
- * capturing process */
-#define RESTART_TIMER_COUNTER 	19000
-
 /* Messaure statistics for each pkt */
 #define EACH_PKT 20
-/*
- * Duration of one Interval in which we wait before checking if userrp has
- * increased (a.k.a. Userspace has read a packet ouf of the buffer)
- */
-#define SECS_WAIT_USER 			1000
-
-/* Micro seconds to wait for user process */
-#define SECS_TO_TICKS(secs)		(int)(hz / SECS_WAIT_USER)
 
 /* Driver have to work only with device wich has the following device ID */
 // #define DEV_ID 	0x105E 
@@ -250,15 +235,13 @@ struct e1000_hw_stats {
 /**********************************************
  *  	Arithmetic in Ring Buffer	
  **********************************************/
-#define FIVEG_MODULO(r,a,b)												\
-				(r) = ( ((unsigned int)(a)) % ((unsigned int)(b)) ) ;
 
 #define R_MODULO(a,b)								\
 	( ((unsigned int)(a)) % ((unsigned int)(b)) )
 
 /* Distance from "a" to "b" in ring: r = (b-a) mod (size) */
 #define RING_DISTANCE(r,a,b,size)										\
-	FIVEG_MODULO((r), ((b) - (a)) , (size));
+	(r) = R_MODULO(((b) - (a)), (size));
 
 #define R_DISTANCE(a,b,size)		\
 	(R_MODULO((b)-(a), (size)))
@@ -286,11 +269,11 @@ struct e1000_hw_stats {
 
 /* Increment of USER pointer. (KERN pointer is incremented by Hardware) */
 #define INC_USER_POINTER(ringp)											\
-	FIVEG_MODULO((ringp)->userrp, (ringp)->userrp + 1, SLOTS_NUMBER);
+	((ringp)->userrp) = R_MODULO(((ringp)->userrp + 1), SLOTS_NUMBER);
 
 /* Add "a" to USER pointer */
 #define ADD_USER_POINTER(ringp, a)										\
-	FIVEG_MODULO((ringp)->userrp, (ringp)->userrp + (a), SLOTS_NUMBER);
+	((ringp)->userrp) = R_MODULO(((ringp)->userrp + a), SLOTS_NUMBER);
 
 /* Next Operationts are only in Kern usefull because they set hardware registers */
 #ifdef _KERNEL
@@ -306,14 +289,6 @@ struct e1000_hw_stats {
 		(ringp)->userrp = (ringp)->kernrp;								\
 		RINGMAP_HW_WRITE_REG(&(adapter)->hw, E1000_RDT(0), R_MODULO(((ringp)->userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER));	\
 	}while(0);
-
-/* Increment USER pointer and set the hardware register (RDT) */
-#define INC_USER_POINTER_AND_SET_REG(userrp, ringp, adapter)			\
-	do {																\
-		INC_USER_POINTER(ringp);										\
-		FIVEG_MODULO((userrp), ((ringp)->userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER); \
-		RINGMAP_HW_WRITE_REG(&adapter->hw, E1000_RDT(0), (userrp));						\
-	} while(0);
 
 #endif
 
@@ -340,10 +315,10 @@ struct e1000_hw_stats {
 #define ERR_PREFIX 		"--> RINGMAP ERROR: " 
 #define WARN_PREFIX 	"--> RINGMAP WARN: "
 
-#define RINGMAP_ERROR(x) 	printf("--> RINGMAP ERROR: [%s]: "  #x "\n", __func__);
-#define RINGMAP_IOCTL(x)	if (IOCTL_DEB) 	printf(" ---> RINGMAP IOCTL: " #x "\n");
-#define RINGMAP_INTR(x)  	if (INTR_DEB) 	printf("[%s] ---> RINGMAP INTR: " #x "\n", __func__);
-#define RINGMAP_FUNC_DEBUG(x) if (__RINGMAP_DEB) printf("[%s] ---> RINGMAP FUNC:" #x "\n", __func__);
+#define RINGMAP_ERROR(x) 	printf("---> RINGMAP ERROR: [%s]: "  #x "\n", __func__);
+#define RINGMAP_IOCTL(x)	if (IOCTL_DEB) 	printf(" --> RINGMAP IOCTL: " #x "\n");
+#define RINGMAP_INTR(x)  	if (INTR_DEB) 	printf("[%s] --> RINGMAP INTR: " #x "\n", __func__);
+#define RINGMAP_FUNC_DEBUG(x) if (__RINGMAP_DEB) printf("[%s] --> RINGMAP FUNC:" #x "\n", __func__);
 #define RINGMAP_OUTPUT(x) if (__RINGMAP_DEB) printf("--> RINGMAP: [%s]: "  #x "\n", __func__);
 #define RINGMAP_WARN(x) 	if (__RINGMAP_DEB) printf("--> WARN: [%s]: "  #x "\n", __func__);
 
