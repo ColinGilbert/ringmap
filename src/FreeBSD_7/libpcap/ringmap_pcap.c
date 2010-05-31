@@ -172,7 +172,7 @@ init_mmapped_capturing(const char *device, pcap_t *p)
 	 * iovec for readv system call to get physical addresses of structures 
 	 * and buffers that we want to map in user space
 	 */
-	struct iovec *iov;
+	// struct iovec *iov;
 
 	RINGMAP_FUNC_DEBUG(start);
 	
@@ -194,38 +194,38 @@ init_mmapped_capturing(const char *device, pcap_t *p)
  	 * 						+1 ring_struct pointer
 	 * 						+1 statistic structure 
 	 */
-	iov = (struct iovec *)malloc(sizeof(struct iovec) * (1));
+	// iov = (struct iovec *)malloc(sizeof(struct iovec) * (1));
 	
 	/* prepare iovec to get physical addresses of ring pointers struct 	*/
-	iov[0].iov_base	= &rspp;
-	iov[0].iov_len	= sizeof(bus_addr_t);
+	//iov[0].iov_base	= &rspp;
+	//iov[0].iov_len	= sizeof(bus_addr_t);
 
 
 	/* 
 	 * Get from kern phys. addresses of mbufs, packet buffers, ring pointer struct 
 	 * to map them later in space our process
 	 */
-	num_of_bytes = readv(ringmap_cdev_fd, iov, 1);
+	//num_of_bytes = readv(ringmap_cdev_fd, iov, 1);
 
-#if (__RINGMAP_DEB)
-	printf("[%s] bytes copied by readv: num_of_bytes = %d \n", __func__,  num_of_bytes);
-#endif
+//#if (__RINGMAP_DEB)
+//	printf("[%s] bytes copied by readv: num_of_bytes = %d \n", __func__,  num_of_bytes);
+//#endif
 
-	if (num_of_bytes < 0){
-		RINGMAP_ERROR("Reading the pointer to ring structure  from kernel failed!");
-		perror("/dev/" RINGMAP_DEVICE);
-		return -1;
-	}
+//	if (num_of_bytes < 0){
+//		RINGMAP_ERROR("Reading the pointer to ring structure  from kernel failed!");
+//		perror("/dev/" RINGMAP_DEVICE);
+//		return -1;
+//	}
 
-#if (__RINGMAP_DEB) 
-	printf("[%s] rspp = 0x%X\n", __func__, rspp);
-	printf("[%s] nic_statspp = 0x%X\n", __func__, nic_statspp);
-	printf("---\n");
-#endif 
-
+//#if (__RINGMAP_DEB) 
+//	printf("[%s] rspp = 0x%X\n", __func__, rspp);
+//	printf("[%s] nic_statspp = 0x%X\n", __func__, nic_statspp);
+//	printf("---\n");
+//#endif 
 	
-	memoffset = (off_t)rspp;
-	tmp_addr = mmap(0, sizeof(struct ring), PROT_WRITE|PROT_READ, MAP_SHARED, devmem_fd, memoffset);
+	// memoffset = (off_t)rspp;
+	memoffset = 0;
+	tmp_addr = mmap(0, sizeof(struct ring), PROT_WRITE|PROT_READ, MAP_SHARED, ringmap_cdev_fd, memoffset);
 	if (tmp_addr == MAP_FAILED){
 		RINGMAP_ERROR("Mapping of Ring Pointers structure failed! Exit!");
 		return -1;

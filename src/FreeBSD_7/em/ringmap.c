@@ -54,6 +54,7 @@ d_open_t	ringmap_open;
 d_close_t	ringmap_close;
 d_read_t	ringmap_read;
 d_ioctl_t	ringmap_ioctl;
+d_mmap_t	ringmap_mmap;
 
 /*
  *	Character Device for access on if_em driver structures
@@ -64,6 +65,7 @@ static struct cdevsw ringmap_devsw = {
 	/* 	close 	*/	.d_close 	= ringmap_close,
 	/* 	read 	*/	.d_read 	= ringmap_read,
 	/*	ioctl	*/	.d_ioctl	= ringmap_ioctl,
+	/*	mmap	*/	.d_mmap		= ringmap_mmap,
 	/* 	name 	*/	.d_name 	= "ringmap_cdev"
 };
 
@@ -174,7 +176,7 @@ ringmap_open(struct cdev *dev, int flag, int otyp, struct thread *td)
 	 **/
 	if (!atomic_cmpset_int(&rm->open_cnt, 0, 1)){
 		RINGMAP_ERROR(Sorry! Device is opened!);
-		return (-EIO);
+		return (ENODEV);
 	}
 	
 	/* Disable interrupts of adapter */
@@ -232,8 +234,8 @@ ringmap_read(struct cdev *dev, struct uio *uio, int ioflag)
 	struct adapter *adapter = (struct adapter *)get_adapter_struct(dev);
 	struct ringmap *rm = adapter->rm;
 
-	/* Physical addres of ring and nic_statistics structures */
-	bus_addr_t nic_statspp, rspp; 
+	/* Physical address of ring structure */
+	bus_addr_t rspp; 
 
 	RINGMAP_FUNC_DEBUG(start);
 
@@ -271,15 +273,66 @@ ringmap_read(struct cdev *dev, struct uio *uio, int ioflag)
 #endif
 	}
 
-	rspp = (bus_addr_t)vtophys(&rm->ring);
-	nic_statspp = (bus_addr_t)vtophys(&adapter->stats); 
-
 	rm->ring.hw_stats.kern = (vm_offset_t)(&adapter->stats);
 	rm->ring.hw_stats.phys = (bus_addr_t)vtophys(&adapter->stats);
+
+	rspp = (bus_addr_t)vtophys(&rm->ring);
 
 	uiomove(&rspp, sizeof(bus_addr_t), uio);
 
 	RINGMAP_FUNC_DEBUG(end);
+
+    return(0);
+}
+
+int
+ringmap_mmap(struct cdev *dev, vm_offset_t offset, vm_paddr_t *paddr, int nprot)
+{
+	int i;
+	struct adapter *adapter = (struct adapter *)get_adapter_struct(dev);
+	struct ringmap *rm = adapter->rm;
+
+	RINGMAP_FUNC_DEBUG(start);
+
+	if (nprot & PROT_EXEC)
+		return (ERESTART);
+	
+	if (!(adapter->ifp->if_flags & IFF_DRV_RUNNING)) {
+		RINGMAP_WARN("ifnet interface is not running!");
+	}
+
+	/* get the physical adresses structures that should be mapped in userland */
+	for(i = 0 ; i < SLOTS_NUMBER ; i++) {
+
+		if (rm->adapter->rx_buffer_area[i].m_head == NULL) {
+#if (__RINGMAP_DEB) 
+			printf(WARN_PREFIX"[%s] mbuf for descriptor=%d is not allocated\n", __func__, i);
+			printf(WARN_PREFIX"[%s] The reason may be: ifnet structure for our network device not present or not initialized\n", __func__);
+#endif
+			return (EFAULT);
+		}
+
+		rm->ring.slot[i].mbuf.kern = (vm_offset_t) RINGMAP_GET_MBUF(rm->adapter, i);
+		rm->ring.slot[i].mbuf.phys = (bus_addr_t) vtophys(RINGMAP_GET_MBUF(rm->adapter, i));
+
+		rm->ring.slot[i].packet.kern = (vm_offset_t) RINGMAP_GET_PACKET(rm->adapter, i);
+		rm->ring.slot[i].packet.phys = (bus_addr_t)	vtophys(RINGMAP_GET_PACKET(rm->adapter, i));
+
+		rm->ring.slot[i].descriptor.kern = (vm_offset_t) RINGMAP_GET_DESCRIPTOR(rm->adapter, i);
+		rm->ring.slot[i].descriptor.phys = (bus_addr_t)	vtophys(RINGMAP_GET_DESCRIPTOR(rm->adapter, i));
+
+#if (__RINGMAP_DEB)
+		ringmap_print_slot(adapter, i);
+#endif
+	}
+
+	rm->ring.hw_stats.kern = (vm_offset_t)(&adapter->stats);
+	rm->ring.hw_stats.phys = (bus_addr_t)vtophys(&adapter->stats);
+
+	*paddr = vtophys(&(rm->ring) + offset);
+
+	RINGMAP_FUNC_DEBUG(end);
+
     return(0);
 }
 
