@@ -19,7 +19,9 @@
 /* Messaure statistics for each pkt */
 #define EACH_PKT 20
 
-/* Driver have to work only with device wich has the following device ID */
+/* Driver have to work only with device wich has the following device ID 
+ * if 0 then work with all devices that was found
+ */
 // #define DEV_ID 	0x105E 
 #define DEV_ID 	0
 
@@ -38,7 +40,9 @@ struct ring_slot {
 	struct address	packet;
 
 
-	/* Next fields are for statistics */
+	/* 
+	 * Next fields are for statistics 
+	 */
 
 	/* Time stamp of packet which placed in the slot */
 	struct timeval	ts;
@@ -72,6 +76,10 @@ struct ring {
 
 	/* Number of slots (descriptors a.k.a memory areas for frames) */
 	unsigned int size;
+
+
+	/* Values from adapters statistic registers */
+	struct address 	hw_stats;
 
 	/* 
 	 * Number of times kernel (hardware) waits for user process. More
@@ -111,100 +119,16 @@ struct ringmap {
 	struct 	cdev 	*ringmap_dev;
 
 	/* Now only one process can only one time open device */
-	uint32_t		open_cnt;
+	uint32_t	open_cnt;
 	
 	/* How many frames have seen driver in RAM */
 	unsigned long long 	pkts_counter;
 
 	/* Our ring that have to be mapped in space of user process */
-	struct ring 		ring;
+	struct ring 	ring;
 };
 
 #endif /* _KERNEL */
-
-#ifndef _KERNEL
-
-typedef uint64_t u64;
-
-struct e1000_hw_stats {
-	u64 crcerrs;
-	u64 algnerrc;
-	u64 symerrs;
-	u64 rxerrc;
-	u64 mpc;
-	u64 scc;
-	u64 ecol;
-	u64 mcc;
-	u64 latecol;
-	u64 colc;
-	u64 dc;
-	u64 tncrs;
-	u64 sec;
-	u64 cexterr;
-	u64 rlec;
-	u64 xonrxc;
-	u64 xontxc;
-	u64 xoffrxc;
-	u64 xofftxc;
-	u64 fcruc;
-	u64 prc64;
-	u64 prc127;
-	u64 prc255;
-	u64 prc511;
-	u64 prc1023;
-	u64 prc1522;
-	u64 gprc;
-	u64 bprc;
-	u64 mprc;
-	u64 gptc;
-	u64 gorc;
-	u64 gotc;
-	u64 rnbc;
-	u64 ruc;
-	u64 rfc;
-	u64 roc;
-	u64 rjc;
-	u64 mgprc;
-	u64 mgpdc;
-	u64 mgptc;
-	u64 tor;
-	u64 tot;
-	u64 tpr;
-	u64 tpt;
-	u64 ptc64;
-	u64 ptc127;
-	u64 ptc255;
-	u64 ptc511;
-	u64 ptc1023;
-	u64 ptc1522;
-	u64 mptc;
-	u64 bptc;
-	u64 tsctc;
-	u64 tsctfc;
-	u64 iac;
-	u64 icrxptc;
-	u64 icrxatc;
-	u64 ictxptc;
-	u64 ictxatc;
-	u64 ictxqec;
-	u64 ictxqmtc;
-	u64 icrxdmtc;
-	u64 icrxoc;
-	u64 cbtmpc;
-	u64 htdpmc;
-	u64 cbrdpc;
-	u64 cbrmpc;
-	u64 rpthc;
-	u64 hgptc;
-	u64 htcbdpc;
-	u64 hgorc;
-	u64 hgotc;
-	u64 lenerrs;
-	u64 scvpc;
-	u64 hrmpc;
-};
-#endif
-
 
 
 #include <sys/ioccom.h>
@@ -279,7 +203,7 @@ struct e1000_hw_stats {
 #ifdef _KERNEL
 
 /* Read value from RDH, set RDT = RDH - RING_SAFETY_MARGIN */
-#define INIT_RING_AND_REGISTERS(ringp, adapter)							\
+#define RINGMAP_INIT(ringp, adapter)							\
 	do{																	\
 		(ringp)->kern_wait_user 	= 0;								\
 		(ringp)->user_wait_kern 	= 0;								\

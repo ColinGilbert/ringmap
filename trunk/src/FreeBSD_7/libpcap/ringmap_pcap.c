@@ -194,28 +194,25 @@ init_mmapped_capturing(const char *device, pcap_t *p)
  	 * 						+1 ring_struct pointer
 	 * 						+1 statistic structure 
 	 */
-	iov = (struct iovec *)malloc(sizeof(struct iovec) * (1 + 1));
+	iov = (struct iovec *)malloc(sizeof(struct iovec) * (1));
 	
 	/* prepare iovec to get physical addresses of ring pointers struct 	*/
 	iov[0].iov_base	= &rspp;
 	iov[0].iov_len	= sizeof(bus_addr_t);
 
-	/* prepare iovec to get physical addresses of statistic structure 	*/
-	iov[1].iov_base	= &nic_statspp;
-	iov[1].iov_len	= sizeof(bus_addr_t);	
 
 	/* 
 	 * Get from kern phys. addresses of mbufs, packet buffers, ring pointer struct 
 	 * to map them later in space our process
 	 */
-	num_of_bytes = readv(ringmap_cdev_fd, iov, 1 + 1);
+	num_of_bytes = readv(ringmap_cdev_fd, iov, 1);
 
 #if (__RINGMAP_DEB)
 	printf("[%s] bytes copied by readv: num_of_bytes = %d \n", __func__,  num_of_bytes);
 #endif
 
 	if (num_of_bytes < 0){
-		RINGMAP_ERROR("Reading of mbufs pointers from kernel failed!");
+		RINGMAP_ERROR("Reading the pointer to ring structure  from kernel failed!");
 		perror("/dev/" RINGMAP_DEVICE);
 		return -1;
 	}
@@ -226,15 +223,7 @@ init_mmapped_capturing(const char *device, pcap_t *p)
 	printf("---\n");
 #endif 
 
-	memoffset = (off_t)nic_statspp;
-	tmp_addr = mmap(0, sizeof(struct e1000_hw_stats), PROT_WRITE|PROT_READ, MAP_SHARED, devmem_fd, memoffset);
-	if (tmp_addr == MAP_FAILED){
-		RINGMAP_ERROR("Mapping of Statistics structure failed! Exit!");
-		return -1;
-	}
-	p->nic_statistics = (struct e1000_hw_stats *)tmp_addr;
-
-
+	
 	memoffset = (off_t)rspp;
 	tmp_addr = mmap(0, sizeof(struct ring), PROT_WRITE|PROT_READ, MAP_SHARED, devmem_fd, memoffset);
 	if (tmp_addr == MAP_FAILED){
@@ -246,9 +235,19 @@ init_mmapped_capturing(const char *device, pcap_t *p)
 		RINGMAP_ERROR("Wrong size of ring buffer! Exit!");
 		return -1;
 	}
+
+	memoffset = (off_t)p->ring->hw_stats.phys;
+	tmp_addr = mmap(0, sizeof(struct e1000_hw_stats), PROT_WRITE|PROT_READ, MAP_SHARED, devmem_fd, memoffset);
+	if (tmp_addr == MAP_FAILED){
+		RINGMAP_ERROR("Mapping of Statistics structure failed! Exit!");
+		return -1;
+	}
+	p->nic_statistics = (struct e1000_hw_stats *)tmp_addr;
+
 #if (__RINGMAP_DEB) 
 	printf("[%s] descs number got from kern = %d\n", __func__, p->ring->size);
 #endif 
+
 	/* 
 	 * Mapping mbufs from kern to userspace. 
 	 * mbufs internal pointers contain kernel space addresses - 
