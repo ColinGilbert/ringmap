@@ -186,7 +186,7 @@ ringmap_open(struct cdev *dev, int flag, int otyp, struct thread *td)
     rm->procp = (struct proc *)td->td_proc;
 	rm->td = td;
 
-	INIT_RING_AND_REGISTERS(&rm->ring, adapter);
+	RINGMAP_INIT(&rm->ring, adapter);
 
 	for (i = 0 ; i < SLOTS_NUMBER ; i ++)
 			rm->adapter->rx_desc_base[i].status = 0;
@@ -274,8 +274,10 @@ ringmap_read(struct cdev *dev, struct uio *uio, int ioflag)
 	rspp = (bus_addr_t)vtophys(&rm->ring);
 	nic_statspp = (bus_addr_t)vtophys(&adapter->stats); 
 
+	rm->ring.hw_stats.kern = (vm_offset_t)(&adapter->stats);
+	rm->ring.hw_stats.phys = (bus_addr_t)vtophys(&adapter->stats);
+
 	uiomove(&rspp, sizeof(bus_addr_t), uio);
-	uiomove(&nic_statspp, sizeof(bus_addr_t), uio);
 
 	RINGMAP_FUNC_DEBUG(end);
     return(0);
