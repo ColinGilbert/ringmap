@@ -8,7 +8,7 @@
 #define RING_SAFETY_MARGIN 	3
 
 /* Max value for number of descriptors (a.k.a. slots in the ringbuffer) is 4096 */
-#define SLOTS_NUMBER		2048
+#define SLOTS_NUMBER		16
 
 /* Prefix for name of device (for example /dev/ringmap_cdev_0 will full name) */
 #define RINGMAP_DEVICE 			"ringmap_cdev_"
@@ -125,7 +125,7 @@ struct ringmap {
 	unsigned long long 	pkts_counter;
 
 	/* Our ring that have to be mapped in space of user process */
-	struct ring 	ring;
+	struct ring *ring;
 };
 
 #endif /* _KERNEL */
@@ -242,7 +242,7 @@ struct ringmap {
 #define RINGMAP_ERROR(x) 	printf("---> RINGMAP ERROR: [%s]: "  #x "\n", __func__);
 #define RINGMAP_IOCTL(x)	if (IOCTL_DEB) 	printf(" --> RINGMAP IOCTL: " #x "\n");
 #define RINGMAP_INTR(x)  	if (INTR_DEB) 	printf("[%s] --> RINGMAP INTR: " #x "\n", __func__);
-#define RINGMAP_FUNC_DEBUG(x) if (__RINGMAP_DEB) printf("[%s] --> RINGMAP FUNC:" #x "\n", __func__);
+#define RINGMAP_FUNC_DEBUG(x) if (__RINGMAP_DEB) printf("[%s] --> RINGMAP FUNC: " #x "\n", __func__);
 #define RINGMAP_OUTPUT(x) if (__RINGMAP_DEB) printf("--> RINGMAP: [%s]: "  #x "\n", __func__);
 #define RINGMAP_WARN(x) 	if (__RINGMAP_DEB) printf("--> WARN: [%s]: "  #x "\n", __func__);
 

@@ -189,41 +189,6 @@ init_mmapped_capturing(const char *device, pcap_t *p)
 	printf("[%s] Number of descriptors: %d \n", __func__, SLOTS_NUMBER);
 #endif
 	
-	/* 
-	 * Alloc memory for iovec: 
- 	 * 						+1 ring_struct pointer
-	 * 						+1 statistic structure 
-	 */
-	// iov = (struct iovec *)malloc(sizeof(struct iovec) * (1));
-	
-	/* prepare iovec to get physical addresses of ring pointers struct 	*/
-	//iov[0].iov_base	= &rspp;
-	//iov[0].iov_len	= sizeof(bus_addr_t);
-
-
-	/* 
-	 * Get from kern phys. addresses of mbufs, packet buffers, ring pointer struct 
-	 * to map them later in space our process
-	 */
-	//num_of_bytes = readv(ringmap_cdev_fd, iov, 1);
-
-//#if (__RINGMAP_DEB)
-//	printf("[%s] bytes copied by readv: num_of_bytes = %d \n", __func__,  num_of_bytes);
-//#endif
-
-//	if (num_of_bytes < 0){
-//		RINGMAP_ERROR("Reading the pointer to ring structure  from kernel failed!");
-//		perror("/dev/" RINGMAP_DEVICE);
-//		return -1;
-//	}
-
-//#if (__RINGMAP_DEB) 
-//	printf("[%s] rspp = 0x%X\n", __func__, rspp);
-//	printf("[%s] nic_statspp = 0x%X\n", __func__, nic_statspp);
-//	printf("---\n");
-//#endif 
-	
-	// memoffset = (off_t)rspp;
 	if (ringmap_cdev_fd < 0){
 		RINGMAP_ERROR(ringmap char device seems tgo be not open);
 		return (-1);
@@ -234,7 +199,7 @@ init_mmapped_capturing(const char *device, pcap_t *p)
 		return -1;
 	}
 #if (__RINGMAP_DEB)
-	printf("Virtual address of ring is %d \n", tmp_addr);
+	printf("Virtual address of ring is 0x%X\n", tmp_addr);
 #endif 
 
 	p->ring = (struct ring *)tmp_addr;
@@ -247,8 +212,6 @@ init_mmapped_capturing(const char *device, pcap_t *p)
 	printf("Ring Size = %d \n", p->ring->size);
 #endif 
 
-	exit(1);
-
 	memoffset = (off_t)p->ring->hw_stats.phys;
 	tmp_addr = mmap(0, sizeof(struct e1000_hw_stats), PROT_WRITE|PROT_READ, MAP_SHARED, devmem_fd, memoffset);
 	if (tmp_addr == MAP_FAILED){
@@ -258,7 +221,7 @@ init_mmapped_capturing(const char *device, pcap_t *p)
 	p->nic_statistics = (struct e1000_hw_stats *)tmp_addr;
 
 #if (__RINGMAP_DEB) 
-	printf("[%s] descs number got from kern = %d\n", __func__, p->ring->size);
+	printf("[%s] descs number got from kern = %u\n", __func__, p->ring->size);
 #endif 
 
 	/* 

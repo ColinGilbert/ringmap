@@ -84,8 +84,8 @@
  */
 #define SET_RDT(adapter)			\
 		do {						\
-		E1000_WRITE_REG(&adapter->hw, E1000_RDT(0), R_MODULO((adapter->rm->ring.userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER));	\
-		adapter->rm->ring.hw_RDT = R_MODULO((adapter->rm->ring.userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER);	     				\
+		E1000_WRITE_REG(&adapter->hw, E1000_RDT(0), R_MODULO((adapter->rm->ring->userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER));	\
+		adapter->rm->ring->hw_RDT = R_MODULO((adapter->rm->ring->userrp) - RING_SAFETY_MARGIN, SLOTS_NUMBER);	     				\
 		} while(0);
 
 #endif /*_KERNEL*/

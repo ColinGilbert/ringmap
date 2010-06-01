@@ -1946,7 +1946,7 @@ em_irq_fast(void *arg)
 
 #ifdef __RINGMAP__
 	RINGMAP_INTR(NOW SET rxtx_task IN QUEUE);
-	adapter->rm->ring.interrupts_counter++;
+	adapter->rm->ring->interrupts_counter++;
 
 	/* Make interrupt time stamp in the adapter structure */
 	getmicrotime(&adapter->intr_ts);
@@ -4850,7 +4850,7 @@ discard:
 		    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
 #ifdef __RINGMAP__
-			rm->ring.slot[i].ts = adapter->intr_ts;
+			rm->ring->slot[i].ts = adapter->intr_ts;
 #endif
 
 		/* Advance our pointers to the next descriptor. */
@@ -4880,7 +4880,7 @@ discard:
 			EM_RX_LOCK(adapter);
 #else
 			/* Set kern pointer in ring structure */
-			rm->ring.kernrp = adapter->next_rx_desc_to_check;
+			rm->ring->kernrp = adapter->next_rx_desc_to_check;
 			rm->pkts_counter++;
 #endif
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
