@@ -224,17 +224,30 @@ init_mmapped_capturing(const char *device, pcap_t *p)
 //#endif 
 	
 	// memoffset = (off_t)rspp;
-	memoffset = 0;
-	tmp_addr = mmap(0, sizeof(struct ring), PROT_WRITE|PROT_READ, MAP_SHARED, ringmap_cdev_fd, memoffset);
+	if (ringmap_cdev_fd < 0){
+		RINGMAP_ERROR(ringmap char device seems tgo be not open);
+		return (-1);
+	}
+	tmp_addr = mmap(0, sizeof(struct ring), PROT_WRITE|PROT_READ, MAP_SHARED, ringmap_cdev_fd, 0);
 	if (tmp_addr == MAP_FAILED){
 		RINGMAP_ERROR("Mapping of Ring Pointers structure failed! Exit!");
 		return -1;
 	}
+#if (__RINGMAP_DEB)
+	printf("Virtual address of ring is %d \n", tmp_addr);
+#endif 
+
 	p->ring = (struct ring *)tmp_addr;
 	if (p->ring->size == 0){
 		RINGMAP_ERROR("Wrong size of ring buffer! Exit!");
 		return -1;
 	}
+	
+#if (__RINGMAP_DEB)
+	printf("Ring Size = %d \n", p->ring->size);
+#endif 
+
+	exit(1);
 
 	memoffset = (off_t)p->ring->hw_stats.phys;
 	tmp_addr = mmap(0, sizeof(struct e1000_hw_stats), PROT_WRITE|PROT_READ, MAP_SHARED, devmem_fd, memoffset);

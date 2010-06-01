@@ -25,7 +25,7 @@ CFLAGS+=-DHAVE_SNPRINTF -DHAVE_VSNPRINTF
 #######       FIVEG DA Block      #########
 SRCS+=ringmap_pcap.c
 #INCS+=fiveg_da.h
-CFLAGS+=-D__RINGMAP__ -D__E1000_RINGMAP__
+CFLAGS+=-g -D__RINGMAP__ -D__E1000_RINGMAP__
 #CFLAGS+=-lkvm
 
 # Debugging output
