@@ -497,6 +497,7 @@ em_probe(device_t dev)
 	pci_subvendor_id = pci_get_subvendor(dev);
 	pci_subdevice_id = pci_get_subdevice(dev);
 
+//TODO: Fix it. Dirty implemented
 #ifdef __RINGMAP__
 	if (DEV_ID) {
 		if (pci_device_id == DEV_ID)
@@ -4747,7 +4748,7 @@ em_rxeof(struct adapter *adapter, int count)
 #ifndef __RINGMAP__
 			/* 
 			 * We don't want to allocate buffer for new incomming frame 
-			 * We are working with ring buffer
+			 * We are working with preallocated ring buffer
 			 */
 			if (em_get_buf(adapter, i) != 0) {
 				ifp->if_iqdrops++;
@@ -4850,7 +4851,8 @@ discard:
 		    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
 #ifdef __RINGMAP__
-			rm->ring->slot[i].ts = adapter->intr_ts;
+		/* Time stamp */
+		rm->ring->slot[i].ts = adapter->intr_ts;
 #endif
 
 		/* Advance our pointers to the next descriptor. */
@@ -4860,18 +4862,15 @@ discard:
 
 
 
-/* ******************************************************
- * We dont want to do anything with protocol stack
- * We want to map mbufs and pkts in space of user process
- * ******************************************************/
 		if (m != NULL) {
 			adapter->next_rx_desc_to_check = i;
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
 #ifndef __RINGMAP__
 /* ******************************************************
- * We dont want to do anything with protocol stack
- * We want to map mbufs and pkts in space of user process
+ * We dont want to do anything with protocol stack We want 
+ * only to map mbufs, pkts and descriptors into space of 
+ * user process.
  * ******************************************************/
 
 			/* Unlock for call into stack */
@@ -4899,9 +4898,6 @@ discard:
 
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
 #ifndef __RINGMAP__
-	E1000_WRITE_REG(&adapter->hw, E1000_RDT(0), i);
-#endif
-#ifdef __DRIVER_CAPTURING
 	E1000_WRITE_REG(&adapter->hw, E1000_RDT(0), i);
 #endif
 /*	+++++++++++++++++++++++++++++++++++++++++++++++++++++++	*/
