@@ -224,14 +224,14 @@ ringmap_open(struct cdev *dev, int flag, int otyp, struct thread *td)
 
 		rm->adapter->rx_desc_base[i].status = 0;
 
-		rm->ring->slot[i].mbuf.kern = (vm_offset_t) RINGMAP_GET_MBUF(rm->adapter, i);
-		rm->ring->slot[i].mbuf.phys = (bus_addr_t) vtophys(RINGMAP_GET_MBUF(rm->adapter, i));
+		rm->ring->slot[i].mbuf.kern = (vm_offset_t) RINGMAP_GET_MBUF_P(rm->adapter, i);
+		rm->ring->slot[i].mbuf.phys = (bus_addr_t) vtophys(RINGMAP_GET_MBUF_P(rm->adapter, i));
 
-		rm->ring->slot[i].packet.kern = (vm_offset_t) RINGMAP_GET_PACKET(rm->adapter, i);
-		rm->ring->slot[i].packet.phys = (bus_addr_t)	vtophys(RINGMAP_GET_PACKET(rm->adapter, i));
+		rm->ring->slot[i].packet.kern = (vm_offset_t) RINGMAP_GET_PACKET_P(rm->adapter, i);
+		rm->ring->slot[i].packet.phys = (bus_addr_t)	vtophys(RINGMAP_GET_PACKET_P(rm->adapter, i));
 
-		rm->ring->slot[i].descriptor.kern = (vm_offset_t) RINGMAP_GET_DESCRIPTOR(rm->adapter, i);
-		rm->ring->slot[i].descriptor.phys = (bus_addr_t)	vtophys(RINGMAP_GET_DESCRIPTOR(rm->adapter, i));
+		rm->ring->slot[i].descriptor.kern = (vm_offset_t) RINGMAP_GET_DESCRIPTOR_P(rm->adapter, i);
+		rm->ring->slot[i].descriptor.phys = (bus_addr_t)	vtophys(RINGMAP_GET_DESCRIPTOR_P(rm->adapter, i));
 
 #if (__RINGMAP_DEB)
 		ringmap_print_slot(adapter, i);
