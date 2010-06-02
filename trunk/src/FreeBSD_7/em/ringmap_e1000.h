@@ -64,17 +64,17 @@
 
 
 /* Kernel address of mbuf wich placed in the slot "i" */
-#define RINGMAP_GET_MBUF(adapter, i)		\
+#define RINGMAP_GET_MBUF_P(adapter, i)		\
 	((adapter)->rx_buffer_area[(i)].m_head)
 
 
 /* Kernel address of the packet wich placed in the slot "i" */
-#define RINGMAP_GET_PACKET(adapter, i)		\
+#define RINGMAP_GET_PACKET_P(adapter, i)		\
 	((adapter)->rx_buffer_area[(i)].m_head->m_data)
 
 
 /* Kernel address of the descriptor wich placed in the slot "i" */
-#define RINGMAP_GET_DESCRIPTOR(adapter, i)	\
+#define RINGMAP_GET_DESCRIPTOR_P(adapter, i)	\
 	(&((adapter)->rx_desc_base[(i)]))
 
 
