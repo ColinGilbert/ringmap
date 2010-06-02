@@ -81,9 +81,6 @@ int ringmap_attach(struct adapter *a) {
 	/* Disable interrupts while we set our structures */
 	RINGMAP_HW_DISABLE_INTR(adapter);
 
-	/* Alloc mem for ringmap structure */
-	// MALLOC(rm, struct ringmap *, sizeof(struct ringmap), M_DEVBUF,
-	//		M_WAITOK|M_ZERO); 
 	rm = (struct ringmap *) contigmalloc (sizeof(struct ringmap), 
 			M_DEVBUF, M_ZERO, 0, -1L, PAGE_SIZE, 0);
 
@@ -95,11 +92,6 @@ int ringmap_attach(struct adapter *a) {
 		RINGMAP_ERROR(rm is not allined to PAGE_MASK);
 		return (-1);
 	}
-
-	/*Alloc mem for ring structure */
-	// MALLOC(ring, struct ring *, sizeof(struct ring), M_DEVBUF,
-	//		M_WAITOK|M_ZERO); 
-	
 
 	ring = (struct ring *) contigmalloc (sizeof(struct ring), 
 			M_DEVBUF, M_ZERO, 0, -1L, PAGE_SIZE, 0);
