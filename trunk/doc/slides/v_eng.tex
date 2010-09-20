@@ -1,15 +1,19 @@
 \documentclass{beamer}
 \usepackage{subfigure}
-\usepackage{german}
+%\usepackage{english}
 \usepackage{graphics}
 \usepackage{textcomp}
 \usepackage{url}
 \graphicspath{./pics/}
-\usetheme{INET}
+% \usetheme{INET}
+
+\usepackage{beamerthemeshadow}
+% \beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
+
 \title{Ringmap Capturing Stack for High Performance Packet Capturing in FreeBSD}
-\author[Alexandre Fiveg]{ Alexandre Fiveg \\
-\url{alexandre@net.t-labs.tu-berlin.de} }
-\institute[TU Berlin/DT Labs]{Technische Universtit\"at Berlin \\ Deutsche Telekom Laboratories}
+\author[Alexander Fiveg]{ Alexander Fiveg \\
+\url{afiveg@freebsd.org} }
+% \institute[TU Berlin/DT Labs]{Technische Universtit\"at Berlin \\ Deutsche Telekom Laboratories}
 
 \begin{document}
 \frame{\titlepage}
@@ -50,7 +54,7 @@
 \begin{figure}[H] 
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/sysload_generic_slide}}
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/pktlos_generic_slide}}
-	\caption{CPU load and packet loss during capturing 64-bytes packets with the standard FreeBSD-7 Capturing software (Bezier curves)}
+	\caption{Capturing 64-Bytes packets. (Bezier curves)}
 \end{figure}
 \end{frame}
 
@@ -60,7 +64,7 @@
 \frametitle{The reason of the Problems}
 \textbf{Inefficiency of  capturing software}\newline
 \begin{itemize}
-	\item To many "`expensive"' operations in terms of CPU cycles: 
+	\item To many ``expensive'' operations in terms of CPU cycles: 
 \begin{itemize}
 			\item System calls
 			\item Packet copy operations
@@ -81,7 +85,7 @@
 \begin{frame}
 \frametitle{Goal of the project}
 %\begin{large}
-\textbf{Our goal:}
+\textbf{The goal:}
 %\end{large}
 \begin{itemize}
 	\item Increase the capturing performance in FreeBSD
@@ -94,11 +98,11 @@
 \textbf{Conditions:}
 %\end{large}
 \begin{itemize}
-	\item Hardware: One of the following \emph{Intel GbE Controllers}
+	\item Hardware: The following \emph{Intel GbE Controllers}
 		\begin{itemize}
-			\item \small{\emph{82540EP/EM, 82541xx, 82544GC/EI, 82545GM/EM, 82546GB/EB, 82547xx}}
+			\item \small{\emph{8254x, 8257x, 8259x}}
 		\end{itemize}
-	\item Software:	\emph{FreeBSD-\textbf{7.x}}
+%	\item Software:	\emph{FreeBSD}
 \end{itemize}
 \end{frame}
 
@@ -140,11 +144,11 @@
 		\end{itemize}
 	\item \textbf{Filtering} the received packets 
 		\begin{itemize}
-			\item \emph{Berkeley Packet Filter (BPF)})\newline
+			\item \emph{Berkeley Packet Filter}\newline
 		\end{itemize}
 	\item \textbf{Storing} to the hard disk
 		\begin{itemize}
-			\item due to the system call (\emph{write(2)})
+			\item using a system call
 		\end{itemize}
 \end{enumerate}
 \column[t]{0.5\textwidth}
@@ -187,39 +191,32 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{FreeBSD-7 Packet Capturing Stack}
+\frametitle{FreeBSD Packet Capturing Stack}
 \begin{columns}
 \column[t]{0.5\textwidth}
 \vspace{0em}
 \begin{itemize}
-\item <7-> Access packets
-	\begin{itemize}
-		\item <7->due to the \emph{read}-Syscall
-		\item <7->BPF-Buffer $\Rightarrow$ 	User-Buffer
-	\end{itemize}
+\item <6-> Access packets
+%	\begin{itemize}
+%		\item <6->due to the \emph{read}-Syscall
+%		\item <6->BPF-Buffer $\Rightarrow$ 	User-Buffer
+%	\end{itemize}
 \item <5-> Packet filtering
-	\begin{itemize}
-		\item <5->BPF 
-		\item <6->Packet-Buffer $\Rightarrow$ BPF-Buffer
-	\end{itemize}
 \item <4-> Interrupt Service Routine
 \item <3-> Interrupt
-\item <2-> DMA-Transfer:
-	\begin{itemize}
-		\item <2->Adapter-FIFO $\Rightarrow$ Packet-Buffer
-	\end{itemize}
+\item <2-> DMA-Transfer
 \item <1-> Packet is received and saved in Adapter-FIFO
 \end{itemize}
 \column[t]{0.5\textwidth}
 \vspace{-2em}
 \begin{figure}
-	\only<1>{\includegraphics [height=64mm,width=60mm]{pics/3copy_0}}
-	\only<2>{\includegraphics [height=64mm,width=60mm]{pics/3copy_0.5.eps}}
-	\only<3>{\includegraphics [height=64mm,width=60mm]{pics/3copy_0.7.eps}}
-	\only<4>{\includegraphics [height=64mm,width=60mm]{pics/3copy_1}}
-	\only<5>{\includegraphics [height=64mm,width=60mm]{pics/3copy_1_1}}
-	\only<6>{\includegraphics [height=64mm,width=60mm]{pics/3copy_2}}
-	\only<7>{\includegraphics [height=64mm,width=60mm]{pics/3copy_3}}
+	\only<1>{\includegraphics [height=55mm,width=60mm]{pics/3copy_0}}
+	\only<2>{\includegraphics [height=55mm,width=60mm]{pics/3copy_0.5.eps}}
+	\only<3>{\includegraphics [height=55mm,width=60mm]{pics/3copy_0.7.eps}}
+	\only<4>{\includegraphics [height=55mm,width=60mm]{pics/3copy_1}}
+%	\only<5>{\includegraphics [height=55mm,width=60mm]{pics/3copy_1_1}}
+	\only<5>{\includegraphics [height=55mm,width=60mm]{pics/3copy_2}}
+	\only<6>{\includegraphics [height=55mm,width=60mm]{pics/3copy_3}}
 \end{figure}
 \end{columns}
 \end{frame}
@@ -246,8 +243,10 @@
 	\item Our new packet capturing stack.
 	\item Based on \textbf{generic}-Stack: 		
 		\begin{itemize}
-			\item based on \emph{em} driver and \emph{libpcap}
-			\item but slightly changed.\newline
+			\item based on generic network drivers (\emph{em}, \emph{igb}, \emph{ixgbe}) and \emph{libpcap}
+			\begin{itemize}
+				\item but slightly changed.\newline
+			\end{itemize}
 		\end{itemize}
 \end{itemize}
 \textbf{generic:}
@@ -269,17 +268,17 @@
 \begin{itemize}
 	\item <2->Disabled TCP/IP-Stack\newline
 	\item <3->No optimization for storing the packets\newline
-	\item <4->Kernel-Thread, BPF and Libpcap will be changed\newline
-		\begin{itemize}
-			\item <4->ISR is not changed
-		\end{itemize}
+	\item <4->Network driver, BPF and Libpcap will be changed\newline
+%		\begin{itemize}
+%			\item <4->ISR is not changed
+%		\end{itemize}
 \end{itemize}
 \column[t]{0.5\textwidth}
 \vspace{-2em}
-\only<1>{\includegraphics [height=65mm,width=60mm]{pics/PCS_funcs_ziel_DA_0}}
-\only<2>{\includegraphics [height=65mm,width=60mm]{pics/PCS_funcs_ziel_DA_1}}
-\only<3>{\includegraphics [height=65mm,width=60mm]{pics/PCS_funcs_ziel_DA_2}}
-\only<4>{\includegraphics [height=65mm,width=60mm]{pics/PCS_funcs_ziel_DA}}
+\only<1>{\includegraphics [height=55mm,width=60mm]{pics/PCS_funcs_ziel_DA_0}}
+\only<2>{\includegraphics [height=55mm,width=60mm]{pics/PCS_funcs_ziel_DA_1}}
+\only<3>{\includegraphics [height=55mm,width=60mm]{pics/PCS_funcs_ziel_DA_2}}
+\only<4>{\includegraphics [height=55mm,width=60mm]{pics/PCS_funcs_ziel_DA}}
 \end{columns}
 \end{frame}
 
@@ -579,12 +578,6 @@ For each experiment, data streams are generated with different parameters:
 		\end{itemize}
 	\item Multithreading
 \end{enumerate}
-\end{frame}
-
-\begin{frame}
-	\begin{center}
-	\huge{Project to be continued}
-	\end{center}
 \end{frame}
 
 \end{document}
