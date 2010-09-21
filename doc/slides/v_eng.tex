@@ -85,20 +85,16 @@
 \begin{frame}
 \frametitle{Goal of the project}
 %\begin{large}
-\textbf{The goal:}
-%\end{large}
-\begin{itemize}
-	\item Increase the capturing performance in FreeBSD
-		\begin{itemize}
-			\item Design and implementation the new capturing software to
-				minimize the \textbf{packet loss} and \textbf{cpu load} during capturing. \newline \newline
-		\end{itemize}
-\end{itemize}
+\textbf{Increase the capturing performance in FreeBSD}
+	\begin{itemize}
+		\item Design and implementation the new capturing software to
+			minimize the \textbf{packet loss} and \textbf{cpu load} during capturing. \newline \newline
+	\end{itemize}
 %\begin{large}
-\textbf{Conditions:}
+\textbf{Hardware that should be supported:}
 %\end{large}
 \begin{itemize}
-	\item Hardware: The following \emph{Intel GbE Controllers}
+	\item The following \emph{Intel GbE Controllers}
 		\begin{itemize}
 			\item \small{\emph{8254x, 8257x, 8259x}}
 		\end{itemize}
@@ -110,15 +106,15 @@
 \begin{frame}
 \frametitle{Approach to a solution}
 \begin{itemize}
-	\item Eliminating the packet copy operations
+	\item<1-> Eliminating the packet copy operations
 		\begin{itemize}
-			\item by using shared memory buffers (\emph{memory \textbf{mapping}})\newline
+			\item<1-> by using shared memory buffers (\emph{memory \textbf{mapping}})\newline
 		\end{itemize}
-	\item Eliminating the memory allocations
+	\item<2-> Eliminating the memory allocations
 		\begin{itemize}
-			\item by using \textbf{ring} buffers\newline \newline
+			\item<2-> by using \textbf{ring} buffers\newline \newline
 		\end{itemize}
-	\item<2->[$\Rightarrow$] $ring + mapping = \textbf{ringmap}$
+	\item<3->[$\Rightarrow$] $ring + mapping = \textbf{ringmap}$
 \end{itemize}
 \end{frame}
 
@@ -184,23 +180,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 	\begin{center}
-	\huge{How does Packet Capturing Work ?}
+	\huge{How does standard packet capturing work ?}
 	\end{center}
 \end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{FreeBSD Packet Capturing Stack}
+\frametitle{FreeBSD Standard Packet Capturing Stack}
 \begin{columns}
 \column[t]{0.5\textwidth}
 \vspace{0em}
 \begin{itemize}
 \item <6-> Access packets
-%	\begin{itemize}
-%		\item <6->due to the \emph{read}-Syscall
-%		\item <6->BPF-Buffer $\Rightarrow$ 	User-Buffer
-%	\end{itemize}
 \item <5-> Packet filtering
 \item <4-> Interrupt Service Routine
 \item <3-> Interrupt
@@ -221,10 +213,34 @@
 \end{columns}
 \end{frame}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Disadvantages of Standard Capturing Stack}
+\begin{itemize}
+	\item \textbf{Three copies per packet}
+		\begin{enumerate}
+			\item DMA: $FIFO \Rightarrow Packet-Buffer$
+			\item $Packet-Buffer \Rightarrow BPF-Buffer$
+			\item $BPF-Buffer \Rightarrow Userspace-Buffer$\emph{(*)}
+		\end{enumerate}
+	\item \textbf{Memory allocations }
+		\begin{itemize}
+			\item For each new received packet will be a new \emph{mbuf} 
+				allocated
+		\end{itemize}
+	\item \textbf{System calls }
+		\begin{itemize}
+			\item User-space application receives the packets using read(2)\emph{(*)}
+			\item Saving packets to the hard disk
+		\end{itemize}
+\end{itemize}
+\begin{tiny}
+\emph{(*)} Using BPF-Zero-Copy eliminates the last copy and system call
+\end{tiny}
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%	Description of Task, Goal, Aufgabenstellung
+%	Description of Task, Goal
 \section{Solution}
 
 \begin{frame}
@@ -237,24 +253,19 @@
 \subsection*{Capturing stacks}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Packet Capturing Stacks}
-\textbf{ringmap:}
+\frametitle{Ringmap Packet Capturing Stacks}
 \begin{itemize}
-	\item Our new packet capturing stack.
-	\item Based on \textbf{generic}-Stack: 		
+	\item<1-> The new packet capturing stack.
+	\item<1-> Based on standard FreeBSD packet capturing stack: 		
 		\begin{itemize}
-			\item based on generic network drivers (\emph{em}, \emph{igb}, \emph{ixgbe}) and \emph{libpcap}
+			\item<1-> based on generic network drivers (\emph{em}, \emph{igb}, \emph{ixgbe}) and \emph{libpcap}
 			\begin{itemize}
-				\item but slightly changed.\newline
+				\item<1-> but slightly changed.\newline
 			\end{itemize}
 		\end{itemize}
 \end{itemize}
-\textbf{generic:}
-\begin{itemize}
-	\item Standard Packet Capturing Stack in FreeBSD-\textbf{7.x}\newline \newline
-\end{itemize}
 \begin{center}
-	\only<2>{\Large{Where the changes in \textbf{generic} are taking place?}}
+Where the changes in \textbf{generic} are taking place?
 \end{center}
 \end{frame}
 
@@ -347,36 +358,36 @@
 \end{itemize}
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{What is measured ?}
-\textbf{packet loss} and \textbf{CPU-Load} as a function of :\newline
-\begin{itemize}
-	\item Traffic parameters
-		\begin{itemize}
-			\item packet size
-			\item bit-rate and packet-rate
-		\end{itemize}
-
-\color{gray}
-	\item  Hardware components
-		\begin{itemize}
-\color{gray}
-			\item PCI vs. PCI-Express
-			\item Number of CPUs
-		\end{itemize}
-	\item Driver parameters
-		\begin{itemize}
-\color{gray}
-			\item Size of packet puffers 
-			\item etc\ldots
-		\end{itemize}
-\end{itemize}
-\normalcolor
-\end{frame}
-
-\subsection*{Testbed}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{frame}
+%\frametitle{What is measured ?}
+%\textbf{packet loss} and \textbf{CPU-Load} as a function of :\newline
+%\begin{itemize}
+%	\item Traffic parameters
+%		\begin{itemize}
+%			\item packet size
+%			\item bit-rate and packet-rate
+%		\end{itemize}
+%
+%\color{gray}
+%	\item  Hardware components
+%		\begin{itemize}
+%\color{gray}
+%			\item PCI vs. PCI-Express
+%			\item Number of CPUs
+%		\end{itemize}
+%	\item Driver parameters
+%		\begin{itemize}
+%\color{gray}
+%			\item Size of packet puffers 
+%			\item etc\ldots
+%		\end{itemize}
+%\end{itemize}
+%\normalcolor
+%\end{frame}
+%
+%\subsection*{Testbed}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Testbed}
 \begin{center}
@@ -412,30 +423,30 @@
 \subsection*{Experiment description}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Experiment parameters}
-For each experiment, data streams are generated with different parameters:
-\begin{itemize}
-	\item Constant parameters: 
-		\begin{itemize}
-			\item Packet size
-				\begin{itemize}
-					\item 64, 200, 300, 700, 1500
-				\end{itemize}
-		\end{itemize}
-	\item Variable parameters: 
-		\begin{itemize}
-			\item bit-rate 
-				\begin{itemize}
-					\item  $ < 1GBit/sec$
-				\end{itemize}
-		\end{itemize}
-\end{itemize}
-
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{frame}
+%\frametitle{Experiment parameters}
+%For each experiment, data streams are generated with different parameters:
+%\begin{itemize}
+%	\item Constant parameters: 
+%		\begin{itemize}
+%			\item Packet size
+%				\begin{itemize}
+%					\item 64, 200, 300, 700, 1500
+%				\end{itemize}
+%		\end{itemize}
+%	\item Variable parameters: 
+%		\begin{itemize}
+%			\item bit-rate 
+%				\begin{itemize}
+%					\item  $ < 1GBit/sec$
+%				\end{itemize}
+%		\end{itemize}
+%\end{itemize}
+%
+%\end{frame}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Calculation of results}
 \begin{itemize}
@@ -488,28 +499,28 @@ For each experiment, data streams are generated with different parameters:
 \end{itemize}
 \end{frame}
 
-\subsection*{Probleme bei Experimenten}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Problems arose in experiments }
-\begin{itemize}
-	\item Instability of  Linux Kernel Packet Generator
-		\begin{itemize}
-			\item often kernel panics
-			\item [$\Rightarrow$] therefore max. $15000000 pkts$ per experiment\newline
-		\end{itemize}
-	\item Impossible to generate traffic with any packet- or bit-rate
-		\begin{itemize}
-			\item because of Interrupt-Throttling
-			\item [$\Rightarrow$] therefore only certain measurement points \newline
-		\end{itemize}
-	\item Flow-Control
-		\begin{itemize}
-			\item limits the rate of generated traffic
-			\item [$\Rightarrow$] therefore must be switched off
-		\end{itemize}
-\end{itemize}
-\end{frame}
+%\subsection*{Probleme bei Experimenten}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{frame}
+%\frametitle{Problems arose in experiments }
+%\begin{itemize}
+%	\item Instability of  Linux Kernel Packet Generator
+%		\begin{itemize}
+%			\item often kernel panics
+%			\item [$\Rightarrow$] therefore max. $15000000 pkts$ per experiment\newline
+%		\end{itemize}
+%	\item Impossible to generate traffic with any packet- or bit-rate
+%		\begin{itemize}
+%			\item because of Interrupt-Throttling
+%			\item [$\Rightarrow$] therefore only certain measurement points \newline
+%		\end{itemize}
+%	\item Flow-Control
+%		\begin{itemize}
+%			\item limits the rate of generated traffic
+%			\item [$\Rightarrow$] therefore must be switched off
+%		\end{itemize}
+%\end{itemize}
+%\end{frame}
 
 \subsection*{Results}
 \begin{frame}
@@ -567,16 +578,48 @@ For each experiment, data streams are generated with different parameters:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
+\frametitle{Achieved goals 2}
+\begin{itemize}
+	\item Ringmap is easy portable to the other network controllers
+		\begin{itemize}
+			\item The software contains hardware dependent and hardware
+				independent parts. Only hardware independent part should be
+				slightly adjusted to the hardware. 
+			\item In the generic driver and libpcap some hooks for calling
+				\emph{ringmap}-functions are needed
+		\end{itemize}
+	\item Packet Filtering
+		\begin{itemize}
+			\item Packet filtering can be accomplished using both
+				\emph{libpcap}- and kernel-BPF. Usually if BPF is compiled in
+				the kernel the packet filtering will be accomplished through
+				kernel BPF. Else \emph{libpcap}-BPF in user-space will be used
+		\end{itemize}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Achieved goals 3}
+\begin{itemize}
+	\item Multithreading Capturing
+		\begin{itemize}
+			\item Multiple applications can capture from the same ring. 
+		\end{itemize}
+	\item Partly ported to the 10GbE controller. 
+		\begin{itemize}
+			\item Currently only one queue is used while capturing. The work on
+				supporting multiqueue is in progress.
+		\end{itemize}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
 \frametitle{Future works}
 \begin{enumerate}
-	\item Benchmarking:  \textbf{FreBSD-8.x} vs. \textbf{ringmap}
-	\item Refactoring the \emph{ringmap} in order to make it portable to other network adapters
-	\item Porting the \emph{ringmap} to FreeBSD-8
-	\item 10-GBit-Paket-Capturing
-		\begin{itemize}
-			\item Porting \emph{ringmap} to \emph{ixgbe} driver
-		\end{itemize}
-	\item Multithreading
+	\item Benchmarking:  \textbf{Zero-Copy-BPF} vs. \textbf{ringmap}
+	\item Support for hardware time stamping
+	\item Using TCP/IP stack together with ringmap
+	\item 10-GbE-Paket-Capturing: Multiqueue + hardware support for packet filtering 
 \end{enumerate}
 \end{frame}
 
