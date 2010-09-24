@@ -88,13 +88,13 @@
 \textbf{Increase the capturing performance in FreeBSD}
 	\begin{itemize}
 		\item Design and implementation the new capturing software to
-			minimize the \textbf{packet loss} and \textbf{cpu load} during capturing. \newline \newline
+			minimize the \textbf{packet loss} and \textbf{CPU load} during capturing. \newline \newline
 	\end{itemize}
 %\begin{large}
-\textbf{Hardware that should be supported:}
+\textbf{Supported Hardware:}
 %\end{large}
 \begin{itemize}
-	\item The following \emph{Intel GbE Controllers}
+	\item The following \emph{Intel GbE Controllers:}
 		\begin{itemize}
 			\item \small{\emph{8254x, 8257x, 8259x}}
 		\end{itemize}
@@ -104,7 +104,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Approach to a solution}
+\frametitle{Approach}
 \begin{itemize}
 	\item<1-> Eliminating the packet copy operations
 		\begin{itemize}
@@ -128,7 +128,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Packet Capturing}
+\frametitle{Packet Capturing: Hardware View}
 \begin{columns}
 \column[t]{0.5\textwidth}
 \vspace{-15em}
@@ -180,7 +180,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 	\begin{center}
-	\huge{How does standard packet capturing work ?}
+	\huge{Detailes of standard packet capturing stack}
 	\end{center}
 \end{frame}
 
@@ -215,13 +215,13 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Disadvantages of Standard Capturing Stack}
+\frametitle{Disadvantages of Standard Packet Capturing Stack}
 \begin{itemize}
 	\item \textbf{Three copies per packet}
 		\begin{enumerate}
-			\item DMA: $FIFO \Rightarrow Packet-Buffer$
-			\item $Packet-Buffer \Rightarrow BPF-Buffer$
-			\item $BPF-Buffer \Rightarrow Userspace-Buffer$\emph{(*)}
+			\item DMA: $FIFO \Rightarrow Packet\ Buffer$
+			\item $Packet\ Buffer \Rightarrow BPF\ Buffer$
+			\item $BPF\ Buffer \Rightarrow Userspace\ Buffer$\emph{(*)}
 		\end{enumerate}
 	\item \textbf{Memory allocations }
 		\begin{itemize}
@@ -253,20 +253,17 @@
 \subsection*{Capturing stacks}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Ringmap Packet Capturing Stacks}
+\frametitle{Ringmap Packet Capturing Stack}
 \begin{itemize}
-	\item<1-> The new packet capturing stack.
-	\item<1-> Based on standard FreeBSD packet capturing stack: 		
+	\item \textbf{Ringmap}: The new packet capturing stack
+	\item based on standard FreeBSD packet capturing stack: 		
 		\begin{itemize}
-			\item<1-> based on generic network drivers (\emph{em}, \emph{igb}, \emph{ixgbe}) and \emph{libpcap}
+			\item based on generic network drivers and \emph{libpcap}
 			\begin{itemize}
-				\item<1-> but slightly changed.\newline
+				\item but slightly changed.\newline
 			\end{itemize}
 		\end{itemize}
 \end{itemize}
-\begin{center}
-Where the changes in \textbf{generic} are taking place?
-\end{center}
 \end{frame}
 
 
@@ -279,7 +276,7 @@ Where the changes in \textbf{generic} are taking place?
 \begin{itemize}
 	\item <2->Disabled TCP/IP-Stack\newline
 	\item <3->No optimization for storing the packets\newline
-	\item <4->Network driver, BPF and Libpcap will be changed\newline
+	\item <4->Network driver, BPF and Libpcap is modified\newline
 %		\begin{itemize}
 %			\item <4->ISR is not changed
 %		\end{itemize}
@@ -313,7 +310,7 @@ Where the changes in \textbf{generic} are taking place?
 	\item<2->Eliminate packet copies  and syscalls
 	\item<3->BPF-Buffer is then not necessary
 	\item<4->Mapping the Packet-Buffer to user-space
-	\item<5->Move BPF to Userspace\newline
+	\item<5->Move BPF to user-space\newline
 	\item<6->[$\Rightarrow$]\textbf{ringmap}
 \end{itemize}
 \column[t]{0.5\textwidth}
@@ -332,7 +329,7 @@ Where the changes in \textbf{generic} are taking place?
 \begin{frame}
 \frametitle{Overview}
 \begin{center}
-\includegraphics [height=65mm,width=115mm]{pics/Ueberblick_new}
+\includegraphics [height=55mm,width=115mm]{pics/Ueberblick_new}
 \end{center}
 \end{frame}
 
@@ -455,7 +452,7 @@ Where the changes in \textbf{generic} are taking place?
 			\item Percentage proportion of time the CPU spent in system mode
 			\item Interrupt load is not considered
 				\begin{itemize}
-					\item because of interrupt-throttling is always constant for \textbf{generic} and \textbf{ringmap}
+					\item because of interrupt-throttling it is always constant for \textbf{generic} and \textbf{ringmap}
 				\end{itemize}
 			\item $syst = 1 - intr - user - nice - idle$\newline
 		\end{itemize}
@@ -554,7 +551,7 @@ Where the changes in \textbf{generic} are taking place?
 \begin{frame}
 \frametitle{Achieved goals}
 \begin{itemize}
-	\item Improving the Capturing-Performance
+	\item Enhanced Capturing-Performance
 		\begin{itemize}
 			\item very low  system load (below $12\%$) and very low
 				packet loss  (below  $0.02\%$)
@@ -565,10 +562,10 @@ Where the changes in \textbf{generic} are taking place?
 		\end{itemize}
 	\item Stability and usability of implemented software
 		\begin{itemize}
-			\item during the all experiments, no \emph{kernel panics} and no \emph{segmentation faults} occurred
-			\item very simple install and uninstall
+			\item during all experiments, no \emph{kernel panics} and no \emph{segmentation faults} occurred
+			\item very simple install and remove
 				\begin{itemize}
-					\item two Shell-Scripts to installing  and deinstalling the   
+					\item two Shell-Scripts to installing  and removing the   
 						\emph{ringmap} Capturing Stacks
 				\end{itemize}
 			\item Libpcap-applications don't require modification in order to run with the \emph{ringmap}
@@ -580,12 +577,12 @@ Where the changes in \textbf{generic} are taking place?
 \begin{frame}
 \frametitle{Achieved goals 2}
 \begin{itemize}
-	\item Ringmap is easy portable to the other network controllers
+	\item Ringmap is easily portable to the other network controllers
 		\begin{itemize}
 			\item The software contains hardware dependent and hardware
-				independent parts. Only hardware independent part should be
-				slightly adjusted to the hardware. 
-			\item In the generic driver and libpcap some hooks for calling
+				independent parts. Only hardware independent part require
+				modifications.
+			\item In the generic driver and libpcap there few hooks for calling
 				\emph{ringmap}-functions are needed
 		\end{itemize}
 	\item Packet Filtering
