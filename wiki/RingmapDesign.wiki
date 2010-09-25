@@ -1,5 +1,5 @@
 #summary Ringmap architecture.
-#labels Phase-Design,Phase-Implementation
+#labels Phase-Design,Phase-Implementation,Deprecated
 #sidebar TableOfContents
 <wiki:toc max_depth="2" />
 
