@@ -18,12 +18,5 @@ svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
 }}}
 
 = Installing ringmap =
- # go to _[http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/scripts scripts/]_ directory 
- # run *ringmap_build_and_load* shell script
-  * *ringmap* network driver will build and (kld-)loaded
-  * *ringmap*-libpcap will build and be installed
-
-= To uninstall and revert to the original packet capturing stack = 
- # go to _[http://code.google.com/p/ringmap/source/browse/#svn/trunk/src/FreeBSD_7/scripts scripts/]_ directory 
- # run *generic_build_and_load* shell script
-  * *generic* network driver and *generic* libpcap will build and be installed
+Please contact me in order to get detailed instruction for installation: 
+afiveg(at)freebsd.org
