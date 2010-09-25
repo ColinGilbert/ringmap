@@ -98,7 +98,9 @@ int	em_display_debug_stats = 0;
  *  Driver version:
  *********************************************************************/
 char em_driver_version[] = "6.9.6";
-
+#ifdef __RINGMAP__
+#define __DRIVER_VERSION 696
+#endif 
 
 /*********************************************************************
  *  PCI Device ID Table
