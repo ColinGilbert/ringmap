@@ -29,5 +29,5 @@ Also the system calls have to be implemented in order to control the sniffing pr
  * Gigabit Ethernet adapters based on the following Intel controller chips:
   * _8254x, 8257x, 8259x_
 
-= Results =
+= Details and Results =
 [http://ringmap.googlecode.com/files/ringmap_slides.pdf See presentation]
