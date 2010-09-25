@@ -2,16 +2,6 @@
 #labels Phase-Deploy
 <wiki:toc max_depth="2" />
 
-= Requirements =
-== Hardware ==
- * Gigabit Ethernet adapters based on the following Intel controller chips:
-  * _82540, 82541ER, 82541PI, 82542, 82543, 82544, 82545, 82546, 82546EB, 82546GB, 82547, 82571, 82572 and 82573_
-
-== Software == 
- * FreeBSD-*7.x*, *i386*-Kernel
- * *em* driver for Intel GbE adapters
-  * must be [http://www.freebsd.org/doc/en/books/handbook/kernelconfig.html compiled and installed as module]
-
 = Download =
 {{{
 svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
