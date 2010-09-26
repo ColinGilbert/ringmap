@@ -119,130 +119,6 @@
 \end{itemize}
 \end{frame}
 
-\section{Background}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-	\begin{center}
-	\huge{Background}
-	\end{center}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Packet Capturing: Hardware View}
-\begin{columns}
-\column[t]{0.5\textwidth}
-\vspace{-15em}
-\begin{enumerate}
-	\item \textbf{Receiving} network packets
-		\begin{itemize}
-			\item receive at network adapter
-			\item DMA transfer in RAM \newline
-		\end{itemize}
-	\item \textbf{Filtering} the received packets 
-		\begin{itemize}
-			\item \emph{Berkeley Packet Filter}\newline
-		\end{itemize}
-	\item \textbf{Storing} to the hard disk
-		\begin{itemize}
-			\item using a system call
-		\end{itemize}
-\end{enumerate}
-\column[t]{0.5\textwidth}
-\includegraphics [width=0.82\textwidth, keepaspectratio]{pics/HardwareView}
-\end{columns}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{FreeBSD Packet Capturing Stack}
-\begin{itemize}
-	\item \textbf{Network driver}
-		\begin{itemize}
-			\item Receiving packets\newline
-		\end{itemize}
-	\item \textbf{Berkley Packet Filter} (BPF)
-		\begin{itemize}
-			\item Filtering packets\newline
-		\end{itemize}
-	\item \textbf{User-space application}
-		\begin{itemize}
-			\item Accessing received packets
-			\item Initiates:
-				\begin{itemize}
-					\item Storing packets to hard drive
-					\item Output packets information to the terminal
-				\end{itemize}
-		\end{itemize}
-\end{itemize}
-\end{frame}
-
-\subsection*{Capturing}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-	\begin{center}
-	\huge{How does standard packet capturing works}
-	\end{center}
-\end{frame}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{FreeBSD Standard Packet Capturing Stack}
-\begin{columns}
-\column[t]{0.5\textwidth}
-\vspace{0em}
-\newline
-\begin{itemize}
-\item <6-> Access packets
-\item <5-> Packet filtering
-\item <4-> Interrupt Service Routine
-\item <3-> Interrupt
-\item <2-> DMA-Transfer
-\item <1-> Packet is received and saved in Adapter-FIFO
-\end{itemize}
-\column[t]{0.5\textwidth}
-\vspace{-2em}
-\begin{figure}
-	\only<1>{\includegraphics [height=55mm,width=60mm]{pics/3copy_0}}
-	\only<2>{\includegraphics [height=55mm,width=60mm]{pics/3copy_0.5.eps}}
-	\only<3>{\includegraphics [height=55mm,width=60mm]{pics/3copy_0.7.eps}}
-	\only<4>{\includegraphics [height=55mm,width=60mm]{pics/3copy_1}}
-%	\only<5>{\includegraphics [height=55mm,width=60mm]{pics/3copy_1_1}}
-	\only<5>{\includegraphics [height=55mm,width=60mm]{pics/3copy_2}}
-	\only<6>{\includegraphics [height=55mm,width=60mm]{pics/3copy_3}}
-\end{figure}
-\end{columns}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Disadvantages of Standard Packet Capturing Stack}
-\begin{itemize}
-	\item \textbf{Three copies per packet}
-		\begin{enumerate}
-			\item DMA: $FIFO \Rightarrow Packet\ Buffer$
-			\item $Packet\ Buffer \Rightarrow BPF\ Buffer$
-			\item $BPF\ Buffer \Rightarrow Userspace\ Buffer$\emph{(*)}
-		\end{enumerate}
-	\item \textbf{Memory allocations }
-		\begin{itemize}
-			\item For each new received packet will be a new \emph{mbuf} 
-				allocated
-		\end{itemize}
-	\item \textbf{System calls }
-		\begin{itemize}
-			\item User-space application receives the packets using read(2)\emph{(*)}
-			\item Saving packets to the hard disk
-		\end{itemize}
-\end{itemize}
-\begin{tiny}
-\emph{(*)} Using Zero-Copy BPF eliminates the last copy and system call
-\end{tiny}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%	Description of Task, Goal
 \section{Solution}
 
 \begin{frame}
@@ -252,7 +128,7 @@
 \end{frame}
 
 
-\subsection*{Capturing stacks}
+\subsection*{The new capturing stack}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Ringmap Packet Capturing Stack}
@@ -269,7 +145,6 @@
 \end{frame}
 
 
-\subsection*{Changes in generic-Stack}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 	\frametitle{What did we change in \emph{generic}}
@@ -340,8 +215,6 @@
 	\end{center}
 \end{frame}
 
-\subsection*{Goal of measurements}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Goal of measurements}
@@ -352,43 +225,6 @@
 		\end{itemize}
 	\item Benchmarking: \textbf{generic} vs. \textbf{ringmap}
 \end{itemize}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\begin{frame}
-%\frametitle{What is measured ?}
-%\textbf{packet loss} and \textbf{CPU-Load} as a function of :\newline
-%\begin{itemize}
-%	\item Traffic parameters
-%		\begin{itemize}
-%			\item packet size
-%			\item bit-rate and packet-rate
-%		\end{itemize}
-%
-%\color{gray}
-%	\item  Hardware components
-%		\begin{itemize}
-%\color{gray}
-%			\item PCI vs. PCI-Express
-%			\item Number of CPUs
-%		\end{itemize}
-%	\item Driver parameters
-%		\begin{itemize}
-%\color{gray}
-%			\item Size of packet puffers 
-%			\item etc\ldots
-%		\end{itemize}
-%\end{itemize}
-%\normalcolor
-%\end{frame}
-%
-%\subsection*{Testbed}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Testbed}
-\begin{center}
-\includegraphics [height=0.68\textheight]{pics/Messaufbau}
-\end{center}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -417,106 +253,6 @@
 \end{frame}
 
 \subsection*{Experiment description}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\begin{frame}
-%\frametitle{Experiment parameters}
-%For each experiment, data streams are generated with different parameters:
-%\begin{itemize}
-%	\item Constant parameters: 
-%		\begin{itemize}
-%			\item Packet size
-%				\begin{itemize}
-%					\item 64, 200, 300, 700, 1500
-%				\end{itemize}
-%		\end{itemize}
-%	\item Variable parameters: 
-%		\begin{itemize}
-%			\item bit-rate 
-%				\begin{itemize}
-%					\item  $ < 1GBit/sec$
-%				\end{itemize}
-%		\end{itemize}
-%\end{itemize}
-%
-%\end{frame}
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Calculation of results}
-\begin{itemize}
-	\item System load
-		\begin{itemize}
-			\item Percentage proportion of time the CPU spent in system mode
-			\item Interrupt load is not considered
-				\begin{itemize}
-					\item because of interrupt-throttling it is always constant for \textbf{generic} and \textbf{ringmap}
-				\end{itemize}
-			\item $syst = 1 - intr - user - nice - idle$\newline
-		\end{itemize}
-	\item Packet loss
-		\begin{itemize}
-			\item Difference between generated and captured packets
-			\item $Packets_{loss} = Packets_{send} - Packets_{received}$
-		\end{itemize}
-\end{itemize}
-\end{frame}
-
-\subsection*{Testing sequence}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-\frametitle{Testing sequence}
-\begin{enumerate}
-	\item Login to the capturer to 
-		\begin{itemize}
-			\item start of capturing 
-			\item start of system load measurement applications 
-		\end{itemize}
-	\item Login to the Packet-Generator to 
-
-	\begin{itemize}
-		\item generate traffic with:
-				\begin{itemize}
-					\item a certain number of packets
-					\item a certain bit-rate and packet-rate
-				\end{itemize}
-	\end{itemize}
-
-	\item Login to the capturer to 
-		\begin{itemize}
-			\item stop capturing- und measurement-applications
-		\end{itemize}
-	\item Storing of measured values
-\end{enumerate}
-\begin{itemize}
-	\item Each experiment is repeated five times
-	\item The mean and standard deviation is calculated
-\end{itemize}
-\end{frame}
-
-%\subsection*{Probleme bei Experimenten}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\begin{frame}
-%\frametitle{Problems arose in experiments }
-%\begin{itemize}
-%	\item Instability of  Linux Kernel Packet Generator
-%		\begin{itemize}
-%			\item often kernel panics
-%			\item [$\Rightarrow$] therefore max. $15000000 pkts$ per experiment\newline
-%		\end{itemize}
-%	\item Impossible to generate traffic with any packet- or bit-rate
-%		\begin{itemize}
-%			\item because of Interrupt-Throttling
-%			\item [$\Rightarrow$] therefore only certain measurement points \newline
-%		\end{itemize}
-%	\item Flow-Control
-%		\begin{itemize}
-%			\item limits the rate of generated traffic
-%			\item [$\Rightarrow$] therefore must be switched off
-%		\end{itemize}
-%\end{itemize}
-%\end{frame}
 
 \subsection*{Results}
 \begin{frame}
