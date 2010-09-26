@@ -2,6 +2,7 @@
 \usepackage{subfigure}
 %\usepackage{english}
 \usepackage{graphics}
+\usepackage{color}
 \usepackage{textcomp}
 \usepackage{url}
 \graphicspath{./pics/}
@@ -48,7 +49,7 @@
 \begin{itemize}
 	\item High bit rates and packet rates
 		\begin{itemize}
-			\item [$\Rightarrow$] high CPU load and packet loss \newline
+			\item [$\Rightarrow$] \textcolor{red}{high CPU load and packet loss} \newline
 		\end{itemize}
 \end{itemize}
 \begin{figure}[H] 
@@ -580,7 +581,7 @@
 	\item \textbf{Ringmap is easily portable to the other network controllers}
 		\begin{itemize}
 			\item The software contains hardware dependent and hardware
-				independent parts. Only hardware independent part require
+				independent parts. Only hardware dependent part require
 				modifications.
 			\item The generic driver and libpcap should contain a few hooks for calling
 				\emph{ringmap}-functions.
