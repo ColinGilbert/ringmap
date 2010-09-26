@@ -278,7 +278,10 @@
 \begin{itemize}
 	\item <2->Disabled TCP/IP-Stack\newline
 	\item <3->BPF is accessible in both kernel and user-space\newline
-	\item <4->Network driver, BPF and Libpcap is modified\newline
+	\item <4->Network driver, and Libpcap is modified
+		\begin{itemize}
+			\item BPF is unchanged
+		\end{itemize}
 \end{itemize}
 \column[t]{0.5\textwidth}
 \vspace{-2em}
@@ -308,9 +311,12 @@
 	\item<1->\textbf{generic}
 	\item<2->Eliminate packet copies  and syscalls
 	\item<3->BPF-Buffer is then not necessary
+		\begin{itemize}
+			\item<3->Packet filtering is possible in both kernel and 
+				user-space
+		\end{itemize}
 	\item<4->Mapping the Packet-Buffer to user-space
-	\item<5->Move BPF to user-space\newline
-	\item<6->[$\Rightarrow$]\textbf{ringmap}
+	\item<5->[$\Rightarrow$]\textbf{ringmap}
 \end{itemize}
 \column[t]{0.5\textwidth}
 \vspace{-2em}
@@ -318,8 +324,8 @@
 \only<2>{\includegraphics [height=59mm,width=60mm]{pics/3copy_solution_1}}
 \only<3>{\includegraphics [height=59mm,width=60mm]{pics/3copy_solution_2}}
 \only<4>{\includegraphics [height=59mm,width=60mm]{pics/3copy_solution_3}}
+%\only<5>{\includegraphics [height=59mm,width=60mm]{pics/3copy_solution_4}}
 \only<5>{\includegraphics [height=59mm,width=60mm]{pics/3copy_solution_4}}
-\only<6>{\includegraphics [height=59mm,width=60mm]{pics/3copy_solution_5}}
 \end{columns}
 \end{frame}
 
