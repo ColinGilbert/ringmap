@@ -43,7 +43,7 @@ All above listed functions are used in the standard packet capturing software in
 
 The main idea of our solution to this problem is eliminating packet copy operations by using shared memory buffers and eliminating memory allocations by using ring buffers.
 
-Our solution is to map DMA packet-buffers into the space of user process. This allows user space process to access the captured packets directly in its own address space without any additional overhead. So, the user space process has the access to all packets received from the network. The packet filtering can be accomplished by both kernel- and libpcap-BPF. 
+Our solution is to map DMA packet-buffers into the space of user process. This allows user space process to access the captured packets directly in its own address space without any additional overhead. So, the user-space process has the access to all packets received from the network immediately. The packet filtering can be accomplished by both kernel- and libpcap-BPF. 
 
 
 
