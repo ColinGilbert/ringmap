@@ -3,8 +3,11 @@
 #sidebar TableOfContents
 <wiki:toc max_depth="1" />
 
+
+
 = Introduction =
 Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately, at line-rate speeds, it is often impossible to capture every packet arriving at a network interface. Hardware may not be the only bottleneck, however, as inefficient software is also to blame for poor resources usage and resulting packet loss during capture. Within the context of this project the new software components will be developed in order to improve the performance of packet capturing in [http://www.freebsd.org FreeBSD].
+
 
 
 = Project Goal =
@@ -17,6 +20,7 @@ Implementation the new software components for efficient packet capturing at 1Gb
 Also the system calls have to be implemented in order to control the sniffing process. The new implemented software must be transparent for user-space applications. Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with the new _ringmap_ network driver and new modified _libpcap_. 
 
 
+
 = Definitions = 
 *Packet capturing stack:* the software used for capturing packets 
  * Network adapter driver
@@ -24,6 +28,8 @@ Also the system calls have to be implemented in order to control the sniffing pr
   * [http://en.wikipedia.org/wiki/Berkeley_Packet_Filter Berkeley Packet Filter]
  * Software to  access received packets from user-space
   * mostly based on _[http://www.tcpdump.org/ libpcap]_ library 
+
+
 
 = Approach =
 Our goal, as mentioned above, is to enhance the packet capturing performance in FreeBSD  Operating System. To this aim, some issues from standard packet capturing software that can cause packet loss and high CPU load should be eliminated.
@@ -39,9 +45,13 @@ The main idea of our solution to this problem is eliminating packet copy operati
 
 Our solution is to map DMA packet-buffers into the space of user process. This allows user space process to access the captured packets directly in its own address space without any additional overhead. So, the user space process has the access to all packets received from the network. The packet filtering can be accomplished by both kernel- and libpcap-BPF. 
 
+
+
 = Supported Hardware ==
  * Gigabit Ethernet adapters based on the following Intel controller chips:
   * _8254x, 8257x, 8259x_
+
+
 
 = Details and Results =
 [http://ringmap.googlecode.com/files/ringmap_slides.pdf See presentation]
