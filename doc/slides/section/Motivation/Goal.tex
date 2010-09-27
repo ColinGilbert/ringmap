@@ -1,0 +1,36 @@
+\begin{frame}
+\frametitle{Goal of the project}
+%\begin{large}
+\textbf{Increase the capturing performance in FreeBSD}
+	\begin{itemize}
+		\item Design and implementation the new capturing software to
+			minimize the \textbf{packet loss} and \textbf{CPU load} during capturing. \newline \newline
+	\end{itemize}
+%\begin{large}
+\textbf{Supported Hardware:}
+%\end{large}
+\begin{itemize}
+	\item The following \emph{Intel GbE Controllers:}
+		\begin{itemize}
+			\item \small{\emph{8254x, 8257x, 8259x}}
+		\end{itemize}
+%	\item Software:	\emph{FreeBSD}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Approach}
+\begin{itemize}
+	\item<1-> Eliminating the packet copy operations
+		\begin{itemize}
+			\item<1-> by using shared memory buffers (\emph{memory \textbf{mapping}})\newline
+		\end{itemize}
+	\item<1-> Eliminating the memory allocations
+		\begin{itemize}
+			\item<1-> by using \textbf{ring} buffers\newline \newline
+		\end{itemize}
+	\item<2->[$\Rightarrow$] $ring + mapping = \textbf{ringmap}$
+\end{itemize}
+\end{frame}
+
+
