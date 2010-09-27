@@ -8,6 +8,6 @@ svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
 }}}
 
 = Installing ringmap =
-Please contact me in order to get detailed instruction for installation: 
+Please contact me in order to get detailed instructions for installation: 
 
 EMail: afiveg(at)freebsd.org
