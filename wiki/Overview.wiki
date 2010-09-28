@@ -59,7 +59,7 @@ Our solution is to map DMA packet-buffers into the space of user process. This a
  * Enabling TCP/IP Stack
  * 10-GbE-Packet-Capturing:
   * Multiqueue support
-  * Support for hardware packet filtering
+  * Extending to support hardware packet filtering
  * Extending *ringmap* for packet transmission
 = Details and Results =
 [http://ringmap.googlecode.com/files/ringmap_slides.pdf See presentation]
