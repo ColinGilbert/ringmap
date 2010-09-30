@@ -4,18 +4,19 @@
 \usepackage{color}
 \usepackage{textcomp}
 \usepackage{url}
+\usepackage{beamerthemeshadow}
+
+
 \graphicspath{./pics/}
 
-\usepackage{beamerthemeshadow}
 
 \title{Ringmap Capturing Stack for High Performance Packet Capturing in FreeBSD}
 \author[Alexander Fiveg]{ Alexander Fiveg \\
 \url{afiveg@freebsd.org} }
-% \institute[TU Berlin/DT Labs]{Technische Universtit\"at Berlin \\ Deutsche Telekom Laboratories}
+
 
 \begin{document}
 \frame{\titlepage}
-
 
 
 \section*{Outline}
@@ -25,91 +26,19 @@
 \end{frame}
 
 
-%
+\input{section/Motivation/Motivation.tex}
 
 
-\section{Motivation}
-\begin{frame}
-	\begin{center}
-	\huge{Motivation}
-	\end{center}
-\end{frame}
-
-\subsection*{Problem}
-\input{section/Motivation/Problem.tex}
-
-\subsection*{Goal of the Project}
-\input{section/Motivation/Goal.tex}
+\input{section/Background/Background.tex}
 
 
-%
+\input{section/Solution/Solution.tex}
 
 
-\section{Background}
-\begin{frame}
-	\begin{center}
-	\huge{Background}
-	\end{center}
-\end{frame}
-\input{section/Background/Capturing.tex}
+\input{section/Performance/Performance.tex}
 
 
-%
+\input{section/Summary/Summary.tex}
 
-
-\section{Solution}
-\begin{frame}
-	\begin{center}
-	\huge{Solution}
-	\end{center}
-\end{frame}
-
-\subsection*{Ringmap Capturing Stack}
-\input{section/Solution/Ringmap.tex}
-
-\subsection*{From generic to ringmap}
-\begin{frame}
-	\begin{center}
-		\huge{From \emph{generic} to \emph{ringmap}}
-	\end{center}
-\end{frame}
-\input{section/Solution/Generic2Ringmap.tex}
-
-\subsection*{Overview}
-\input{section/Solution/Overview.tex}
-
-
-%
-
-
-\section{Performance evaluation}
-\begin{frame}
-	\begin{center}
-	\huge{Measurements and performance evaluation}
-	\end{center}
-\end{frame}
-
-\subsection*{Measurement setup}
-\input{section/Performance/Setup.tex}
-
-\subsection*{Results}
-\input{section/Performance/Results.tex}
-
-
-%
-
-
-\section{Summary}
-\begin{frame}
-	\begin{center}
-	\huge{Summary}
-	\end{center}
-\end{frame}
-
-\subsection*{Achieved Goals}
-\input{section/Summary/AchievedGoals.tex}
-
-\subsection*{Future Works}
-\input{section/Summary/FutureWorks.tex}
 
 \end{document}
