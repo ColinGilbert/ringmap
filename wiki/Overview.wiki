@@ -61,5 +61,12 @@ Our solution is to map DMA packet-buffers into the space of user process. This a
   * Multiqueue support
   * Extending to support hardware packet filtering
  * Extending _ringmap_ for packet transmission
+
+
 = Details and Results =
 [http://ringmap.googlecode.com/files/ringmap_slides.pdf See presentation]
+
+= External Links =
+ * [http://wiki.freebsd.org/AlexandreFiveg ringmap wiki pages] on http://wiki.freebsd.org/
+ * [http://www.seccuris.com/documents/whitepapers/20070517-devsummit-zerocopybpf.pdf Zero-Copy BPF Buffers]
+ * [http://www.intel.com/support/network/adapter/pro100/sb/CS-029872.htm Intel® Server Adapters. Introduction to 10 Gigabit Ethernet]
