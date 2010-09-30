@@ -15,6 +15,11 @@
 \url{afiveg@freebsd.org} }
 
 
+
+\usepackage{ifthen}
+\newboolean{SUMMIT}
+\setboolean{SUMMIT}{true}
+
 \begin{document}
 \frame{\titlepage}
 
@@ -29,13 +34,13 @@
 \input{section/Motivation/Motivation.tex}
 
 
-\input{section/Background/Background.tex}
+% \input{section/Background/Background.tex}
 
 
 \input{section/Solution/Solution.tex}
 
 
-\input{section/Performance/Performance.tex}
+% \input{section/Performance/Performance.tex}
 
 
 \input{section/Summary/Summary.tex}
