@@ -60,6 +60,6 @@ Our solution is to map DMA packet-buffers into the space of user process. This a
  * 10-GbE-Packet-Capturing:
   * Multiqueue support
   * Extending to support hardware packet filtering
- * Extending *ringmap* for packet transmission
+ * Extending _ringmap_ for packet transmission
 = Details and Results =
 [http://ringmap.googlecode.com/files/ringmap_slides.pdf See presentation]
