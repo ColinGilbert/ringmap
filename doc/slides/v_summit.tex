@@ -34,13 +34,14 @@
 \input{section/Motivation/Motivation.tex}
 
 
-% \input{section/Background/Background.tex}
-
+\ifthenelse{\boolean{SUMMIT}}{}{
+	\input{section/Background/Background.tex}
+}
 
 \input{section/Solution/Solution.tex}
 
 
-% \input{section/Performance/Performance.tex}
+\input{section/Performance/Performance.tex}
 
 
 \input{section/Summary/Summary.tex}
