@@ -81,28 +81,5 @@
 \end{columns}
 \end{frame}
 
-\subsection*{Disadvantages}
-\begin{frame}
-\frametitle{Disadvantages of Standard Packet Capturing Stack}
-\begin{itemize}
-	\item \textbf{Three copies per packet}
-		\begin{enumerate}
-			\item DMA: $FIFO \Rightarrow Packet\ Buffer$
-			\item $Packet\ Buffer \Rightarrow BPF\ Buffer$
-			\item $BPF\ Buffer \Rightarrow Userspace\ Buffer$\emph{(*)}\newline
-		\end{enumerate}
-	\item \textbf{Memory allocations }
-		\begin{itemize}
-			\item For each new received packet will be a new \emph{mbuf} 
-				allocated\newline
-		\end{itemize}
-	\item \textbf{System calls }
-		\begin{itemize}
-			\item User-space application receives the packets using read(2)\emph{(*)}
-			\item Saving packets to the hard disk
-		\end{itemize}
-\end{itemize}
-\begin{tiny}
-\emph{(*)} Using Zero-Copy BPF eliminates the last copy and system call
-\end{tiny}
-\end{frame}
+
+\input{section/Background/Disadvantages.tex}

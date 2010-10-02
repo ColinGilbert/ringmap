@@ -7,6 +7,8 @@
 			\item [$\Rightarrow$] \textcolor{red}{high CPU load and packet loss} \newline
 		\end{itemize}
 \end{itemize}
+
+\ifthenelse{\boolean{SUMMIT}}{}{
 \begin{figure}[H] 
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/sysload_generic_slide}}
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/pktlos_generic_slide}}
@@ -16,7 +18,8 @@
 
 \begin{frame}
 \frametitle{The reason of the Problems}
-\textbf{Inefficiency of standard capturing software}\newline
+}
+\textbf{Inefficiency of standard capturing software}
 \begin{itemize}
 	\item To many ``expensive'' operations in terms of CPU cycles: 
 \begin{itemize}
@@ -34,3 +37,6 @@
 \end{itemize}
 \end{frame}
 
+\ifthenelse{\boolean{SUMMIT}}{
+\input{section/Background/Disadvantages.tex}
+} {}
