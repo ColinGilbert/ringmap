@@ -22,7 +22,7 @@ Also the system calls have to be implemented in order to control the sniffing pr
 
 
 = Definitions = 
-*Packet capturing stack:* the software used for capturing packets 
+*Packet capturing stack* (the software used for capturing packets): 
  * Network adapter driver
  * Software to analyze and filter received packets
   * [http://en.wikipedia.org/wiki/Berkeley_Packet_Filter Berkeley Packet Filter]
