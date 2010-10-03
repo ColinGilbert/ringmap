@@ -1,0 +1,31 @@
+\subsection*{Disadvantages of standard capturing software}
+\begin{frame}
+\frametitle{Disadvantages of Standard Packet Capturing Stack}
+\begin{itemize}
+	\item<1-> System calls:
+		\begin{itemize}
+			\item<1-> User-space application receives the packets using read(2)\emph{(*)}
+			\item<1-> Saving packets to the hard disk\newline
+		\end{itemize}
+	\item<2-> Too many copies per packet:
+		\begin{itemize}
+\ifthenelse{\boolean{SUMMIT}}{
+			\item<2-> DMA: $Controller \Rightarrow RAM$
+			\item<2-> BPF: $RAM \Rightarrow BPF\ RAM$
+			\item<2-> read(2): $RAM \Rightarrow RAM (Userspace\ Buffer)$\emph{(*)}\newline
+}{
+			\item<2-> DMA: $FIFO \Rightarrow Packet\ Buffer$
+			\item<2-> $Packet\ Buffer \Rightarrow BPF\ Buffer$
+			\item<2-> $BPF\ Buffer \Rightarrow Userspace\ Buffer$\emph{(*)}\newline
+}
+		\end{itemize}
+	\item<3-> Memory allocations:
+		\begin{itemize}
+			\item<3-> For each new received packet is a new \emph{mbuf} 
+				allocated\newline
+		\end{itemize}
+\end{itemize}
+\begin{tiny}
+\emph{(*)} Using Zero-Copy BPF eliminates the last copy and system call
+\end{tiny}
+\end{frame}
