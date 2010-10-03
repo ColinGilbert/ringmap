@@ -1,38 +1,19 @@
 \begin{frame}
-\frametitle{Achieved goals}
-\begin{itemize}
-	\item \textbf{Enhanced Capturing-Performance}
-		\begin{itemize}
-			\item very low  system load (below $12\%$) and very low
-				packet loss  (below  $0.02\%$)
-				\begin{itemize}
-					\item during capturing smallest  64-Bytes packets
-					\item maximal reached packet-rate ($ > 450000 pkts/sec$)
-				\end{itemize}
-		\end{itemize}
-	\item \textbf{Stability and usability of implemented software}
-		\begin{itemize}
-			\item during all experiments, no \emph{kernel panics} and no \emph{segmentation faults} occurred
-			\item very simple install and remove
-				\begin{itemize}
-					\item two Shell-Scripts to installing  and removing the   
-						\emph{ringmap} Capturing Stacks
-				\end{itemize}
-			\item Libpcap-applications don't require modification in order to run with the \emph{ringmap}
-		\end{itemize}
-\end{itemize}
+	\begin{center}
+	\huge{Achieved goals}
+	\end{center}
 \end{frame}
 
+
 \begin{frame}
-\frametitle{Achieved goals 2}
+\frametitle{Achieved goals 1}
 \begin{itemize}
-	\item \textbf{Ringmap is easily portable to the other network controllers}
+	\item \textbf{Portability}
 		\begin{itemize}
-			\item The software contains hardware dependent and hardware
-				independent parts. Only hardware dependent part require
-				modifications.
-			\item The generic driver and libpcap should contain a few hooks for calling
-				\emph{ringmap}-functions.
+			\item Ringmap is easily portable to other ethernet controllers.
+				Only hardware dependent part of code require modifications.
+			\item The generic driver and libpcap contain a few hooks for calling
+				\emph{ringmap}-functions.\newline
 		\end{itemize}
 	\item \textbf{Packet Filtering}
 		\begin{itemize}
@@ -42,12 +23,13 @@
 \end{itemize}
 \end{frame}
 
+
 \begin{frame}
-\frametitle{Achieved goals 3}
+\frametitle{Achieved goals 2}
 \begin{itemize}
 	\item \textbf{Multithreaded Capturing}
 		\begin{itemize}
-			\item Multiple applications can capture from the same interface. 
+			\item Multiple applications can capture from the same interface. \newline
 		\end{itemize}
 	\item \textbf{Partly ported to the 10GbE controller}
 		\begin{itemize}
@@ -57,3 +39,18 @@
 \end{itemize}
 \end{frame}
 
+
+\begin{frame}
+\frametitle{Achieved goals 3}
+\begin{itemize}
+	\item \textbf{Enhanced Capturing-Performance}
+		\begin{itemize}
+			\item very low  system load (below $12\%$) and very low
+				packet loss  (below  $0.02\%$)\newline
+		\end{itemize}
+	\item \textbf{Usability of implemented software}
+		\begin{itemize}
+			\item Libpcap-applications don't require modification in order to run with the \emph{ringmap}
+		\end{itemize}
+\end{itemize}
+\end{frame}

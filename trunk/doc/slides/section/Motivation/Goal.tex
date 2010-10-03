@@ -1,28 +1,36 @@
+\ifthenelse{\boolean{SUMMIT}}{
+\begin{frame}
+	\begin{center}
+	\huge{Goal and Approach}
+	\end{center}
+\end{frame}
+}{}
+
 \begin{frame}
 \frametitle{Goal of the project}
 %\begin{large}
-\textbf{Increase the capturing performance in FreeBSD}
-	\begin{itemize}
-		\item Design and implementation the new capturing software to
-			minimize the \textbf{packet loss} and \textbf{CPU load} during sniffing.\newline
-			\ifthenelse{\boolean{SUMMIT}}{
-			\begin{itemize}
-				\item modification of 
-				\item adapting \emph{libpcap} to 
-			\end{itemize}
-			}{}
-	\end{itemize}
-%\begin{large}
+\textbf{Increasing the capturing performance in FreeBSD}\newline
+\begin{itemize}
+	\item<1-> Design and implementation the new capturing software to
+		minimize the \textbf{CPU load} and \textbf{packet loss} during sniffing.
+		\ifthenelse{\boolean{SUMMIT}}{
+		\begin{itemize}
+			\item<2-> The new implemented software should be transparent to the user-space applications
+		\end{itemize}
+		}{}
+\end{itemize}
+	
+\ifthenelse{\boolean{SUMMIT}}{}{
 \textbf{Supported Hardware:}
-%\end{large}
 \begin{itemize}
 	\item The following \emph{Intel GbE Controllers:}
 		\begin{itemize}
 			\item \small{\emph{8254x, 8257x, 8259x}}
 		\end{itemize}
-%	\item Software:	\emph{FreeBSD}
 \end{itemize}
+}
 \end{frame}
+
 
 \begin{frame}
 \frametitle{Approach}
@@ -45,7 +53,11 @@
 				\end{itemize}
 				}{}
 		\end{itemize}
-	\item<3->[$\Rightarrow$] $ring + mapping = \textbf{ringmap}$
+	\item<3-> Modifying \emph{libpcap}
+		\begin{itemize}
+			\item<3-> libpcap-apps don't require modifications\newline
+		\end{itemize}
+	\item<4->[$\Rightarrow$] Project Name: $ring + mapping = \textbf{ringmap}$
 \end{itemize}
 \end{frame}
 

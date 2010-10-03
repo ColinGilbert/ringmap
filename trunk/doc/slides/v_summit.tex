@@ -38,8 +38,9 @@
 	\input{section/Background/Background.tex}
 }
 
+\ifthenelse{\boolean{SUMMIT}}{}{
 \input{section/Solution/Solution.tex}
-
+}
 
 \ifthenelse{\boolean{SUMMIT}}{}{
 \input{section/Performance/Performance.tex}
