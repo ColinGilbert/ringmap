@@ -1,14 +1,22 @@
+\ifthenelse{\boolean{SUMMIT}}{}{
 \section{Summary}
 \begin{frame}
 	\begin{center}
 	\huge{Summary}
 	\end{center}
 \end{frame}
+}
 
-\subsection*{Achieved Goals}
+\ifthenelse{\boolean{SUMMIT}}{
+\section{Achieved Goals}
+}{
+\ subsection*{Achieved Goals}
+}
 \input{section/Summary/AchievedGoals.tex}
 
+\ifthenelse{\boolean{SUMMIT}}{
+\section{Future Works}
+}{
 \subsection*{Future Works}
+}
 \input{section/Summary/FutureWorks.tex}
-
-
