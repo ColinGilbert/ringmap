@@ -4,7 +4,13 @@
 \textbf{Increase the capturing performance in FreeBSD}
 	\begin{itemize}
 		\item Design and implementation the new capturing software to
-			minimize the \textbf{packet loss} and \textbf{CPU load} during capturing. \newline \newline
+			minimize the \textbf{packet loss} and \textbf{CPU load} during sniffing.\newline
+			\ifthenelse{\boolean{SUMMIT}}{
+			\begin{itemize}
+				\item modification of 
+				\item adapting \emph{libpcap} to 
+			\end{itemize}
+			}{}
 	\end{itemize}
 %\begin{large}
 \textbf{Supported Hardware:}
@@ -23,13 +29,23 @@
 \begin{itemize}
 	\item<1-> Eliminating the packet copy operations
 		\begin{itemize}
-			\item<1-> by using shared memory buffers (\emph{memory \textbf{mapping}})\newline
+			\item<1-> by using shared memory buffers (\emph{memory \textbf{mapping}})
+				\ifthenelse{\boolean{SUMMIT}}{
+				\begin{itemize}
+					\item<1-> mapping DMA buffers into the user-space\newline
+				\end{itemize}
+				}{}
 		\end{itemize}
-	\item<1-> Eliminating the memory allocations
+	\item<2-> Eliminating the memory allocations
 		\begin{itemize}
-			\item<1-> by using \textbf{ring} buffers\newline \newline
+			\item<2-> by using \textbf{ring} buffers
+				\ifthenelse{\boolean{SUMMIT}}{
+				\begin{itemize}
+					\item<2-> reusing packet buffers: no new allocations\newline
+				\end{itemize}
+				}{}
 		\end{itemize}
-	\item<2->[$\Rightarrow$] $ring + mapping = \textbf{ringmap}$
+	\item<3->[$\Rightarrow$] $ring + mapping = \textbf{ringmap}$
 \end{itemize}
 \end{frame}
 
