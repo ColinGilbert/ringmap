@@ -1,10 +1,10 @@
 \begin{frame}
-\frametitle{Problem}
-\textbf{Problems arising during packet capturing:}
+\frametitle{Problems arising during packet capturing}
+%\textbf{Problems arising during packet capturing:}\newline
 \begin{itemize}
 	\item High bit rates and packet rates
 		\begin{itemize}
-			\item [$\Rightarrow$] \textbf{\textcolor{red}{high CPU load and packet loss}}\newline
+			\item [$\Rightarrow$] \textbf{\textcolor{red}{high CPU load and packet loss}}
 		\end{itemize}
 \end{itemize}
 
@@ -19,22 +19,31 @@
 \begin{frame}
 \frametitle{The reason of the Problems}
 }
+\ifthenelse{\boolean{SUMMIT}}{
+\begin{itemize}
+	\item Inefficiency of standard capturing software
+}{
 \textbf{Inefficiency of standard capturing software}
-\begin{itemize}
+}
+	\begin{itemize}
 	\item To many ``expensive'' operations in terms of CPU cycles: 
-\begin{itemize}
+		\begin{itemize}
 			\item System calls
 			\item Packet copy operations
 			\item Memory allocations
 			\item etc\ldots\newline
-\end{itemize}
+		\end{itemize}
 % \begin{small}
 % 	\item [$\Rightarrow$] probably the capturing software for FreeBSD was
 % 		developed at a time when  network data-rates were low enough relative
 % 		to hardware processing resources such that capturing loss problems did
 % 		not arise?
 % \end{small}
+	\end{itemize}
+
+\ifthenelse{\boolean{SUMMIT}}{
 \end{itemize}
+}{}
 \end{frame}
 
 \ifthenelse{\boolean{SUMMIT}}{
