@@ -2,30 +2,30 @@
 \begin{frame}
 \frametitle{Disadvantages of Standard Packet Capturing Stack}
 \begin{itemize}
-	\item<2-> Memory allocations:
+	\item<1-> Memory allocations
 		\begin{itemize}
-			\item<2-> For each new received packet a new \emph{mbuf} 
+			\item<1-> For each new received packet a new \emph{mbuf} 
 				is allocated\newline
 		\end{itemize}
 
 
-	\item<3-> Too many packet copies:
+	\item<2-> Too many packet copies
 		\begin{itemize}
 \ifthenelse{\boolean{SUMMIT}}{
-			\item<3-> DMA: $Controller \Rightarrow RAM$
-			\item<3-> BPF: $RAM \Rightarrow RAM (BPF\ Buffer)$
-			\item<3-> read(2): $RAM \Rightarrow RAM (Userspace\ Buffer)$\emph{(*)}\newline
+			\item<2-> DMA: $Controller \Rightarrow RAM$
+			\item<2-> BPF: $RAM \Rightarrow RAM (BPF\ Buffer)$
+			\item<2-> read(2): $RAM \Rightarrow RAM (Userspace\ Buffer)$\emph{(*)}\newline
 }{
-			\item<3-> DMA: $FIFO \Rightarrow Packet\ Buffer$
-			\item<3-> $Packet\ Buffer \Rightarrow BPF\ Buffer$
-			\item<3-> $BPF\ Buffer \Rightarrow Userspace\ Buffer$\emph{(*)}\newline
+			\item<2-> DMA: $FIFO \Rightarrow Packet\ Buffer$
+			\item<2-> $Packet\ Buffer \Rightarrow BPF\ Buffer$
+			\item<2-> $BPF\ Buffer \Rightarrow Userspace\ Buffer$\emph{(*)}\newline
 }
 		\end{itemize}
 
-	\item<4-> System calls:
+	\item<3-> System calls
 		\begin{itemize}
-			\item<4-> User-space application receives the packets using read(2)\emph{(*)}
-			\item<4-> Saving packets to the hard disk\newline
+			\item<3-> User-space application receives the packets using read(2)\emph{(*)}
+			\item<3-> Saving packets to the hard disk\newline
 		\end{itemize}
 
 \end{itemize}
