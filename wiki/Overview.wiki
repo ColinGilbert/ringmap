@@ -17,7 +17,8 @@ Implementation the new software components for efficient packet capturing at 1Gb
    * [http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+7.0-RELEASE em] for 1GbE and [http://www.freebsd.org/cgi/man.cgi?query=ixgbe&manpath=FreeBSD+8.0-RELEASE ixgbe] for 10GbE capturing
  * _libpcap_
   * the new functions have to be developed for _libpcap_ to accessing packets by using _ringmap_. 
-Also the system calls have to be implemented in order to control the sniffing process. The new implemented software must be transparent for user-space applications. Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with the new _ringmap_ network driver and new modified _libpcap_. 
+Also the system calls have to be implemented in order to control the sniffing process. The new implemented software must be transparent for user-space applications. 
+Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with the new _ringmap_ network driver and new modified _libpcap_. 
 
 
 
