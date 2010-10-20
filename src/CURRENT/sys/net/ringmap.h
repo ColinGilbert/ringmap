@@ -1,5 +1,7 @@
-/* minimal distance between TAIL and HEAD */
-#define RING_SAFTY_MARGIN	1
+#ifdef _KERNEL
+#include "ringmap_kernel.h"
+#endif
+
 
 /* 
  * value for number of descriptors (a.k.a. slots in the ringbuffer)
@@ -7,31 +9,23 @@
 #define SLOTS_NUMBER		64
 
 /* 
- * Prefix for name of device (for example /dev/ringmap0 will full name) 
+ * Prefix for name of device (for example /dev/ringmap_em0 will full name) 
+ * currently not used, but it will!
  */
 #define RINGMAP_DEVICE 		"ringmap"
 
 /*
- * Default queue number
+ * Default queue number. For multiqueue. Currently not used!
  */
 #define DEFAULT_QUEUE	1
 
-/* 
- * Driver works only with device wich has the following device ID. If 0
- * then work with all devices that was found and accepted in the "probe"
- * function. 
- *
- * #define DEV_ID 	0x105E 
- */
-#define DEV_ID 	0
-
-/* Enable/Disable tranceive. If 0, then receive only */
-#define RINGMAP_TX_ENABLE 0
- 
-/* 1 - enable time stamping in the driver */
+/* TODO: eliminate it.  1 - enable time stamping in the driver */
 #define RINGMAP_TIMESTAMP 1
 
-/* TODO: should not be as macro */
+/* 
+ * TODO: should not be as macro: Max number of user threads that capture 
+ * using ringmap 
+ */
 #define RINGMAP_MAX_THREADS 8
 
 struct address {
@@ -41,10 +35,9 @@ struct address {
 };
 
 /*
- * This structure represents the ring slot. Each slot contains three entities:
- * descriptor, mbuf and packet. The descriptore represents the hardware view of
- * of packet. Mbuf represents the kernel view of packet. The packet represents
- * the buffer where the packet data is placed. 
+ * This structure represents the ring slot. Each slot contains two entities:
+ * mbuf and packet. Mbuf represents the kernel view of packet. The packet
+ * represents the buffer where the packet data is placed. 
  *
  * Each entity is of type 'struct address'. Struct 'address' contains 
  * three addresses: physical-, kernel- and user-address. We need to store 
@@ -52,7 +45,6 @@ struct address {
  */
 struct ring_slot {
 
-	struct address 	descriptor;
 	struct address 	mbuf;
 	struct address	packet;
 
@@ -77,27 +69,27 @@ struct ring_slot {
 };
 
 /*
- * This structure represents the packets ringbuffer. The structure should be
+ * This structure represents the packets ring buffer. The structure has to be
  * mapped into the user-space to be visible and accessible from the user
  * capturing application. The ring contains the pointer to SLOTs array. Each
  * SLOT represents one packet. Additionaly, the structure contains ring-HEAD
  * (kernrp) and ring-TAIL (userrp) poiners. 
- */
+ */ 
 struct ring {
 
 	/*
-	 * kernrp - ring HEAD. Must be changed ONLY in driver through synchronizing
-	 * with ring-HEAD register. Adapter increments the value in its
-	 * HEAD-register after storing the incomming packets in the RAM. The driver
-	 * should in the ISR check the value in the adapter-HEAD-register and set
-	 * this value in kernrp.
-	 */
+	 * kernrp - ring HEAD. Must be modified ONLY in the driver through
+	 * synchronizing it with ring-HEAD controller register. Adapter increments
+	 * the value in its HEAD-register after storing the incomming packets in
+	 * the RAM. Then the value of HEAD-register should be written into the
+	 * kernrp.
+ 	 */
 	unsigned int volatile kernrp;
 
 	/* 
-	 * userrp - ring TAIL. Must be incremented only in user space  after
-	 * reading a slot with a new received packet. The driver, while executing
-	 * ISR shoud check userrp and set this value in the adapter-TAIL-register.
+	 * userrp - ring TAIL. Must be modified only in user space  after reading a
+	 * slot with a new received packet. The driver, while executing ISR shoud
+	 * check userrp and set this value in the adapter-TAIL-register.
 	 */
 	unsigned int volatile userrp;
 
@@ -134,13 +126,9 @@ struct ring {
 
 	unsigned long long intr_num;
 
-	/* Ring identification. Should be initialized with process ID */
-	/* TODO: use other ID. Using PID is a wrong way */
-	unsigned int pid;
-
 	/* Array of slots (A.K.A packet buffers) */
 	struct ring_slot volatile slot[SLOTS_NUMBER];
-};
+}; 
 
 
 /* *************************************
@@ -181,6 +169,17 @@ struct ring {
  */
 #define IOCTL_SETFILTER			_IOW(RINGMAP_IOC_MAGIC, 6, struct bpf_program)
 
+/*
+ * Returns the number of available queues (A.K.A. rings)
+ */
+#define IOCTL_GETQUEUE_NUM		_IOR(RINGMAP_IOC_MAGIC, 7, int)
+
+/*
+ * Associate user-space capturing process with a queue
+ */
+#define IOCTL_ATTACH_RING		_IOW(RINGMAP_IOC_MAGIC, 8, int)
+
+
 
 /**********************************************
  *  	Arithmetic in Ring Buffer	
@@ -190,26 +189,21 @@ struct ring {
 #define SW_TAIL(ringp)	((ringp)->userrp)
 #define SW_HEAD(ringp)  ((ringp)->kernrp)
 
-/* 
- * The macroses for accessing to the hardware HEAD and TAIL are defined in the
- * hardware dependent header files 
- */
-
-#define RING_MODULO(a,b)								\
-	( ((unsigned int)(a)) % ((unsigned int)(b)) )
+#define RING_MODULO(a,b)						\
+	(((unsigned int)(a)) % ((unsigned int)(b)))
 
 /* Distance from "a" to "b" in ring: r = (b-a) mod (size) */
-#define RING_DISTANCE(a,b,size)				\
+#define RING_DISTANCE(a,b,size)		\
 	(RING_MODULO((b)-(a), (size)))
 
-#define R_MODULO(a)							\
+#define R_MODULO(a)					\
 	RING_MODULO((a), (SLOTS_NUMBER))
 
 #define R_DISTANCE(a, b)					\
 	RING_DISTANCE((a), (b), (SLOTS_NUMBER))
 
 /* Distance from head to tail in ring */
-#define SW_HEAD_TO_TAIL_DIST(ringp)						\
+#define SW_HEAD_TO_TAIL_DIST(ringp)				\
 	R_DISTANCE(SW_HEAD(ringp), SW_TAIL(ringp))
 
 /* Distance from tail to head in ring */
@@ -217,14 +211,14 @@ struct ring {
 	((SW_TAIL(ringp) == SW_HEAD(ringp)) ? SLOTS_NUMBER : 	\
 	R_DISTANCE(SW_TAIL(ringp), SW_HEAD(ringp)))
 
-#define SW_INCR_TAIL(ringp)								\
+#define SW_INCR_TAIL(ringp)							\
 	(SW_TAIL(ringp)) = R_MODULO(SW_TAIL(ringp) + 1);
 
 #define RING_IS_EMPTY(ringp)				\
-	((SW_TAIL_TO_HEAD_DIST(ringp)) <= RING_SAFTY_MARGIN)
+	((SW_TAIL_TO_HEAD_DIST(ringp)) <= 1)
 
 #define RING_NOT_EMPTY(ringp)				\
-	((SW_TAIL_TO_HEAD_DIST(ringp)) > RING_SAFTY_MARGIN)
+	((SW_TAIL_TO_HEAD_DIST(ringp)) > 1)
 
 #define RING_IS_FULL(ringp)					\
 	((SW_HEAD_TO_TAIL_DIST(ringp)) == 0)
@@ -254,18 +248,20 @@ struct ring {
  *		DEBUG OUTPUT
  */
 #ifndef RINGMAP_IOCTL_DEB
-#define RINGMAP_IOCTL_DEB 0
+#define RINGMAP_IOCTL_DEB 1
 #else 	
 #define RINGMAP_IOCTL_DEB 1
 #endif
 
 #ifndef RINGMAP_INTR_DEB
-#define RINGMAP_INTR_DEB 0
+#define RINGMAP_INTR_DEB 1
 #else 	
 #define RINGMAP_INTR_DEB  1
 #endif
 
 #ifndef __RINGMAP_DEB
+#define __RINGMAP_DEB 1
+#elif
 #define __RINGMAP_DEB 1
 #endif
 
@@ -279,18 +275,20 @@ struct ring {
 	printf(ERR_PREFIX "[%s]: "  #x "\n", __func__);
 
 #define RINGMAP_IOCTL(x)	\
-	if (RINGMAP_IOCTL_DEB) 	printf(IOCTL_PREFIX "[%s] " #x "\n", __func__);
+	if (RINGMAP_IOCTL_DEB) 	\
+		printf(IOCTL_PREFIX "[%s] " #x "\n", __func__);
 
-#define RINGMAP_INTR(x)  								\
-	if (RINGMAP_INTR_DEB) 								\
+#define RINGMAP_INTR(x)  							\
+	if (RINGMAP_INTR_DEB) 							\
 		printf(INTR_PREFIX "[%s] " #x "\n", __func__);
 
-#define RINGMAP_FUNC_DEBUG(x) \
-	if (__RINGMAP_DEB) printf(RINGMAP_PREFIX "[%s] " #x "\n", __func__);
+#define RINGMAP_FUNC_DEBUG(x)	\
+	if (__RINGMAP_DEB) 			\
+		printf(RINGMAP_PREFIX "[%s] " #x "\n", __func__);
 
 #define RINGMAP_WARN(x) 	\
-	if (__RINGMAP_DEB) printf(WARN_PREFIX"[%s]: "  #x "\n", __func__);
-
+	if (__RINGMAP_DEB)		\
+		printf(WARN_PREFIX"[%s]: "  #x "\n", __func__);
 
 #define PRINT_PKT_BYTES(pktp, i)										\
    printf("=+= [%s] SOME BYTES FROM PKT: %hhu %hhu %hhu %hhu %hhu %hhu %hhu\n", 	\
@@ -307,13 +305,13 @@ struct ring {
 #define PRINT_MBUF_ADDR(ring, i)	\
 	do {							\
 		printf("=+= mbuf.user=0x%X, mbuf.phys=0x%llX, mbuf.kern=0x%X\n",  \
-		(unsigned int)ring->slot[i].mbuf.user, 	\
-		(long long unsigned int)ring->slot[i].mbuf.phys, 	\
-		(unsigned int)ring->slot[i].mbuf.kern);	\
+		(unsigned int)ring->slot[i].mbuf.user,			\
+		(long long unsigned int)ring->slot[i].mbuf.phys,\
+		(unsigned int)ring->slot[i].mbuf.kern);			\
 	} while (0);
 
 #define PRINT_SLOT(ring, i)												\
-	if (((ring) != NULL) && ((i) < SLOTS_NUMBER)){ 						\
+	if (((ring) != NULL) && ((i) < SLOTS_NUMBER)){ 		 				\
 		printf("\n=+= ==================================\n");			\
 		printf("=+= Slot Number: %d \n", (i));							\
 		printf("=+= Intrr num:  %llu\n", (ring)->slot[(i)].intr_num);	\
@@ -330,6 +328,12 @@ struct ring {
 		RINGMAP_ERROR(Print failed!);									\
 	}
 
+#define PRINT_SLOT_DEB(ring, i)				\
+	if (__RINGMAP_DEB) {					\
+		PRINT_SLOT((ring), (i))				\
+	};
+
+
 #define PRINT_TAIL(ring)				\
 	printf("=+= [%s] tail = %d\n", __func__, SW_TAIL(ring));	
 
@@ -338,13 +342,6 @@ struct ring {
 
 #define PRINT_RING_PTRS(ring)		\
 	do {							\
-		printf("\n=+= [%s] pid = %d\n", __func__, ring->pid);	\
-		PRINT_TAIL(ring)				\
-		PRINT_HEAD(ring)				\
-		printf("\n");					\
+		PRINT_TAIL(ring)			\
+		PRINT_HEAD(ring)			\
 	} while (0);
-
-
-#ifdef _KERNEL
-#include "ringmap_kernel.h"
-#endif

@@ -1,17 +1,37 @@
 struct ringmap_functions;
+struct address; 
+struct ring_slot;
+struct ring;
 
 struct capt_object {
 	struct 	ringmap *rm;
 	struct 	thread *td;
 
 	struct 	ring *ring;
-	void 	*que;
 
+	/* 
+	 * Pointers to the structures allocated in the generic driver for accesisng
+	 * hardware registers related to the rx/tx queues associated with our 
+	 * capturing object. 
+	 */
+	void *hw_rx_ring, *hw_tx_ring;
+
+	/*
+	 * Pointer to the arrays allocated in the generic driver for accessing 
+	 * rx/tx buffers and descriptors.
+	 */
+	void *rx_buffers, *tx_buffers, *rx_desc_base, *tx_desc_base;
+
+	/* Packet filtering code. */
 	struct bpf_insn *fcode;
 
-	/* Source of interrupts affecting our capturing object */
+	/* 
+	 * Source of interrupts affecting our capturing object. It can be adapter,
+	 * device or queue structure.
+	 */
 	void *intr_context;
 
+	/* Let's concatenate our objects */
 	SLIST_ENTRY(capt_object) objects;
 };
 
@@ -51,56 +71,44 @@ SLIST_HEAD(ringmap_global_list, ringmap);
 struct ringmap_functions {
 
 	/*
-	 * This function should be calld from ISR. It should contain 
+	 * This function should be called from ISR. It should contain 
 	 * the very fast executable operations (don't sleep!). 
 	 */
 	void (*isr)(void *);
 
 	/*
 	 * This function should be calld from delayed interrupt 
-	 * function. It can contain operations that must not be 
+	 * routine. It can contain operations that must not be 
 	 * very fast (can sleep).
 	 */
-	void (*delayed_isr)(void *, struct ringmap *);
+	struct capt_object * (*delayed_isr)(void *, struct ringmap *);
 
 	/*
-	 * The native driver should have cycle for checking the packets that was
-	 * transfered in the RAM from network adapter. per_packet_iteration()
-	 * should be called from that cycle, so it will be called per packet.
+	 * The native driver usually has cycle for checking the packets DMAed in
+	 * the RAM from network controller. per_packet_iteration() should be called
+	 * from that cycle, so it should be called once per packet.
 	 */
-	void (*per_packet_iteration)(struct ringmap *, int);
+	void (*per_packet_iteration)(struct capt_object *, int);
+
+	/* Returns value of TAIL controller register */
+	unsigned int (*get_tail)(void *hw_ring);
+
+	/* Set value into the TAIL controller register */
+	void (*set_tail)(unsigned int val, void *hw_ring);
+
+	/* Returns value of HEAD controller register */
+	unsigned int (*get_head)(void *hw_ring);
+
+	/* Returns pointer to mbuf from array allocated in the generic driver */
+	struct mbuf * (*get_mbuf)(void *buffer_area, unsigned int num);
+
+	/* Returns pointer to the packet buffer: mbuf->m_mhead->m_data */
+	vm_offset_t (*get_packet)(void *buffer_area, unsigned int num);
 
 	/* 
-	 * Next functions synchronize the tail and head hardware registers
-	 * with head and tail software varibles visible in both  
-	 * kernel- and user-space. 
-	 *
-	 * Synchronisation rules:
-	 * 1. SYNC_HEAD: HARDWARE_HEAD => SOFTWARE_HEAD
-	 * 		set value from hardware HEAD register into the software visible
-	 * 		HEAD-variable: ring->kernrp.  The User-space process shouldn't
-	 * 		touch the ring->kernrp variable. Only hardware increment the value
-	 * 		in the HEAD register onto adapters chip while receiving new
-	 * 		packets, and only driver (kernel) synchronizes then hardware HEAD
-	 * 		with ring->kernrp.
-	 *
-	 * 2. SYNC_TAIL: SOFTWARE_TAIL => HARDWARE_TAIL
-	 *		set value from software TAIL-variable: ring->userrp into the
-	 *		hardware TAIL-register. Hardware shouldn't change the content of
-	 *		TAIL-register.  Software after reading one packet in RAM
-	 *		increments the value of ring->userrp. Kernel will check this value
-	 *		(it is mapped - visible in kernel and user) and set it into the
-	 *		hardware TAIL-register.
-	 */
-	void (*sync_tail)(struct capt_object *);
-	void (*sync_head)(struct capt_object *);
-
-	/* Initialize the ring slot */
-	int (*set_slot)(struct capt_object *, unsigned int);
-
-	/* 
-	 * Associate the capturing objec with a hardware queue. Usable ONLY
-	 * on controllers supported multiple queues 
+	 * Associate the capturing objec with a hardware queue (a.k.a ring). Also 
+	 * in this function the pointers for accessing hardware registers and 
+	 * rx/tx buffers should be set.  
 	 */
 	int (*set_queue)(struct capt_object *, unsigned int);
 
@@ -111,13 +119,23 @@ struct ringmap_functions {
 	 */
 	void (*pkt_filter)(struct capt_object *, int);
 
+	/* Retunrns the number of available queues */
+	int (*get_queuesnum)(void);
+
 	/* 
 	 * Set timestamp for packet placed in the slot. If ts != NULL set ts as
 	 * timestamp. Else compute timestamp calling getmicrotime(9) or take
 	 * timestamp from descriptor if controller supports timestamping.
 	 */
 	void (*set_timestamp)(struct ring_slot *slot, struct timeval *ts);
+
+	void (*receive_disable)(struct ringmap *rm);
+	void (*intr_disable)(struct ringmap *rm);
+
+	void (*receive_enable)(struct ringmap *rm);
+	void (*intr_enable)(struct ringmap *rm);
 };
+
 
 /* MUTEX */
 #define	RINGMAP_LOCK_INIT(rm, _name) 	\
@@ -126,3 +144,18 @@ struct ringmap_functions {
 #define	RINGMAP_LOCK(rm)			mtx_lock(&(rm)->ringmap_mtx)
 #define	RINGMAP_TRYLOCK(rm)		mtx_trylock(&(rm)->ringmap_mtx)
 #define	RINGMAP_UNLOCK(rm)		mtx_unlock(&(rm)->ringmap_mtx)
+
+
+/* Debug */
+#define CAPT_OBJECT_DEB(co)									\
+	if (__RINGMAP_DEB) {									\
+		if (co != NULL) {									\
+			printf("\n===  co->td->proc->pid: %d\n", 		\
+					co->td->td_proc->p_pid);				\
+			printf("===  Ring Kernel Addr:0x%X\n", 			\
+					(unsigned int)co->ring);				\
+			PRINT_RING_PTRS(co->ring);						\
+		} else {											\
+			RINGMAP_WARN(NULL pointer: capturing object);	\
+		}													\
+	};
