@@ -39,15 +39,16 @@
 #include "ringmap.h"
 
 struct ringmap * ringmap_attach (device_t, struct ringmap_functions *);
-int ringmap_detach (device_t);
+int ringmap_detach (struct ringmap *rm);
 void ringmap_close_cb (void *data);
 void clear_capt_object(void *);
-void print_capt_obj(struct capt_object *);
 struct ringmap * cdev2ringmap(struct cdev *);
 struct ringmap * dev2ringmap(device_t);
 void ringmap_bpf_filter(struct capt_object *, int);
-void per_packet_iteration(struct ringmap *, int );
-void ringmap_delayed_isr(void *context, struct ringmap *rm);
+void per_packet_iteration(struct capt_object *, int );
+struct capt_object * ringmap_delayed_isr(void *context, struct ringmap *rm);
+int set_slot(struct capt_object *co, unsigned int slot_num);
+void ringmap_timestamp(struct ring_slot *slot, struct timeval *ts);
 
 d_open_t	ringmap_open;
 d_close_t	ringmap_close;
@@ -68,9 +69,12 @@ static struct cdevsw ringmap_devsw = {
 static struct ringmap_global_list ringmap_list_head = 
 		SLIST_HEAD_INITIALIZER(ringmap_list_head);
 
+
 /*
- * Will called from if_em.c before returning from 
- * em_attach() function.  
+ * The function should be called from the attach function of generic network
+ * driver.  Here the ringmap structure is allocated and the character special
+ * device for the communication with user is created. Also default ringmap
+ * functions are set.
  */
 struct ringmap *
 ringmap_attach(device_t dev, struct ringmap_functions *rf) 
@@ -79,43 +83,39 @@ ringmap_attach(device_t dev, struct ringmap_functions *rf)
 
 	RINGMAP_FUNC_DEBUG(begin);
 
+	/* Allocate ringmap */
 	MALLOC(rm, struct ringmap *, sizeof(struct ringmap), 
 			M_DEVBUF, (M_ZERO | M_WAITOK));
-
 	if (rm == NULL) { 
 		RINGMAP_ERROR(Can not allocate space for ringmap structure);
 		return (NULL);
 	}
 
 	/* 
-	 * Create char device for communication with user-space. The user-space
-	 * process wich want to capture packets should first open this device.
+	 * Create character special device for communication with user-space. The
+	 * user-space process wich want to capture packets first opens this device.
 	 * Then, by syscalls on this device it will: 
 	 * - 	get physical adresses of packet buffers for mapping them in its 
-	 * 		virtual memory space 
-	 *
+	 * 		virtual memory
 	 * -	controll packet capturing: start, stop, sleep to wait for packets.
 	 */
 	rm->cdev = make_dev(&ringmap_devsw, device_get_unit(dev),
 						UID_ROOT, GID_WHEEL, 0666, 
 						device_get_nameunit(dev));
 	if (rm->cdev == NULL) {
-		RINGMAP_ERROR(Can not create char device);
+		RINGMAP_ERROR(Can not create character device);
 		FREE(rm, M_DEVBUF);
 		return (NULL);
 	}
 
-	/* 
-	 * Tell to ringmap which hardware and driver speciffic functions 
-	 * should it use 
-	 */
+	/* Set the hardware and driver speciffic functions */
 	rm->funcs = rf;
 
-	/* Store adapters device structure in ringmap */
+	/* Store interface device structure in ringmap */
 	rm->dev = dev;
 
 	/* 
-	 * Initialize the list of capturing objects. Each object will represent the
+	 * Initialize the list of capturing objects. Each object represents the
 	 * thread that capture traffic and its ring.
 	 */
 	SLIST_INIT(&rm->object_list);
@@ -123,43 +123,43 @@ ringmap_attach(device_t dev, struct ringmap_functions *rf)
 	/* Insert ringmap structure into the list */
 	SLIST_INSERT_HEAD(&ringmap_list_head, rm, entries);
 
-	/* Init the mutex to protecting our data */
+	/* Init the mutex for protecting our data */
 	RINGMAP_LOCK_INIT(rm, device_get_nameunit(dev));
 
 	/* 
-	 * Set default function if the hardware specific functions are not set
+	 * Set default functions if the generic driver's specific functions are not
+	 * set.
 	 */
-	if (rm->funcs->delayed_isr != NULL)
+	if (rm->funcs->delayed_isr == NULL)
 		rm->funcs->delayed_isr = ringmap_delayed_isr;
 
-	if (rm->funcs->per_packet_iteration != NULL)
+	if (rm->funcs->per_packet_iteration == NULL)
 		rm->funcs->per_packet_iteration = per_packet_iteration;
 
+	if (rm->funcs->set_timestamp == NULL)
+		rm->funcs->set_timestamp = ringmap_timestamp;
 
 	RINGMAP_FUNC_DEBUG(end); 
 
 	/* 
 	 * Return ringmap pointer to the generic driver. Generic driver should
 	 * store the pointer in the adapter structure in order to be able to access
-	 * ringmap
+	 * ringmap.
 	 */
 	return (rm);	
-}
+} 
 
 
 /* 
- * Should be called from driver's detach function. It is a little dangerous 
- * place - probably we shoul protect our code here with locks!!!
+ * Should be called from driver's detach function. 
  */
 int
-ringmap_detach(device_t dev)
+ringmap_detach(struct ringmap *rm)
 {
-	struct ringmap *rm = NULL;
 	struct capt_object *co = NULL;
 
 	RINGMAP_FUNC_DEBUG(start);
 	
-	rm = dev2ringmap(dev);
 	if (rm == NULL) {
 		RINGMAP_WARN(Can not get pointer to ringmap structure);
 		return (-1);
@@ -171,15 +171,20 @@ ringmap_detach(device_t dev)
 	    clear_capt_object((void *)co);
     }
 
+	RINGMAP_LOCK(rm);
+	/* To be sure */
+	if (!SLIST_EMPTY(&rm->object_list)) {
+		RINGMAP_WARN(There are still active capturing objects);
+	}
 	/* Destroy char device associated with ringmap */
 	if (rm->cdev != NULL)
 		destroy_dev(rm->cdev);
 
-	RINGMAP_LOCK_DESTROY(rm);
-
 	/* And remove ringmap from global list */
 	SLIST_REMOVE(&ringmap_list_head, rm, ringmap, entries);
-	
+	RINGMAP_UNLOCK(rm);
+
+	RINGMAP_LOCK_DESTROY(rm);
 	FREE(rm, M_DEVBUF);
 
 	RINGMAP_FUNC_DEBUG(end);
@@ -188,12 +193,11 @@ ringmap_detach(device_t dev)
 }
 
 
-/******************************************************************
- * This func will called as result of open(2). Here we allocate 
- * the memory for the new ring and capt_object structure (so called 
- * capturing object). Capturing object represents the thread with 
- * its ring.
- ******************************************************************/
+/*
+ * This function is called as result of open(2). Here we allocate the memory
+ * for the new ring and capt_object structure (so called capturing object).
+ * Capturing object represents a thread with its ring.
+ */
 int
 ringmap_open(struct cdev *cdev, int flag, int otyp, struct thread *td)
 {
@@ -207,7 +211,6 @@ ringmap_open(struct cdev *cdev, int flag, int otyp, struct thread *td)
 #if (__RINGMAP_DEB)
 	printf(RINGMAP_PREFIX"[%s] pid = %d\n", __func__, td->td_proc->p_pid);
 #endif 
-
 	rm = cdev2ringmap(cdev);
 	if ( rm == NULL ) {
 		RINGMAP_ERROR(Could not get the pointer to ringmap structure);
@@ -221,6 +224,11 @@ ringmap_open(struct cdev *cdev, int flag, int otyp, struct thread *td)
 		RINGMAP_ERROR(Can not open device!);
 		err = EIO; goto out;
 	}
+
+	/* First stop receive and interupts while we allocate our data */
+	rm->funcs->receive_disable(rm);
+	rm->funcs->intr_disable(rm);
+	// pause("wait", hz); 
 
 	/* Only ONE open() per thread */
 	SLIST_FOREACH(co, &rm->object_list, objects) {
@@ -240,57 +248,22 @@ ringmap_open(struct cdev *cdev, int flag, int otyp, struct thread *td)
 		RINGMAP_ERROR(Can not allocate space for ring);
 		err = EIO; goto out;
 	}
+	ring->size = SLOTS_NUMBER;
 
 	/* 
-	 * create the capturing object wich will represent 
-	 * current thread and packets ring 
+	 * create the capturing object wich will represent current thread and
+	 * its packets ring 
 	 */
 	MALLOC(co, struct capt_object *, 
 			sizeof(struct capt_object), M_DEVBUF, (M_ZERO | M_WAITOK));
-	if ( co == NULL ){
+	if ( co == NULL ) {
 		contigfree(ring, sizeof(struct ring), M_DEVBUF);
 		err = EIO; goto out;
 	}
-
-	ring->size = SLOTS_NUMBER;
-	ring->pid = td->td_proc->p_pid;
-
 	co->ring = ring;
 	co->td = td;
 	co->rm = rm;
 
-	/* The next should be probably done in the ioctl() */
-#ifdef DEFAULT_QUEUE 
-	/* Associate the capturing object with a queue */
-	if (rm->funcs->set_queue(co, DEFAULT_QUEUE) == -1) {
-		RINGMAP_ERROR(Can not associate que with the capturing object!);
-
-		contigfree(ring, sizeof(struct ring), M_DEVBUF);
-		FREE(co, M_DEVBUF);
-
-		err = EIO; goto out;
-	}
-#endif 
-
-	/* Init ring-slots with mbufs and packets adrresses */
-	for (i = 0 ; i < SLOTS_NUMBER ; i++) {
-		if (rm->funcs->set_slot(co, i) == -1){
-			RINGMAP_ERROR(Ring initialization failed!);
-
-			contigfree(ring, sizeof(struct ring), M_DEVBUF);
-			FREE(co, M_DEVBUF);
-
-			err = EIO; goto out;
-		}
-#if (__RINGMAP_DEB)
-		PRINT_SLOT(ring, i);
-#endif
-	}
-
-	/* 
-	 * Insert the capturing object in the single linked list
-	 * the head of the list is in the ringmap structure
-	 */
 	SLIST_INSERT_HEAD(&rm->object_list, co, objects);
 
 	/* 
@@ -299,25 +272,19 @@ ringmap_open(struct cdev *cdev, int flag, int otyp, struct thread *td)
 	 */
 	if (devfs_set_cdevpriv((void *)co, clear_capt_object)) {
 		RINGMAP_ERROR(Can not set private data!);
-
 		contigfree(ring, sizeof(struct ring), M_DEVBUF);
 		FREE(co, M_DEVBUF);
-
 		err = EIO; goto out;
 	}
 
 	++rm->open_cnt;
-
-#if (__RINGMAP_DEB)
-	print_capt_obj(co);
-	PRINT_RING_PTRS(co->ring); 
-#endif
-
+	CAPT_OBJECT_DEB(co);
 out:
+	rm->funcs->intr_enable(rm);
+	rm->funcs->receive_enable(rm);
+
 	RINGMAP_UNLOCK(rm);
-
 	RINGMAP_FUNC_DEBUG(end);
-
 	return (err);
 }
 
@@ -340,9 +307,8 @@ ringmap_close(struct cdev *cdev, int flag, int otyp, struct thread *td)
 
 
 /* 
- * Callback of ringmap_close() 
- * Free memory allocated for capturing object and remove the 
- * capturing object from the list. 
+ * Callback of ringmap_close() Free memory allocated for capturing object and
+ * remove the capturing object from the list. 
  */
 void 
 clear_capt_object(void * data)
@@ -352,38 +318,24 @@ clear_capt_object(void * data)
 
 	RINGMAP_FUNC_DEBUG(start);
 
-	if (data != NULL) {
-		co = (struct capt_object *)data;
+	co = (struct capt_object *)data;
 
-		RINGMAP_LOCK(co->rm);
+	RINGMAP_LOCK(co->rm);
 
-		/* to be completely sure */
-		if (co == NULL) 
-			goto out;
+	CAPT_OBJECT_DEB(co);
 
-		rm = co->rm;
-#if (__RINGMAP_DEB)
-		printf("[%s] Object to delete:\n", __func__);
-		print_capt_obj(co);
-#endif 
-		if (co->ring != NULL)
-			contigfree(co->ring, sizeof(struct ring), M_DEVBUF);
+	rm = co->rm;
+	contigfree(co->ring, sizeof(struct ring), M_DEVBUF);
+	co->ring = NULL;
 
-		SLIST_REMOVE(&rm->object_list, co, capt_object, objects);
-		FREE(co, M_DEVBUF);
-		data = co = NULL;
+	SLIST_REMOVE(&rm->object_list, co, capt_object, objects);
+	FREE(co, M_DEVBUF);
 
-		if (rm->open_cnt) {
-			--rm->open_cnt;
-		} else {
-			RINGMAP_WARN(Incorrect value of rm->open_cnt);
-		}
-out: 
-		RINGMAP_UNLOCK(rm);
-
-	} else {
-		RINGMAP_FUNC_DEBUG(NULL pointer to the capturing object!);
-	}
+	if (rm->open_cnt > 0)
+		--rm->open_cnt;
+	 else 
+		RINGMAP_WARN(Incorrect value of rm->open_cnt);
+	RINGMAP_UNLOCK(rm);
 	
 	RINGMAP_FUNC_DEBUG(end);
 }
@@ -396,16 +348,11 @@ ringmap_mmap_single(struct cdev *cdev, vm_ooffset_t *offset,
 {
 	struct ringmap *rm = NULL;
 	struct capt_object *co = NULL;
-
 	vm_object_t obj;
 	vm_map_entry_t  entry;
     vm_pindex_t pindex;
     vm_prot_t prot;
     boolean_t wired;
-
-
-	RINGMAP_FUNC_DEBUG(start);
-
 
 	rm = cdev2ringmap(cdev);
 	if ( rm == NULL ) {
@@ -415,12 +362,12 @@ ringmap_mmap_single(struct cdev *cdev, vm_ooffset_t *offset,
 	}
 
 	SLIST_FOREACH(co, &rm->object_list, objects) {
-		if (co->td == curthread){
+		if (co->td == curthread) {
 			break;
 		}
 	}
 
-	if ((co == NULL) || (co->ring == NULL)){
+	if ((co == NULL) || (co->ring == NULL)) {
 		RINGMAP_ERROR(Null pointer);
 		return (EIO);
 	}
@@ -429,7 +376,7 @@ ringmap_mmap_single(struct cdev *cdev, vm_ooffset_t *offset,
 			      &entry, &obj, &pindex, &prot, &wired);
 	vm_map_lookup_done(kmem_map, entry);
 
-	if (obj == kmem_object){
+	if (obj == kmem_object) {
 		RINGMAP_ERROR(Got kmem_object);
 	} else {
 		RINGMAP_FUNC_DEBUG(Got other obj);
@@ -437,40 +384,15 @@ ringmap_mmap_single(struct cdev *cdev, vm_ooffset_t *offset,
 
 	object = &obj;
 
-	RINGMAP_FUNC_DEBUG(start);
-
 	return (0);
 }
 
 
-void 
-per_packet_iteration(struct ringmap *rm, int slot_num)
-{
-	struct capt_object *co = NULL;
-
-	RINGMAP_INTR(start);
-
-	SLIST_FOREACH(co, &rm->object_list, objects) {
-		if (co->ring != NULL) {
-			co->ring->slot[slot_num].is_ok = 1;
-			co->ring->slot[slot_num].intr_num = co->ring->intr_num;
-			
-			if (rm->funcs->pkt_filter != NULL)
-				rm->funcs->pkt_filter(co, slot_num);
-
-#ifdef RINGMAP_TIMESTAMP
-			co->ring->slot[slot_num].ts = co->ring->last_ts;
-#endif
-#if (RINGMAP_INTR_DEB)
-			PRINT_SLOT(co->ring, slot_num);
-#endif
-		}
-	}
-
-	RINGMAP_INTR(end);
-}
-
-
+/*
+ * Tells usre the physical addres of ring. User process will 
+ * use this addres in order to map the buffer in its address 
+ * space.
+ */
 int 
 ringmap_read(struct cdev *cdev, struct uio *uio, int ioflag)
 {
@@ -487,21 +409,12 @@ ringmap_read(struct cdev *cdev, struct uio *uio, int ioflag)
 	error = devfs_get_cdevpriv((void **)&co);
 	if (error) {
 		RINGMAP_ERROR(Can not access private data);
-		return(error);
+		return (error);
 	} 
 
-	if (co->td != curthread ){
-		RINGMAP_ERROR(Wrong capturing object!);
-		return(EIO);
-	}
+	CAPT_OBJECT_DEB(co);
 
 	phys_ring_addr = vtophys(co->ring);
-
-#if (__RINGMAP_DEB)
-	print_capt_obj(co);
-	PRINT_RING_PTRS(co->ring);
-#endif
-
 	uiomove(&phys_ring_addr, sizeof(phys_ring_addr), uio);
 
 	RINGMAP_FUNC_DEBUG(end);
@@ -514,7 +427,7 @@ int
 ringmap_ioctl (struct cdev *cdev, u_long cmd, caddr_t data, 
 				int fflag, struct thread *td)
 {
-	int err = 0, err_sleep = err_sleep, size, flen;
+	int err = 0, err_sleep = err_sleep, size, flen, qn, i;
 
 	struct ringmap *rm = NULL;
 	struct capt_object *co;
@@ -539,40 +452,37 @@ ringmap_ioctl (struct cdev *cdev, u_long cmd, caddr_t data,
 
 		/* Sleep and wait for new packets */
 		case IOCTL_SLEEP_WAIT:
+			/* Set the new value into the adapter's TAIL register */
+			rm->funcs->set_tail(co->ring->userrp, co->hw_rx_ring);
 
-			/* Count how many times we wait for new packets */
-			co->ring->user_wait_kern++;
+			CAPT_OBJECT_DEB(co);
 
-			/* Set adapter's TAIL register */
-			rm->funcs->sync_tail(co);
-
-#if (RINGMAP_IOCTL_DEB)
-			print_capt_obj(co);
-			PRINT_RING_PTRS(co->ring);
-#endif
 			/* 
-			 * In the time: from user has called ioctl() until now could 
-			 * come the new packets. It means, before we are going to sleep
-			 * it makes a sence to check if we really must do it 
+			 * Before we are going to sleep it makes a sence to check if we
+			 * really must do it 
 			 */
 			while (RING_IS_EMPTY(co->ring)) {
 				RINGMAP_IOCTL(Sleep and wait for new packets);
 
+				/* Count how many times we wait for new packets */
+				co->ring->user_wait_kern++;
+
 				err = tsleep(co->ring, 
 						(PRI_MAX_ITHD) | PCATCH, "ioctl", 0);
-
-				/* go back in user-space by catching signal */
+				/* go back into user-space by catching signal */
 				if (err)
 					goto out;
 			}
 		break;
 
+
 		/* Synchronize sowftware ring-tail with hardware-ring-tail (RDT) */
 		case IOCTL_SYNC_TAIL:
 			RINGMAP_LOCK(rm);
-			rm->funcs->sync_tail(co);
+			rm->funcs->set_tail(co->ring->userrp, co->hw_rx_ring);
 			RINGMAP_UNLOCK(rm);
 		break;
+
 
 		case IOCTL_SETFILTER:
 			bpf_prog = (struct bpf_program *)data;
@@ -582,7 +492,6 @@ ringmap_ioctl (struct cdev *cdev, u_long cmd, caddr_t data,
 				err = EINVAL;
 				goto out;
 			}
-
 			size = flen * sizeof(*bpf_prog->bf_insns);
 			fcode = (struct bpf_insn *)malloc(size, M_BPF, M_WAITOK);
 
@@ -595,7 +504,6 @@ ringmap_ioctl (struct cdev *cdev, u_long cmd, caddr_t data,
 				err = EINVAL;
 				goto out;
 			}
-			
 			/* 
 			 * Everything went Ok. Set the filtering function 
 			 * Think about hardware support for packet filtering!
@@ -603,52 +511,139 @@ ringmap_ioctl (struct cdev *cdev, u_long cmd, caddr_t data,
 			co->rm->funcs->pkt_filter = ringmap_bpf_filter;
 		break;
 
+
+		/* Tell user how many queues we have */
+		case IOCTL_GETQUEUE_NUM:
+			qn = rm->funcs->get_queuesnum();
+			*(int *)data = qn;
+		break;
+
+
+		/* Associate the ring/queue with the capturing object */
+		case IOCTL_ATTACH_RING:
+			/* First stop receive and interupts while we allocate our data */
+			rm->funcs->receive_disable(rm);
+			rm->funcs->intr_disable(rm);
+
+			qn = *(int *)data;
+			/* Associate the capturing object with a queue */
+			if (rm->funcs->set_queue(co, qn) == -1) {
+				RINGMAP_ERROR(Queue attachment failed!);
+				err = EINVAL;
+				goto xxx;
+			}
+			/* Init ring-slots with mbufs and packets adrresses */
+			for (i = 0 ; i < SLOTS_NUMBER ; i++) {
+				if (set_slot(co, i) == -1) {
+					RINGMAP_ERROR(Ring initialization failed!);
+					err = EINVAL; 
+					goto xxx;
+				}
+#if (__RINGMAP_DEB)
+				PRINT_SLOT(co->ring, i);
+#endif
+			}
+xxx:		
+			rm->funcs->intr_enable(rm);
+			rm->funcs->receive_enable(rm);
+		break;
+		
+
 		default:
 			RINGMAP_ERROR("Undefined command!");
 			err = ENODEV;
 	}
  
 out: 
-
 	RINGMAP_IOCTL(end);
- 
 	return (err);
 }
 
+
+int
+set_slot(struct capt_object *co, unsigned int slot_num)
+{
+	struct ring *ring = co->ring;; 
+	struct ringmap *rm = co->rm;
+
+#if (__RINGMAP_DEB)
+	printf("[%s] Set slot: %d\n", __func__, slot_num);
+#endif
+
+	ring->slot[slot_num].mbuf.kern = 
+		(vm_offset_t)rm->funcs->get_mbuf(co->rx_buffers, slot_num);
+
+	if (ring->slot[slot_num].mbuf.kern == 0)
+		return (-1);
+
+	ring->slot[slot_num].mbuf.phys = 
+		(bus_addr_t)vtophys(ring->slot[slot_num].mbuf.kern);
+
+	ring->slot[slot_num].packet.kern = 
+		(vm_offset_t)rm->funcs->get_packet(co->rx_buffers, slot_num);
+	ring->slot[slot_num].packet.phys = 
+		(bus_addr_t)vtophys(ring->slot[slot_num].packet.kern);
+
+	return (0);
+} 
 	
-void 
+
+struct capt_object * 
 ringmap_delayed_isr(void *context, struct ringmap *rm)
 {
 	struct capt_object *co = NULL;
-	struct timeval	last_ts;
 
 	RINGMAP_INTR(start);
 
 	RINGMAP_LOCK(rm);
 	/* Do the next steps only if there is capturing process */ 
 	if (rm->open_cnt > 0) {
-
-		/* TODO: do it through our set_timestamp() */
-		getmicrotime(&last_ts);
-
 		SLIST_FOREACH(co, &rm->object_list, objects) {
 			if (co->intr_context == context) {
 #if (RINGMAP_INTR_DEB)
 				PRINT_RING_PTRS(co->ring);
 #endif
-				rm->funcs->sync_tail(co);
-				co->ring->last_ts = last_ts;
+				rm->funcs->set_tail(co->ring->userrp, co->hw_rx_ring);
+				/* set hardware speciffic time stamp function */
+				getmicrotime(&co->ring->last_ts);
 				++co->ring->intr_num;
+				break;
 			}
 		}
 	}
 	RINGMAP_UNLOCK(rm);
 
 	RINGMAP_INTR(end);
+
+	return (co);
 }
 
 
-/* Paket filtering: wrapper about bpf_filter() */ 
+void 
+per_packet_iteration(struct capt_object *co, int slot_num)
+{
+	struct ringmap *rm = co->rm;
+
+	RINGMAP_INTR(start);
+
+	co->ring->slot[slot_num].is_ok = 1;
+	co->ring->slot[slot_num].intr_num = co->ring->intr_num;
+	
+	if (rm->funcs->pkt_filter != NULL)
+		rm->funcs->pkt_filter(co, slot_num);
+
+	co->ring->kernrp = slot_num;
+#ifdef RINGMAP_TIMESTAMP
+	co->ring->slot[slot_num].ts = co->ring->last_ts;
+#endif
+
+	PRINT_SLOT_DEB(co->ring, slot_num);
+
+	RINGMAP_INTR(end);
+}
+
+
+/* Paket filtering: wrapper around bpf_filter() */ 
 void
 ringmap_bpf_filter(struct capt_object *co, int slot_num)
 {
@@ -663,22 +658,12 @@ ringmap_bpf_filter(struct capt_object *co, int slot_num)
 
 
 void 
-print_capt_obj(struct capt_object *co)
+ringmap_timestamp(struct ring_slot *slot, struct timeval *ts)
 {
-	if (co != NULL) {
-		printf("\n===  co->td->proc->pid: %d\n", 
-				co->td->td_proc->p_pid);
-
-		printf("===  Ring Kernel Addr:0x%X\n", 
-				(unsigned int)co->ring);
-
-		/* Print addr of que only if multiqueue supported */
-		if (co->que != NULL)
-			printf("===  Queue Kernel Addr:0x%X\n\n", 
-					(unsigned int)co->que);
-	} else {
-		RINGMAP_WARN(NULL pointer: capturing object);
-	}
+	if (ts == NULL) 
+		getmicrotime(&slot->ts);
+	else 
+		slot->ts = *(ts);
 }
 
 
@@ -689,9 +674,9 @@ dev2ringmap(device_t dev)
 
 	SLIST_FOREACH(rm, &ringmap_list_head, entries) {
 		if (rm->dev == dev) 
-			return(rm);
+			return (rm);
 	}
-	return(rm);
+	return (rm);
 }
 
 
@@ -702,7 +687,7 @@ cdev2ringmap(struct cdev *cdev)
 	
 	SLIST_FOREACH(rm, &ringmap_list_head, entries) {
 		if (rm->cdev == cdev) 
-			return(rm);
+			return (rm);
 	}
-	return(rm);
+	return (rm);
 }
