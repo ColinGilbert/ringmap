@@ -1,0 +1,12 @@
+#! /usr/bin/gnuplot -persist
+set terminal postscript eps color enhanced
+set output "./sysload_single_kts.eps"
+set xlabel "max. Anzahl der Pakete pro Kernel-Thread-Ablauf"
+set ylabel "Systemload (%)"
+
+#set yrange [4.5:7]
+set xrange [:300]
+
+set key left top Left reverse
+
+plot "./sysload_64_kts.dat" using 1:2 title "Systemload" with linesp lt 1, "./sysload_64_kts.dat" using 1:2:3 title "Standard Abweichung" with yerrorbars lt 7

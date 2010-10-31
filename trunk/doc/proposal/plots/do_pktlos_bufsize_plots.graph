@@ -1,0 +1,12 @@
+#! /usr/bin/gnuplot -persist
+set terminal postscript eps color enhanced
+set output "./pktlos_single_bufsize.eps"
+set xlabel "Anzahl der Slots im Paket-Ringpuffer"
+set ylabel "Paketverluste (%)"
+
+set yrange [-5:]
+set xrange [:4150]
+
+set key left top Left reverse
+
+plot "./pktlos_64_bufsize.dat" using 1:2 title "Paketverluste" with linesp lt 1, "./pktlos_64_bufsize.dat" using 1:2:3 title "Standard Abweichung" with yerrorbars lt 7

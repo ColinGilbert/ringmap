@@ -1,0 +1,13 @@
+#! /usr/bin/gnuplot -persist
+
+set terminal postscript eps color enhanced
+set output "../../vortragsfolien/plots/sysload_generic_slide.eps"
+set xlabel "Bit-Rate (MBit/s)" font "Terminus,30"
+set ylabel "Systemload (%)" font "Terminus,30"
+
+set yrange [-5:105]
+set xrange [0:]
+
+set key left top Left reverse
+
+plot "./60_generic.dat" using 1:3:4 smooth bezier notitle with lines

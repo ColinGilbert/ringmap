@@ -1,0 +1,154 @@
+Das Ziel dieser Diplomarbeit ist es, die für Capturing relevante Software des
+Betriebssystem FreeBSD zu untersuchen, die Probleme, die zur Reduzierung der
+Capturing-Performance führen, herauszufinden und aufgrund der gefundenen
+Problemen den neuen (ringmap)-FreeBSD-Packet-Capturing-Stack zu erarbeiten,
+zu implementieren und auszuwerten. Die neue Lösung basiert auf der für die Diplomarbeit
+vorausgesetzte Hardware (siehe Abschnitt \ref{sec:hwsw_voraus}).\\\\
+%
+Die Diplomarbeit ist in drei Phasen abgelaufen: Einarbeitung, Implementierung
+und Testen.  Während der \textbf{Einarbeitungszeit} habe ich viele neue
+Kenntnise in Themen, die über das normales Informatiksstudium hinausgehen,
+erworben.  Es handelt sich vor allem um Wissen über die Funktionsweise moderner
+Netzwerkadapter und Betriebssystemkern- und -Treiber-Programmierung. Unter
+Anderem habe ich dabei neue Konzepte über die Hardware-Gegebenheiten und
+Software-Implementierung der modernen Interrupt- und DMA-Mechanismen (siehe
+Kapitel Grundlagen, Abschnitt \ref{sec:adapter}) gelernt. \\\\
+%
+Außerdem wurden von mir mehrere Arbeiten~\cite{fabian_da, pcin10gb_paper,
+perfev_paper, bpf_paper} über Capturing-Problematik durchgearbeitet mit dem
+Ziel, die beim Capturing vorhandene Probleme zu analysieren, um die
+Anforderungen für den neuen \emph{ringmap}-Packet-Capturing-Stack zu erstellen.
+Für die Capturing-Performance-Probleme wurde in den Arbeiten hauptsachlich die
+Anzahl der Paket-Kopie-Operationnen und die hohe Interrupt-Rate bei der
+Verkehr-Erfassung als Gründe genannt. Als eine mögliche Lösung zur des
+Interrupt-Overhead wird die Verwendung des
+\emph{Polling}-Mechanismus~\cite{bsd_polling} vorgeschlagen.  Wegen der
+Instabilität der BSD-Polling-Implementierung für
+SMP-Kernel~\cite{bsd_devpoll_page} habe ich für den Entwurf des neuen Stacks
+allerdings das normale Interrupt-Driven-Modell eingesetzt. Neben der Anzahl der
+Kopie-Operationen, wurden im \emph{generic}-Capturing-Stack einige andere
+Implementierungsdetails entdeckt, welche die Capturing-Performance bei hohen
+Paket-Raten beeinflüssen können. Vor allem die Speicher-Allozierungen welche
+der \emph{generic}-Treiber für jedes neue Packet durchführt, beeinflüssen die
+Performanz negativ. Mit dem Ziel die herausgefundene
+Capturing-Performance-Probleme zu eliminieren wurden die Anforderungen und den
+Entwurf der Implementierung des neuen \emph{ringmap}-Packet-Capturing-Stack
+erstellt (Kapitel Grundlagen, Abschnitt \ref{sec:aufgstel}).\\\\
+%
+In der \textbf{Implementierung}-Phase wurde der neue
+\emph{ringmap}-Packet-Capturing-Stack für das Betriebssystem FreeBSD
+programmiert (siehe Kapitel Implementierung). Dafür wurde der Code für
+Adapter-Treiber, Systemaufruf-Funktionen und Libpcap-Library implementiert.
+Während der Implementierung  habe ich tiefgehende Kenntnisse und viel
+praktische Erfahrung in  Kernel- bzw. Treiberprogramming für
+UNIX-artige-Systeme erworben.  \\\\
+%
+In der \textbf{Test}-Phase wurde der neue \emph{ringmap}-Packet-Capturing-Stack
+getestet und mit dem \emph{generic}-Stack in Bezug auf leistungsfähigkeit
+vergliechen. Für das Testen des \emph{ringmap}-Stack wurden unterschiedliche
+Verkehr-Raten generiert, unterschiedliche Treiber-Parameter eingesetzt und
+verschiedene Hardware für den Tets verwendet (siehe Kapitel
+Leistungsbewertung). Für die Tests wurden \emph{Shell}-Skripte implementiert
+die sowohl alle Testablüfe gesteuert haben als auch die Testergebnisse
+ausgewertet und in Form von Tabellen und \emph{gnuplot}-Grafiken gespeichert
+haben. 
+
+\subsection{Erreichte Ziele}
+
+\subsubsection{Verbesserung der Capturing-Performance}
+Beim Einsatz des im Rahmen der Diplomarbeit implementierten
+\emph{ringmap}-Stack wird die Capturing-Performance unter gleichen Bedingungen
+höher als beim \emph{generic}-Stack. Die \textbf{Systemload} beim Capturing mit
+dem \emph{ringmap}-Stack ist deutlich geringer als mit dem \emph{generic}-Stack.
+Bei allen durchgeführten Experimenten war die Systemload beim Capturing mit dem
+\emph{ringmap} kleiner als $12\%$. Die Systemload bei der Verwendung von
+\emph{generic}-Stack variiert von $13\%$ bis $100\%$. Bezüglich der
+Systemload zeigt der \emph{ringmap} einen deutlichen Gewinn.\\\\
+%
+Anders sieht es mit den \textbf{Paketverlusten} aus. Beide Stacks zeigen
+identisch gute ($100\%$) Paketerfassungsrate für den Fall wenn die Paketgröße
+über 200 Bytes liegt. Bei Paketen kleiner als 200 Bytes, und daraus
+verursachten höheren Paketraten, $> 450000 pkts/sec$, verliert der
+\emph{generic}-Stack (mit 10MB BPF-Puffer-Größe) bis zu $100\%$ aller der
+generierten Pakete. Selbst bei maximaler Belastung verliert der \emph{ringmap}-Stack 
+weniger als $0.02\%$ der Pakete.
+
+\subsubsection{Stabilität und Benutzbarkeit}\label{sec:stab_und_func}
+Der \emph{ringmap}-Capturing-Stack hat in der Tests-Phase (insgesamt mehr als
+100 000 Tests mit den unterschiedlichen Treiber-Parameter) weder
+\emph{Segmentation faults} noch keine \emph{Kernel panics} verursacht. Das
+bedeutet, dass die für Kernelspace und Userspace (Libpcap) implementierte
+Software sehr stabil ist.\\\\
+%
+Der \emph{ringmap} ist sehr einfach einzusetzen. Im Verzeichnis 
+\verb+scripts/+ befinden sich zwei Shell-Skripts:
+\begin{itemize}
+	\item \verb+ringmap_build_and_load+: Kompiliert und installiert \emph{ringmap}-Software. 
+	\item \verb+generic_build_and_load+: Bringt das System in den generischen Zustand. 
+\end{itemize}
+Dadurch, dass der Userspace-Code in der Libpcap-Library eingesetzt wurde,
+erlaubt es allen Anwendungen, die auf Libpcap basieren, zum Beispiel \emph{tcpdump},
+ohne Änderungen  Netzwerk-Pakete mit dem \emph{ringmap}-Stack zu erfassen
+(siehe Einschränkungen im nächsten Abschnitt \ref{sec:einschr}).\\\\
+%
+Zudem lässt sich der \emph{ringmap}-Capturing-Stack, im Fall dass es auf dem 
+System mehrere unterschiedliche Intel Gigabit Adapters gibt, durch die 
+Eingabe der \emph{PCI-Device-ID} nur für einen ausgewählten Adapter einsetzen, 
+sodass der \emph{generic}-\textbf{em}-Treiber die restliche Adapters steuert. 
+Die \emph{PCI-Device-ID} des Adapter wird als Makrodefinition \verb+DEV_ID+ in der 
+Datei \verb+fiveg_da.h+ eingegeben. Dadurch ist es möglich \emph{ringmap}- und 
+\emph{generic}-Software auf einem System gleichzeitig zu benutzen.
+
+\subsection{Einschränkungen des ringmap-Packet-Capturing-Stack}\label{sec:einschr}
+Die Benutzung der \emph{ringmap}-Software verursacht auf dem Capturing-System
+(bzw. für die Ausgewählte Adapter) folgende Einschränkungen:
+\begin{description}
+	\item [Kein TCP/IP Protokollstack:] Der \emph{ringmap}-Adapter-Treiber
+		besitzt zur Zeit keine Verbindung mit den TCP/IP-Protokoll-Stack-Funktionen.
+		Das heißt, dass ein Netzwerk-Interface, das  mit dem
+		\emph{ringmap}-Treiber gesteuert wird, zu diesem Zeitpunkt ausschliesslich für
+		Paket-Capturing benutzt werden kann. Wenn aber im System mehrere
+		Netzwerk-Adapter mit den unterschiedlichen \emph{Device-ID's} vorhanden
+		sind, dann ist es möglich den Protokoll-Stack über das andere
+		Netzwerkinterface zu benutzen (siehe Abschnitt
+		\ref{sec:stab_und_func}).
+	\item [Keine Paketfilterung im Userspace:] Die Paket-Filterung mit  BPF
+		im Userspace ist derzeit nicht möglich. Das Benutzen von
+		BPF-Filter sollte aber keine aufwendige Aufgabe zu sein, denn auch die  Libpcap hat eine 
+		Implementierung für BPF. Daher kann Filtern mit den
+		Libpcap-Funktionen umgesetzt werden.
+	\item [Libpcap Einschränkungen:] Für das Anpassen der Libpcap an den \emph{ringmap}-Stack wurden einige Code-Stücke im
+		Libpcap-Quell-Code auskommentiert oder ersetzt. Dadurch ist die
+		Funktionalität der neuen \emph{ringmap}-Libpcap ist nicht mit
+		der \emph{generic}-Libpcap identisch. Aus der
+		\emph{generic}-Libpcap sind die Funktionalität entfernt, welche den
+		BPF im Kernelspace anfordern. Außerdem wurde der
+		\verb+to_ms+-Parameter~\cite{man_pcap} für die
+		\verb+pcap_open_live()+-Funktion deaktiviert, aber aus 
+		Kompatibilitätsgründen geblieben. Beim
+		Capturing mit dem \emph{ringmap}-Stack blockiert der Userspace-Prozess wenn
+		es keine neue Pakete mehr gibt, bis  weitere Pakete ankommen.
+\end{description}
+Alle genannte Einschränkungen sind  in dem Sinne nicht kritisch, dass 
+sie sich eliminieren oder, für bestimmte Anforderungen, anpassen lassen. 
+Der Source-Code von \emph{ringmap} ist auf Google-Code veröffentlicht 
+und unter dem Namen \emph{ringmap} auf dem Server zu finden. An der  zukünftigen 
+Weiterentwicklung des Projektes habe ich großes Interesse und biete meine Hilfe an.
+
+\subsection{Zukünftige Themen}
+\subsubsection{Performance-Vergleich mit dem Zero-Copy-BPF-Buffers}
+Im Lauf der Test-Phase der Diplomarbeit, war der \emph{Zero-Copy-BPF-Buffers}
+Projekt noch im alpha-Stadium und nicht bereit für das Testen (siehe Abschnitt
+\ref{sec:verw_bpf}). Inzwischen ist der Zero-Copy-BPF-Buffers in der neusten
+FreeBSD-8.0-Version vorhanden und soll stabil sein. Daher soll die Auswertung 
+von Zero-Copy-BPF-Buffers der nächste Schritt sein.
+\subsubsection{10Gbit Capturing}
+Der Source-Code des \textbf{ixgbe}-Adapter-Treibers~\cite{10gbit_adapter_bsd}
+für 10-Gigabit-Netzwerkanschlüsse\footnote{\textbf{ixgbe} - Treiber für Intel
+10-Gigabit-Netzwerkadapter} hat eine ähnliche Struktur wie der Source-Code des
+\textbf{em}-Treiber. Deshalb sollte die \emph{ringmap}-Software einfach für den
+10-Gigabit-Treiber anpassbar sein. Dafür muss aber eine Arbeit vom in
+FreeBSD-Kernel-Programming kompetenten Spezialisten geleistet werden, denn
+beide Treiber sind nicht vollkommen identisch, und deshalb sollte dem
+Softwareentwickler alle Details von BSD-Treiber-Programming bekannt werden, um
+die Portierung auf 10Gbit zu machen. Auch hierzu biete ich meine Hilfe an.\\\\

@@ -1,0 +1,17 @@
+#! /usr/bin/gnuplot -persist
+set terminal postscript eps color enhanced
+set output "./sysload_generic_vs_ringmap_mbs.eps"
+set xlabel "Bit-Rate (MBit/s)"
+set ylabel "Systemload (%)"
+
+#set yrange [-5:]
+
+set key left top Left reverse
+
+plot "./60_ringmap.dat" using 1:3 title "64-Bytes Pakete ringmap" with linesp lt 4, "./60_ringmap.dat" using 1:3:4 notitle with yerrorbars lt 7, \
+"./200_ringmap.dat" using 1:3 title "200-Bytes Pakete ringmap" with linesp lt 5, "./200_ringmap.dat" using 1:3:4 notitle with yerrorbars lt 7, \
+"./300_ringmap.dat" using 1:3 title "300-Bytes Pakete ringmap" with linesp lt 6, "./300_ringmap.dat" using 1:3:4 notitle with yerrorbars lt 7, \
+"./60_generic.dat" using 1:3 title "64-Bytes Pakete generic" with linesp lt 3, "./60_generic.dat" using 1:3:4 notitle with yerrorbars lt 7, \
+"./200_generic.dat" using 1:3 title "200-Bytes Pakete generic" with linesp lt 2, "./200_generic.dat" using 1:3:4 notitle with yerrorbars lt 7, \
+"./300_generic.dat" using 1:3 title "300-Bytes Pakete generic" with linesp lt 1, "./300_generic.dat" using 1:3:4 title "Standard Abweichung" with yerrorbars lt 7
+

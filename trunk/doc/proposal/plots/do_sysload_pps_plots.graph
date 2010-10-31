@@ -1,0 +1,16 @@
+#! /usr/bin/gnuplot -persist
+set terminal postscript eps color enhanced
+set output "./sysload_single_CPU_pcie_pps.eps"
+set xlabel "Paket-Rate (pps)"
+set ylabel "Systemload (%)"
+
+set yrange [4.5:7]
+set xrange [:400000]
+
+set key left top Left reverse
+
+plot "./sysload_300_single_CPU_PCIe.dat" using 1:5 title "300 Bytes Pakete" with linesp lt 3, "./sysload_300_single_CPU_PCIe.dat" using 1:5:6 notitle with yerrorbars lt 7, \
+"./sysload_200_single_CPU_PCIe.dat" using 1:5 title "200 Bytes Pakete" with linesp lt 2, "./sysload_200_single_CPU_PCIe.dat" using 1:5:6 notitle with yerrorbars lt 7, \
+"./sysload_60_single_CPU_PCIe.dat" using 1:5 title "64 Bytes Pakete" with linesp lt 1 , "./sysload_60_single_CPU_PCIe.dat" using 1:5:6 title "Standard Abweichung" with yerrorbars lt 7 
+
+
