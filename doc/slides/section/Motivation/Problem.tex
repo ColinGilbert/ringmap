@@ -1,6 +1,5 @@
 \begin{frame}
 \frametitle{Problems arising during packet capturing}
-%\textbf{Problems arising during packet capturing:}\newline
 \begin{itemize}
 	\item High bit rates and packet rates
 		\begin{itemize}
@@ -14,33 +13,38 @@
 	\subfigure{\includegraphics [width=0.45\textwidth]{plots/pktlos_generic_slide}}
 	\caption{Capturing 64-Bytes packets. (Bezier curves)}
 \end{figure}
+}
+\ifthenelse{\boolean{SUMMIT}}{
+\begin{itemize}
+\item ``expensive'' operations in terms of CPU cycles: 
+	\begin{itemize}
+		\item<2-> Memory allocations
+		\item<2-> Data copy operations
+		\item<2-> System calls
+		\item<2-> etc\ldots\newline
+	\end{itemize}
+\end{itemize}
+}{}
 \end{frame}
 
+\ifthenelse{\boolean{SUMMIT}}{}
+{
 \begin{frame}
 \frametitle{The reason of the Problems}
-}
-\ifthenelse{\boolean{SUMMIT}}{
-}{
+
 \textbf{Inefficiency of standard capturing software}
-}
-	\begin{itemize}
+\begin{itemize}
 	\item ``expensive'' operations in terms of CPU cycles: 
-		\begin{itemize}
-			\item<2-> Memory allocations
-			\item<2-> Data copy operations
-			\item<2-> System calls
-			\item<2-> etc\ldots\newline
-		\end{itemize}
-% \begin{small}
-% 	\item [$\Rightarrow$] probably the capturing software for FreeBSD was
-% 		developed at a time when  network data-rates were low enough relative
-% 		to hardware processing resources such that capturing loss problems did
-% 		not arise?
-% \end{small}
+	\begin{itemize}
+		\item Memory allocations
+		\item Data copy operations
+		\item System calls
+		\item etc\ldots\newline
 	\end{itemize}
-
+\end{itemize}
 \end{frame}
+}
 
-\ifthenelse{\boolean{SUMMIT}}{
-\input{section/Background/Disadvantages.tex}
-} {}
+%%\ifthenelse{\boolean{SUMMIT}}{
+%%\input{section/Background/Disadvantages.tex}
+%%} {}
