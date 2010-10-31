@@ -1,0 +1,14 @@
+#! /usr/bin/gnuplot -persist
+set terminal postscript eps color enhanced
+set output "./sysload_PCI_mbs.eps"
+set xlabel "Bit-Rate (MBit/s)"
+set ylabel "Systemload (%)"
+
+#set yrange [-5:]
+
+set key left top Left reverse
+
+plot "./60_fabtest.dat" using 1:3 title "64-Bytes Pakete" with linesp lt 3, "./60_fabtest.dat" using 1:3:4 notitle with yerrorbars lt 7, \
+"./700_fabtest.dat" using 1:3 title "700-Bytes Pakete" with linesp lt 2, "./700_fabtest.dat" using 1:3:4 notitle with yerrorbars lt 7, \
+"./1500_fabtest.dat" using 1:3 title "1500-Bytes Pakete" with linesp lt 1, "./1500_fabtest.dat" using 1:3:4 title "Standard Abweichung" with yerrorbars lt 7
+

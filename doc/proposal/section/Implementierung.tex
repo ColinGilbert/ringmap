@@ -1,0 +1,333 @@
+\lstset{language=C}
+Das in diesem Kapitel vorgestellten Material wird die Implementierungs-Details
+des neuen \emph{ringmap}-Paket-Capturing-Stack darstellen. Die vorgestellten hier Code-Abschnitte
+haben keine exakte übereinstimmung mit dem implementierten Code: es sind nur
+die wichtigste Details dargestellt, die sich im Zusamenhang mit den im Kapitel
+\textbf{Entwurf} vorgestellten Algorithmen stehen. Für das eingehende
+Verständnis des Codes gibt es ausführliche Kommentare im Code.
+
+\subsection{Datenstrukturen}
+Die in diesem Kapitel dargestellten Datenstrukturen sin in der \verb+fiveg_da.h+ Datei deklariert. 
+\subsubsection{Ringpuffer}
+\subsubsection*{RING}
+\begin{lstlisting}[frame=single, caption={RING-Struktur}, captionpos={b}, label={code:ring_struct}]
+struct ring {
+	unsigned int kernrp;
+	unsigned int userrp;
+	unsigned int size;
+	struct ring_slot slot[SLOTS_NUMBER];
+};
+\end{lstlisting}
+\begin{itemize}
+	\item \textbf{kernrp}: \verb+RING.HEAD+ - HEAD-Pointer. Soll nur im Kernelspace geändert werden. 
+	\item \textbf{userrp}: \verb+RING.TAIL+ - TAIL-Pointer. Soll nur im Userspace geändert werden.
+	\item \textbf{size}: \verb+RING.SIZE+ - Anzahl der Slots im Ringpuffer.
+	\item \textbf{slot}: \verb+RING.RING_SLOT+-Array - Array von Slots. 
+\end{itemize}
+\subsubsection*{RING\_SLOT}
+\begin{lstlisting}[frame=single, caption={RING-SLOT-Struktur}, captionpos={b}, label={code:ring_slot_struct}]
+struct ring_slot {
+	struct address 	descriptor;
+	struct address 	mbuf;
+	struct address	packet;
+	struct timeval	ts;
+	unsigned long long cnt;
+};
+\end{lstlisting}
+\begin{itemize}
+	\item \textbf{descriptor}: \verb+DESKRIPTOR+ - Für Adressierung der Deskriptoren
+	\item \textbf{mbuf}: \verb+MBUF+ - Für Adressieren der \verb+mbuf+'s
+	\item \textbf{packet}: \verb+PAKET+ -  Für Adressieren des Paket-Puffers
+	\item \textbf{ts}: \verb+TIME_STAMP+ - Paket-Timestamp. Wird beim Treiber berechnet.
+	\item \textbf{cnt}: \verb+SLOT_COUNTER+ - Paket-Counter
+\end{itemize}
+\subsubsection*{ADDRESS}
+\begin{lstlisting}[frame=single, caption={ADDRESS-Struktur}, captionpos={b}, label={code:address_struct}]
+struct address {
+	bus_addr_t 	phys;
+	vm_offset_t	kern;
+	vm_offset_t	user;
+};
+\end{lstlisting}
+\begin{itemize}
+	\item \textbf{phys}: \verb+PHYS_ADDR+ - Physische Adresse des adressierten Elementen
+	\item \textbf{kern}: \verb+KERN_ADDR+ - Kernelspace-Adresse des adressierten Elementen
+	\item \textbf{user}: \verb+USER_ADDR+ - Userspace-Adresse des adressierten Elementen
+\end{itemize}
+\subsection{Funktionalität}
+Die für den \emph{ringmap}-Paket-Capturing-Stack implementierten Funktionalitäten
+betreffen sich \emph{Netzwerkadapter-Treiber}, \emph{Libpcap}-Library und
+Kernel-Funktionen, die in Folge der \emph{Systemaufrufen} ausgeführt werden.\\\\
+Alle Änderungen in der generischen Dateien des \textbf{em}-Treiber und Libpcap
+sind in über Makrodefinition \verb+__FIVEG_DA__+ eingetragen. Zum Beispiel:
+\begin{lstlisting}[frame=single, caption={Code-Einträge in Dateien des generischen em-Treiber}, captionpos={b}, label={code:code_eintr}]
+	. . . 
+#ifdef __FIVEG_DA__
+	adapter->rm->ring.interrupts_counter++;
+	/* Make interrupt time stamp in the adapter structure */
+	getmicrotime(&adapter->intr_ts);
+#endif
+	. . . 
+\end{lstlisting}	
+\subsubsection{Treiber. Paketzustellung}\label{sec:impl_treiber}
+Für den \emph{ringmap}-Treiber wurde als Basis der generische \textbf{em}-Treiber
+genommen.  In den Funktionen des generischen \textbf{em}-Treibers wurden kleine
+Änderungen gemacht und dazu noch die neue Funktionen implementiert, die den
+Treiber der im Abschnitt \ref{sec:aufgstel} gestellten Anforderungen
+entsprechend machen.\\\\ 
+%
+Die für den \emph{ringmap}-Treiber implementierten Funktionalitäten befinden sich zum
+grossen Teil in der Datei \verb+fiveg_da.c+. In den generischen Dateien des
+Treibers wurden nur kleine Änderungen gemacht, die meistens nur die
+Funktionsaufrufe aus \verb+fiveg_da.c+ enthalten. \\\\
+%
+Die Funktionen des Treiber lassen sich in drei Kategorien Teilen: 
+\begin{itemize}
+	\item Initialisierung-Funktionen:
+		\begin{itemize}
+			\item werden beim Laden des Treibers aufgerufen.
+		\end{itemize}
+	\item Systemaufruf-Funktionen
+		\begin{itemize}
+			\item Kernel-Funktionen, die infolge eines Systemaufrufes aufgerufen werden.
+		\end{itemize}
+	\item Interruptsbehandlung-Funktionen
+		\begin{itemize}
+			\item \emph{Interrupt-Service-Routine} und Kernel-Thread, die infolge eines 
+				Interrupt-Ereignisses aufgerufen werden und welche für Capturing-Ablauf
+				zuständig sind.
+		\end{itemize}
+\end{itemize}
+
+\subsubsection*{Initialisierung}
+Während des Ladens des Treiber werden unter Anderem folgende Funktionen aufgerufen: 
+\begin{itemize}
+	\item \verb+em_probe()+: Datei \verb+if_em.c+. Ist für das Erkennen der
+		Netzwerkadapter-Modelles verantwortlich. 
+	\item \verb+em_attach()+: Datei \verb+if_em.c+. Diese Funktion ist für alle
+		Initialisierung-Prozesse zuständig. Hier werden unter Anderem die
+		Speicherbereiche für Deskriptoren und Paket-Puffer alloziert.
+	\item \verb+ringmap_attach()+: Datei \verb+fiveg_da.c+. Wird aus der
+		\verb+em_attach()+ aufgerufen. Alloziert den Speicher für
+		\verb+ring+-Struktur und erzeugt ein neues symbolische Device
+		\verb+/dev/ringmap+. Über dieses Device  wird der
+		Userspace-Capturing-Prozess mit Hilfe der Systemaufrufen \verb+read+
+		und \verb+ioctl+ \emph{Capturing-Steuerung}, \emph{Mempory-Mapping} und
+		\emph{Blokierendes Warten} anfordern (siehe Abschnitt
+		\ref{sec:entw_syscalls}).
+\end{itemize}
+Für das Kompilieren aller Software für den \emph{ringmap}-Capturing-Stack und Laden des Treibers 
+wurde den Skript \verb+ringmap_build_and_load+ implementiert. Der Skript befindet sich 
+im Verzeichnis \textbf{scripts/}\footnote{SVN-URL:
+\url{https://svn.net.t-labs.tu-berlin.de/svn/alexandre-da/src/70/scripts/}}
+im Code-Repository.
+
+\subsubsection*{Treiber. Systemaufruf-Funktionen}
+Um dem Userspace-Prozess die Interaktion mit dem Treiber und dadurch die
+Capturing-Steuerung zu ermöglichen, registriert der Treiber bei der
+\textbf{Initialisierung} das symbolische Device \verb+/dev/ringmap+ und bietet
+eine Menge von Kernel-Funktionen an, die in folge der Systemaufrufen auf dem
+device \verb+/dev/ringmap+ ausgeführt werden:
+\begin{itemize}
+	\item \verb+ringmap_open()+: wird in foge des \emph{open}-Systemaufrufes
+		ausgeführt.  Checkt die für den Capturing benötigte Datenstrukturen.
+		Prüft ob alle Speicher-Bereiche alloziert und zugreifbar sind.
+	\item \verb+ringmap_read()+: Wird in folge des \emph{read}-Systemaufrufes
+		ausgeführt.  Initialisiert die \verb+ring+-Struktur mit den physischen
+		Adressen von den Paket-Puffer und Deskriptoren. Und liefert dm
+		Userspce-Prozes die physische Adresse der \verb+ring+-Struktur. 
+	\item \verb+ringmap_ioctl()+: wird in Folge des \emph{ioctl}-Systemaufrufes
+		ausgeführt. Erlaubt dem Userspace-Prozess über die Eingabe der 
+		folgenden \emph{ioctl}-Werten unterschiedliche Funktionalitäten ausführen:
+		\begin{itemize}
+			\item \verb+IOCTL_DISABLE_RECEIVE+: Schaltet den Paketempfang bei
+				Netzwerkadapter aus.
+			\item \verb+IOCTL_ENABLE_RECEIVE+: Schaltet den Paketempfang bei
+				Netzwerkadapter wieder ein.
+			\item \verb+IOCTL_DISABLE_FLOWCNTR+: Sperrt
+				\emph{Flow-Control}-Mechanismus bei Netzwerkadapter.
+			\item \verb+IOCTL_SLEEP_WAIT+: Bringt den Userspace-Prozess in den
+				blockierenden Zustand. Dabei wird für den Prozess den höchsten
+				Priorität gesetzt. Der Prozess wird erst im \verb+ringmap_handle_rxtx()+ (Kernel-Thread)
+				wieder aufgewacht durch den Aufruf von
+				\verb+wakeup()+-Funktion.
+			\item \verb+IOCTL_SET_RDT+: Synchronisiert \verb+RDT+-Register mit
+				dem \verb+ring.userrp+ (TAIL-Pointer).
+		\end{itemize}
+\end{itemize}
+
+\subsubsection*{Capturing-Ablauf. Interruptsbehandlung-Funktionen}
+Der für den Ablauf des Capturing verantwortliche Code des Treibers wird 
+in den Interruptsbehandlung-Funktionen ausgeführt. Das sind:
+\begin{itemize}
+	\item \verb+em_irq_fast()+: Datei \verb+if_em.c+. Das ist die eigentliche
+		\emph{Interrupt-Service-Routine}. Die Funktion wird im
+		Interrupt-Kontext, mit den gesperrten allen anderen Aktivitäten auf der
+		aktuellen CPU ausgeführt. Hier werden die Ursache der
+		Interrupter-Ereignisses herausgestellt, Interrupts des Netzwerkadapters
+		gesperrt und den Kernel-Thread geplant.
+	\item \verb+ringmap_handle_rxtx()+: Datei: \verb+fiveg_da.c+. Das ist der
+		\emph{Kernel-Thread}. Hie wird es folgendes erledigt: 
+		\begin{itemize}
+			\item \verb+IFF_DRV_RUNNING+-Flag prüfen
+			\item \verb+em_rxeof()+ aufgerufen
+			\item ggf. noch Mal \verb+ringmap_handle_rxtx()+ planen
+			\item Interrupts des Netzwerkadapters entsperren
+		\end{itemize}
+	\item \verb+em_rxeof()+: Datei \verb+if_em.c+ Die Aufgabe der Funktion
+		unter Anderem ist es, die Paket-Puffer (maximal
+		\verb+rx_processing_limit+) mit den neuen Pakete zu prüfen und das
+		\verb+RDT+-Register mit \verb+userrp+ zu synchronisieren.
+\end{itemize}
+\subsubsection{Anpassung der Libpcap}
+Um den Userspace-Anwendungen die Pakete mit dem \emph{ringmap}-Treiber erfassen zu ermöglichen
+wurde die Funktionalität der Libpcap-Library entsprechend für diese Aufgabe angepasst. 
+Dadurch brauchen alle Anwendungen, die Libpcap für Paket-Capturing benutzen, keine 
+Änderungen im Code zu haben. \\\\
+%
+Die neue Funktionen zur Libpcap befinden sich in der Datei \verb+fiveg_da_pcap.c+.
+Die Datei wird statisch beim Kompilieren zur Libpcap gelinkt.
+
+\subsubsection*{Initialisierung}
+Bevor es mit dem Captruing angefangen wird, sollen die Paket-Puffer und
+\verb+ring+-Struktur in den virtuellen Speicher des
+Userspace-Capturing-Prozesses eingeblendet werden. Weil für die Userspace-Anwendungen
+der Einsatz des \emph{ringmap}-Treiber transparent sein soll, ist die Funktionalität für 
+die Memory-Mapping vollkommen in Libpcap implementiert. Dafür wurden einige Änderungen 
+sowohl in \verb+pcap+-Datenstruktur als auch in den \verb+pcap_open_live()+ gemacht.\\\\
+%
+Die \verb+pcap+-Datenstruktur enthält unter Anderem folgende neue Variablen: 
+\begin{itemize}
+	\item \verb+pkt_counter+: Anzahl der empfangenen Pakete.
+	\item \verb+nic_statistics+: Pointer zu der Datenstruktur, die ebenfalls
+		mit der \verb+ring+-Datenstruktur in Userspace eingeblendet wird und
+		die Statistik-Daten, die von den Netzwerkadapter-Register im Treiber abgelesen
+		werden, enthält. Dadurch bekommt der Userspace-Capturing-Prozess einen
+		lesenden Zugriff auf Netzwerkadapter-Statistik-Register~\cite{e1000_sdm}.
+	\item \verb+ring+: Pointer auf \verb+ring+-Struktur (siehe Listing
+		\ref{code:ring_struct}).
+\end{itemize}
+%
+Für die Einblendung der benötigten Speicherbereichen in Userspace 
+würden in der \verb+pcap_open_live()+ folgende Zeilen hinzugefügt:
+\begin{lstlisting}[frame=single, caption={Initiierung von Memory-Mapping}, captionpos={b}, label={code:code_libpcap_memmap}]
+#ifdef __FIVEG_DA__ 
+	if (check_module(device) < 0)
+		goto bad;
+	if (fiveg_set_iface_promisc(device) < 0)
+		goto bad;
+	if (init_mmapped_capturing(device, p) < 0)
+		goto bad;
+#endif /* __FIVEG_DA__*/
+\end{lstlisting}
+\begin{itemize}
+	\item \verb+check_module()+: Prüft ob der neue \emph{ringmap}-Treiber installiert ist. 
+		Macht den \emph{open}-Systemaufruf.
+	\item \verb+fiveg_set_iface_promisc()+: Setzt den Interface für Capturing
+		in \emph{Promiscuous}-Mode.
+	\item \verb+init_mmapped_capturing()+: Bekommt über \emph{read}-Systemaufruf die physische Adresse 
+		der \verb+ring+-Struktur. Blendet die \verb+ring+ über den \emph{mmap}-Systemaufruf
+		in den Userspace ein. Liest im \verb+ring+ die physischen Adressen von den Ring-Puffer und 
+		blendet alle  Paket-Puffer über \emph{mmap} in den Userspace.
+\end{itemize}
+
+\subsubsection*{Capturing-Ablauf}
+Der Userspace-Capturing-Prozess bekommt den Zugriff auf die empfangene Pakete 
+über den Aufruf von \verb+pcap_loop()+ oder \verb+pcap_dispatch()+ Funktionen. 
+Als Parameter bekommen diese Funktionen einen Pointer auf eine \emph{callback}-Funktion
+die für jedes empfangenes Paket aufgerufen wird und als Eingabeparameter den Pointer 
+auf den Paket-Puffer, wo sich das aktuell bearbeitende Paket befindet, bekommt.\\\\
+%
+Der Aufruf von \verb+pcap_loop()+ oder \verb+pcap_dispatch()+ verursacht in der generischen 
+Libpcap den Aufruf von \verb+pcap_read_bpf()+. Im neuen \emph{ringmap}-Treiber wird stattdessen \\
+\verb+pcap_read_ringmap()+ aufgerufen. Die Aufgabe der \verb+pcap_read_ringmap()+ unter Anderem ist 
+es, die Packet-Puffer mit den neuen Paketen zu lesen, die benötige Trafik-Statistiken zu berechnen, 
+und für jedes empfangene \emph{callback}-Funktion aufrufen. 
+
+\subsection{Makrodefinitionen}
+Alle Makrodefinitionen sind sowohl für Treiber als auch für Libpcap im
+\verb+fiveg_da.h+ implementiert.  Die Makrodefinitionen können geändert werden,
+wodurch kann aber auch die Capturing-Performance beeinflusst werden. Die Detailierte 
+Beschreibung der Makrodefinition ist in der \verb+fiveg_da.h+ zu finden.
+Hier sind die einige wichtigste Definitionen gelistet:  
+\begin{description}
+	\item \verb+RING_SAFETY_MARGIN+:
+		Minimale distance zwischen den TAIL- und HEAD-Slot. Erlaubt dem User-Prozess 
+		eine bestimmte Anzahl an vorhergelesenen Slots vor Überschreibung mit neuen Daten 
+		zu retten. 
+	\item \verb+SLOTS_NUMBER+:
+		Anzahl von Slots im Ringpuffer
+	\item \verb+_KERNEL+:
+		Code, der nur im Kernelspace ausgeführt wird
+	\item \verb+__FIVEG__DA__+:
+		Code der im Rahmen der Diplomarbeit implementiert wurde. Beim setzen dieses Makro auf 0 
+		werden alle Änderungen im Code zurückgesetzt, sodass Libpcap zum ihren klassischen Stand
+		zurückkommt.
+\end{description}
+\subsection{Schwierigkeiten und Probleme während des Implementierung-Prozess}
+\subsubsection{Mangel an Dokumentation}
+Die von dem FreeBSD-Projekt angebotene Dokumentation für
+System-Entwickler~\cite{bsd_sys_arch} war während der Implementierung-Phase der
+Diplomarbeit zum großen Teil nicht ``up-to-date''. Viele Aspekte die sowohl für
+Netzwerk-Treiber-Programmierung als auch für die Netzwerkdatenerfassung
+relevant sind, sind in diesem Buch nicht mehr aktuell. Ein anderes Buch für
+Systementwickler unter FreeBSD ist \emph{``The Design and Implementation of the
+FreeBSD Operating System''}~\cite{freebsd_design}.  Es beschreibt die nicht
+mehr aktuelle Version 5.3 (aktuell: 7.2) und hat relativ wenige Code-Beispiele.
+Ferner, die Implementierung von Traffic Capturing im Kernel ist kaum (oder gar
+nicht) beschrieben.\\\\
+ %
+Aufgrund der bestehenden Dokumentation-Mangel habe ich intensive die
+\verb+freebsd-hackers+-Mailing-Liste~\cite{mail_list_bsd_hackers} benutzt.  Die
+Mailingliste \verb+freebsd-hackers+-Mailing-Liste~\cite{mail_list_bsd_hackers}
+bot dagegen eine wertvolle Informationsquelle, entweder durch historischen
+Artikeln oder durch Antworten an meinen Fragen.\\\\
+%
+Das Buch \emph{Linux Device Drivers}~\cite{ldd_book} war fur das allgemeine
+Verständnis der Kernel-Programmierung sehr hilfreich. Leider sind die Unterschiede
+zwischen Linux und FreeBSD zu groß um dem Buch konkrete Implementierungshinweise
+zu entnehmen.\\\\
+%
+Die Arbeit von Fabian Schneider~\cite{fabian_da,pcin10gb_paper} basiert auf dem
+aktuellen Stand der Technik der Verkehrerfassung unter BSD-Systemen.  Die
+Autoren beschreiben die Probleme die mit dem aktuellen Stack verbunden
+sind.\\\\
+%
+In vielen Details waren die \emph{man-pages} und die Kernelquellen die einzig
+verfügbare Dokumentation.
+
+\subsubsection{Komplexität der Hardware}
+Eine sehr detaillierte Dokumentation der von uns benutzten Netzwerkadapter
+(\emph{Intel Gigabit Ethernet}) ist in dem \emph{Software Developer’s Manual}
+(SDM)~\cite{e1000_sdm} enthalten. Eine Einleitung (Tutorial) in der Materie
+fehlt leider in diesem Buch. Das Buch führt einige relativ neue Konzepten ein:
+\begin{itemize}
+        \item Interrupt-Coalescing (Abschnitt \ref{sec:intr_coal})
+        \item Descriptor-Based-DMA (Abschnitt \ref{sec:hw_dma})
+\end{itemize}
+\emph{Interrupt Coalescing} ist in \emph{``Interrupt Moderation Using Intel GbE
+Controllers''}~\cite{intrr_mod} sehr gut beschrieben. Eine gute Beschreibung
+der \emph{Descriptor-based DMA} befindet sich in dem Patent \emph{Linked List
+DMA Descriptor Architecture}~\cite{dma_desc_base}.\\\\
+%
+Wenn die Dokumentation nicht ausreichend war, mussten die Fragen durch das
+aufwändige und intensive Lesen der Kenrelquellen beantwortet werden.
+
+\subsection{Zusammenfassung}
+In diesem Kapitel wurden die für die Implementierung des neuen 
+\emph{ringmap}-FreeBSD-Packet-Capturing-Stacks wichtigsten Details dargestellt. Die ersten
+Abschnitte des Kapitels beziehen sich vollkommen auf den \textbf{Entwurf} und
+stellen die Datenstrukturen und die Funktionen dar, mit deren Hilfe die, im
+Abschnitt Entwurf beschriebenen, Algorithmen implementiert sind.  Die beiden
+Kapiteln sollte man für ein besseres Verständnis des Codes parallel lesen.\\\\
+%
+Der Source-Code der Funktionen und Datenstrukturen des 
+\emph{ringmap}-Capturing-Stack ist sehr groß und komplex. Dadurch besteht keine
+Möglichkeit alle Details im schriftlichen Teil der Diplomarbeit zu beschreiben.
+Für diejenigen, die den Code für eigene Zwecke verwenden wollen oder an der
+Weiterentwicklung interessiert sind, stehen ausführliche Kommentare im Code zur
+Verfügung. \\\\
+%
+Außerdem ist der Source-Code des Projektes auf Google-Code unter BSD-Lizenzen
+veröffentlicht und kann dort problemlos heruntergeladen werden. Für Rückfragen
+bei der Weiterentwicklung stehe ich gerne zur Verfügung.

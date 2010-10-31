@@ -1,0 +1,195 @@
+\documentclass[a4paper,11pt,abstracton,twoside,titlepage,openany,nochapterprefix,noappendixprefix,liststotoc,bibtotoc,normalheadings,pointlessnumbers,BCOR1cm]{article}
+
+\usepackage{graphicx}
+\usepackage[german]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{longtable}
+\usepackage{fancyhdr}
+\usepackage{color}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{listings}
+\bibliographystyle{plain}
+\selectlanguage{german}
+\usepackage{setspace}
+
+\topmargin  0.0cm
+\headheight 0.0cm
+
+\textwidth 15cm
+\textheight 22cm
+
+\oddsidemargin 0in
+\evensidemargin 0in
+
+\renewcommand{\headheight}{0.7in}
+\renewcommand{\headrulewidth}{0.0pt}
+\setlength{\headwidth}{\textwidth}
+
+\usepackage{ifthen}
+\newboolean{BRIEF}
+\setboolean{BRIEF}{true}
+
+
+
+\begin{document}
+
+\begin{titlepage}
+\thispagestyle{fancy}
+\ifthenelse{\boolean{BRIEF}}{}{
+\lhead{
+	\includegraphics[height=0.6in]{bilder/tu-logo_2d_rot.eps}
+}
+\chead{}
+\rhead{
+	\includegraphics[height=0.6in]{bilder/INET-Logo.red.eps}
+}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+}
+
+%%%%%
+%%  This defines the coverpage - change the fields to your personal liking
+%%%%%
+
+\begin{Large}
+\vspace{5em}
+\center
+	\vspace{5em}
+	Projekt
+	\vspace{3em}
+
+	\begin{Huge}
+	\ifthenelse{\boolean{BRIEF}}{
+	Optimierung des FreeBSD-Packet-Capturing-Stacks
+	}{
+	Optimierung des FreeBSD-Packet-Capturing-Stacks	
+	}
+	\end{Huge}
+\newline
+\newline
+	\begin{Large}
+	\ifthenelse{\boolean{BRIEF}}{
+	Ringmap Packet Capturing Stack for High Performance Packet Capture in FreeBSD
+	}{
+	(Improving the FreeBSD Packet Capturing Stack)
+	}
+	\end{Large}
+	\ifthenelse{\boolean{BRIEF}}{}{
+	\mbox{}\\
+	\vspace{5em}
+	Fakultät IV - Elektrotechnik und Informatik\\
+	Intelligent Networks / Intelligente Netze (INET)\\
+	Research Group of Prof. Anja Feldmann, Ph.D.\\
+	}
+
+	\vspace{3em}
+	Alexander Fiveg\\
+	\today\\
+
+	\ifthenelse{\boolean{BRIEF}}{}{
+	\vspace{4 em}
+	Prüfer: Prof. Anja Feldmann, Ph. D.\\
+	\vspace{-.5 ex}
+	Betreuer: Fabian Schneider\\
+	}
+\end{Large}
+\end{titlepage}
+\pagestyle{empty}
+
+%%%%%
+%%  End cover page
+%%%%%
+
+\ifthenelse{\boolean{BRIEF}}{}{
+\mbox{}
+\newpage
+
+\oddsidemargin 0.5in
+\evensidemargin 0in
+
+\vspace*{40em}
+\begin{center}
+\begin{minipage}{11cm}
+\mdseries{
+\begin{normalsize}
+\sffamily
+Die selbständige und eigenhändige Anfertigung versichere ich an Eides Statt. 
+
+\vspace*{2em}
+Berlin, den \today 
+\vspace*{4em}
+}
+%%%%%
+%%  Put your own name here !
+%%%%%
+\begin{small}Alexander Fiveg\end{small}
+\end{normalsize}
+\end{minipage}
+\end{center}
+
+\mbox{}
+\newpage
+}
+
+\topmargin -2.0cm
+\textheight 24cm
+\textwidth 13cm
+
+\mbox{}
+\newpage
+
+\mbox{}
+\section*{Abstract}
+\input{section/abstract.tex}
+\newpage
+
+\mbox{}
+
+\setcounter{page}{1}
+\setcounter{tocdepth}{4}
+\tableofcontents
+
+\newpage
+
+\pagestyle{plain}
+\section{Einleitung}
+\input{section/Einleitung.tex}
+\newpage
+
+\ifthenelse{\boolean{BRIEF}}{
+\section{Analyse des standard Paket-Capturing-Stacks in FreeBSD}
+}{
+\section{Grundlagen}
+}
+\input{section/Grundlagen.tex}
+\newpage
+
+\section{Entwurf}\label{sec:Entwurf}
+\input{section/Entwurf.tex}
+\newpage
+\ifthenelse{\boolean{BRIEF}}{}{ 
+\section{Implementierung}
+\input{section/Implementierung.tex}\label{sec:Implementierung}
+\newpage
+
+}
+\section{Leistungsbewertung}\label{sec:leist}
+\input{section/Leistungsbewertung.tex}
+\newpage
+
+\section{Zusammenfassung}
+\input{section/Schlussfolgerungen.tex}
+\newpage
+
+\newpage
+\pagestyle{empty}
+\bibliography{main}
+
+\newpage
+
+\lstlistoflistings
+\mbox{}
+\cleardoublepage
+\end{document}
