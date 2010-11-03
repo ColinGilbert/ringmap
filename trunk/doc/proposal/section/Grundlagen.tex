@@ -460,7 +460,7 @@ vielfältige Funktionen zum Einstellen der Prozessoraffinität zur Verfügung st
 erlaubt, für die Threads-Gruppen eine bestimmte CPU zu zuweisen.
 
 }
-\subsection{Softwareaspekte bei Capturing}\label{subsec:sw_cap}
+\subsection{Softwareaspekte beim Capturing}\label{subsec:sw_cap}
 In FreeBSD besteht der Capturing-Stack aus mehreren Komponenten.  Das sind der
 Netzwerk-Treiber, die Software für die Paketfilterung und die
 User-Anwendungen, die ggf.  Libpcap-Funktionen für den Zugriff auf empfangene
@@ -470,17 +470,10 @@ Beim Capturing wird jedes aus dem Netz empfangene Paket zuerst in den internen
 Speicher des Netzwerk-Adapters kopiert. Sobald es möglich ist, macht der
 Adapter den DMA-Transfer der vorhandenen Pakete in den RAM und meldet dies
 durch ein Interrupt. Weiter werden die Paket-Daten von der Paketfilter-Software
-(BPF\footnote{Berkley Packet Filter}) bearbeitet. Nach der Bearbeitung bzw.
-Filterung werden die Pakete von einer Userspace-Anwendung geholt,
-weiterbearbeitet und eventuell auf der Festplatte gespeichert oder ggf. auf dem
-Terminal dargestellt.\\\\
-%
-Die Funktionen des FreeBSD-Packet-Capturing-Stacks sind in mehreren
-Papers~\cite{bpf_paper, fabian_da} und Manuals~\cite{man_bpf} ausführlich
-beschrieben.  Deshalb enthält der weitere Text nur eine einführende
-Beschreibung des Themas.  Eingehend werden lediglich die Aspekte betrachtet,
-die für Analyse und Verbesserung der Performance des aktuellen Capturing-Stack
-relevant sind.
+(BPF\footnote{Berkley Packet Filter~\cite{bpf_wiki, man_bpf, man_kernel_bpf}})
+bearbeitet. Nach der Bearbeitung bzw.  Filterung werden die Pakete von einer
+Userspace-Anwendung geholt, weiterbearbeitet und eventuell auf der Festplatte
+gespeichert oder ggf. auf dem Terminal dargestellt.
 \begin{figure}
 \centering \includegraphics[width=5.1in]{bilder/3copy}
 \caption{FreeBSD Packet Capturing Stack}
@@ -490,10 +483,10 @@ relevant sind.
 \subsubsection{Interruptbehandlung}\label{sec:intr_behandlung}
 Die erste Komponente des Packet-Capturing Stacks (siehe Abbildung
 \ref{bsd_cap_stack}) ist der Netzwerk-Treiber. Für jedes empfangene Packet wird
-einen neuen Paket-Puffer alloziert. Nachdem ein Paket vom Netzwerk-Adapter in
-den Paket-Puffer im RAM kopiert wurde, meldet der Adapter die Anwesenheit von
-neuen Daten im RAM durch ein Interrupt, und verursacht damit den Aufruf der
-\emph{Interrupt-Service-Routine} (ISR).\\\\ 
+beim Treiber einen neuen Paket-Puffer im RAM alloziert. Nachdem ein Paket vom
+Netzwerk-Adapter in den Paket-Puffer kopiert wurde, meldet der Adapter
+die Anwesenheit von neuen Daten im RAM durch ein Interrupt, und verursacht damit den
+Aufruf der \emph{Interrupt-Service-Routine} (ISR).\\\\ 
 %
 Da die Interruptbehandlung mit der höchste Priorität ausgeführt wird, sind alle
 derzeit laufenden Prozesse auf der aktuellen CPU unterbrochen. Dies kann das
@@ -501,7 +494,7 @@ Capturing-Performance negativ beeinflussen, wenn die Interruptbehandlung zu
 große  Ausführungszeit hat. Die andere Software-Komponenten, die auf die
 empfangene Pakete zugreifen wollen, können in dem Fall nicht genügend
 CPU-Zyklen bekommen, denn sie mit der geringeren Priorität ausgeführt sind.
-Dies würde zu den vollen Paket-Puffer und als Ergebnis zu den Paketverlusten
+Dies kann zu den vollen Paket-Puffer und als Ergebnis zu den Paketverlusten
 führen~\cite{elim_recv_lock}. Deshalb ist es für die Vermeidung von
 Paketverlusten sehr wichtig, dass die Interruptbehandlung-Funktionen effizient
 implementiert sind und dadurch möglichst kurze Ausführungszeiten haben.\\\\
@@ -642,13 +635,25 @@ Userspace zu holen und den Anwendungen, die auf die Pakete zugreifen wollen eine
 Pointer auf Paketpuffer zu übergeben. Dabei besteht keinen großen Overhead, der 
 sich deutlich reduzieren lässt. 
 
-\subsection{Capturing-Analyse und Entwurf-Anforderungen}\label{sec:aufgstel}
+
+\subsection{Namenskonventionen}
+Um die Unverständlichkeiten mit den Bezeichnungen zu vermeiden, geben wir 
+hier die Namen, unter denen die standard FreeBSD-Capturing-Stack und 
+der neuen im Rahmen des Projektes entwickelten Capturing-Stack in den 
+weiteren abschnitten auftauchen werden: 
+\begin{description}
+	\item[ringmap:] Wird als Bezeichnung für die im Rahmen des Projektes 
+		entwickelte Capturing-Software benutzt. 
+	\item [generic:] Wird als Bezeichnung für die FreeBSD Standard-Capturing-Software benutzt.
+\end{description}
+
+\subsection{Zusammenfassung}\label{sec:aufgstel}
 In den vorherigen Abschnitten wurden die für Capturing-Performance relevanten
 Software-Eigenschaften dargestellt. Dabei wurde versucht herauszufinden, welche
 der vorgestellten Komponenten unter welchen Umständen die Performance des
-Capturing negativ beeinflussen können. In diesem Abschnitt wird anhand der
-herausgefundenen Capturing-Performance-Problemen die konkrete Anforderungen am
-Entwurf gestellt.
+Capturing negativ beeinflussen können. Anhand der herausgefundenen Problemen
+werden die konkrete Anforderungen für den Entwurf der neuen Capturing-Software
+im Kapitel~\ref{sec:anf_for_entwurf} gestellt.
 %
 \ifthenelse{\boolean{BRIEF}}{}{
 Die Hardware-Komponenten eines Capturing-Systems stellen die höchste
@@ -673,12 +678,13 @@ Funktionen sind es, die im Vergleich zu den anderen Funktionen, eine relativ gro
 Ausführungszeit anfordern. Das kann mit dem Memory-Mapping gemacht werden.
 Dafür muss aber einen Konzept für den Zugriff auf Daten,  die im ``gemappten''
 Puffer liegen, erarbeitet werden.
+\subsubsection{Capturing-Stack-Analyse}
 }
 %
-\subsubsection{Capturing-Stack-Analyse}
-Betrachten wir noch mal den in Abbildung\ref{bsd_cap_stack} dargestellten
-Capturing-Stack des aktuellen FreeBSD. Stellen wir uns den Fall vor wenn alle
-Pakete durch die BPF-Filterung akzeptiert wurden. Dann haben wir pro Paket drei
+\\\\
+Betrachten wir noch mal den in Abbildung~\ref{bsd_cap_stack} dargestellten
+Capturing-Stack des aktuellen FreeBSD. Stellen wir uns den Fall vor, wenn alle
+Pakete durch die BPF-Filterung akzeptiert sind. Dann gibt es pro Paket drei
 Kopier-Operationen:
 \begin{enumerate}
 \item DMA Transfer in den RAM
@@ -689,25 +695,27 @@ Kopier-Operationen:
 	\begin{itemize}
 		\item ist mit Hilfe der Kernelfunktion \verb+bcopy(9)+ gemacht. 
 	\end{itemize}
-\item Kopieren in Userspace (mit dem Kontextwechsel)
+\item Kopieren in Userspace
 	\begin{itemize}
-		\item ist durch den Systemaufruf \emph{read(2)} erledigt. Dazu 
-			Ausführungskontext-Wechsel
+		\item ist durch den Systemaufruf \emph{read(2)} erledigt, und verursacht damit
+			ein Ausführungskontext-Wechsel
 	\end{itemize}
 \end{enumerate}
 Die erste Kopier-Operation, die durch DMA-Transfer erledigt wird, ist
-unvermeidlich. Die restlichen zwei Kopier-Operationen und der Kontext-Wechsel
-stellen ein Flaschenhals im Capturing-System, falls die Rate der ankommenden
-Pakete nah zu $1GBit/sec$ oder höher steigt (siehe Ergebnisse).  Außerdem,
-vergrössert das ständige Allozieren der neuen Paket-Puffer im Interrupt-Kontext
-den Overhead beim Empfang der Pakete.\\\\
+unvermeidlich und nicht optimierbar\footnote{Eigentlich lässt sich der
+DMA-Transfer der Paket-Daten in den RAM durch bestimmte Interrupt-Moderation
+Einstellungen begrenzt optimieren~\cite{e1000_sdm}}. Aber die restlichen zwei
+Kopier-Operationen, ständiges Speicherallozierung für jedes neue Paket und der
+Kontext-Wechsel stellen ein Flaschenhals im Capturing-System, falls die Rate
+der ankommenden Pakete nah zu $1GBit/sec$ oder höher steigt (siehe Abschnitt
+\ref{sec:test_ergebnisse}~Ergebnisse).\\\\
 %
 Die Kopier-Operationen lassen sich durch die Memory-Mapping eliminieren. Wenn
 die Paket-Puffer in den Address-Raum einer Capturing-Anwendung eingeblendet
 werden, dann braucht diese Anwendung keine Kopier-Operationen und keine
-Systemaufrufe mehr, um die Pakete zugreifen zu können. Dafür muss aber ein 
-Synchronisation-Verfahren erarbeitet werden, wenn die mehrere Prozesse auf 
-den gleichen Paket-Puffer zugreifen werden.\\\\
+Systemaufrufe mehr, um auf die Pakete zugreifen zu können. Dafür muss aber ein
+Synchronisation-Verfahren erarbeitet werden, wenn die mehrere Prozesse auf den
+gleichen Paket-Puffer zugreifen werden.\\\\
 %
 Die Speicherallozierungen lassen sich durch die Anwendung von dem Ring-Buffer
 ersetzen. Der Ring-Buffer präsentiert eine constante Menge der preallozierten
@@ -717,28 +725,37 @@ verwaltet, nur ein mal alloziert und dann ein nach einander beschrieben und
 gelesen werden. Dabei, zeigt \emph{HEAD} auf den nächsten freien
 Speicherbereich, der beschrieben wird. \emph{TAIL} zeigt auf den zuletzt
 gelesenen Bereich. Im Unterschied zum normalen Array werden die ältesten Inhalte
-überschrieben, wenn der Ring-Buffer voll ist und weitere Elemente in den
-Ring-Buffer abgelegt werden.
-\subsubsection{Anforderungen für den Entwurf}
-\begin{enumerate}
-	\item Alle Paket-Kopie-Operationen im Capturing-Stack sollen eliminiert
-		werden (Abbildung \ref{img:new_stack})
-		\begin{itemize}
-			\item Die Pakete sollen sofort nach dem DMA-Transfer im virtuellen 
-				Adressraum des User-Capturing-Prozesses zugreifbar sein.
-		\end{itemize}
-	\item Keine Speicherallozierungen für die neue Paket-Puffer während des Capturing
-		\begin{itemize}
-			\item Alle Paket-Puffer sollen bei der Initialisierung des Treiber
-				alloziert werden und für die ganze Laufzeit des Treibers für
-				Empfang der neuen Pakete der Reihe nach benutzt werden.
-		\end{itemize}
-	\item Keine Systemaufrufe für den Datenzugriff und Paketbearbeitung
-		während des Capturing
+überschrieben, wenn der Ring-Buffer voll ist und weitere Elemente abgelegt werden.
+%
+
+\newpage
+\ifthenelse{\boolean{BRIEF}}{
+\section{Anforderungen für den neuen Capturing-Stack}\label{sec:anf_for_entwurf}
+}{
+\subsubsection{Anforderungen für den Entwurf}\label{sec:anf_for_entwurf}
+}
+\subsection{Eliminierung der Kopier-Operationen}
+Die zwei Paket-Kopie-Operationen, vom Paket-Puffer in den BPF-Puffer und vom
+BPF-Puffer in den Puffer des Userspace-Anwendung, sollen eliminiert werden
+(Abbildung \ref{img:new_stack}) Die Pakete sollen sofort nach dem DMA-Transfer
+im virtuellen Speicher des User-Capturing-Prozesses zugreifbar sein. Dafür
+sollen die Paket-Puffer in den Adressraum der Capturing-Anwendung eingeblendet
+werden. Das entsprechende Synchronisationssverfahren muss für den Zugriff auf 
+Paket-Puffer und auf $HEAD/TAIL$-Pointers erarbeitet werden.
+%
+\subsection{Eliminierung der Speicherallozierungen}
+Keine neue Paket-Puffer sollen für die neue ankommende Pakete alloziert werden. 
+Alle Speicherbereiche für die Pakete und \emph{mbuf}'s sollen als Ring-Buffer 
+verwaltet werden. Die ältere Inhalte sollen mit den neuen Daten überschrieben 
+werden, wenn der Ring-Buffer voll ist. 
+\subsection{Keine Systemaufrufe für den Zugriff auf Pakete}
+Es sollen möglichst keine Systemaufrufe während Capturing auftreten, denn die
+Systemaufrufe verursachen den Ausführungs-Kontextwechsel, was relativ zu den
+anderen Operationen, eine sehr große Menge von System-Ressourcen anfordert.
 		\begin{itemize}
 			\item Dafür müssen außer den Paket-Puffern noch andere
 				Datenstrukturen mit den für das Capturing relevanten Daten in den
-				Userspace eingeblendet werden, damit der Userspace-Prozess ohne
+				Userspace eingeblendet werden, damit der User-Prozess ohne
 				Systemaufrufe die Daten vom Treiber bekommt und auch
 				Informationen an den Treiber liefern und damit das Capturing
 				steuern kann.
@@ -751,55 +768,38 @@ Ring-Buffer abgelegt werden.
 				Paketen für das Blockieren des auf die Pakete wartenden
 				Prozesses erlaubt. 
 		\end{itemize}
-%	\item Anpassung der Libpcap zum Zugriff auf Pakete in den ``gemappten'' Puffer
-%		\begin{itemize}
-%			\item Die Anpassung soll transparent für die Libpcap-Anwendungen sein. 
-%		\end{itemize}
-	\item Eine Userspace-Capturing-Anwendung pro Netzwerk-Interface
-		\begin{itemize}
-			\item Wir begrenzen uns auf eine gleichzeitig aktive Userspace-Capturing-Anwendung
-			      pro Interface, um den Entwurf und die Implementierung einfach zu halten.
-		\end{itemize}
-%	\item Ringpuffer-Struktur für den Paketzugriff.
-%		\begin{itemize}
-%			\item Die Gründe für die Auswahl der Ringpuffer-Struktur für den Datenzugriff 
-%				sind im Kapitel Entwurf \ref{sec:Entwurf} erklärt.
-%		\end{itemize}
-	\item Protokoll-Stack ausschalten 
-		\begin{itemize}
-			\item Wir wollen den neuen Treiber nur für Capturing benutzen
-		\end{itemize}
-	\item BPF aus dem Kernel entfernen. 
-		\begin{itemize}
-			\item Der BPF ist auch in der Libpcap implementiert. Das hat zur Folge, dass
-				es kein Problem wäre, die Paketfilterung im Userspace anzuwenden.
-		\end{itemize}
-\end{enumerate}
-Da der neue Stack anders als der Standard-FreeBSD-Capturing-Stack die empfangene Pakete den
-Userspace-Prozessen zur Verfügung stellt, müssen die Userspace-Prozesse anders
-auf die Pakete zugreifen. Um der neue Stack einsetzbar zu machen soll am besten
-die Libpcap-Library für ihn angepasst werden, sodass für alle
+\subsection{Eine Userspace-Capturing-Anwendung pro Netzwerk-Interface}
+Wir begrenzen uns auf nur eine gleichzeitig aktive
+Userspace-Capturing-Anwendung pro Netzwerk-Interface, um den Entwurf und die
+Implementierung einfach zu halten. Außerdem, die Vergrösserung der Menge der
+Anwendungen, welche von dem gleichen Interface die Pakete erfassen, erhöht
+nicht die Capturing-Performance\footnote{Mit der Ausnahme eines Multi-queue
+Controllers, wenn es mehrere Anwendungen parallel, eine Anwendung per
+receive-queue, ausgeführt werden}
+
+\subsection{Transparenz}
+Die Funktionalität des neuen Capturing-Stacks soll für die standard Anwendungen
+möglichst unsichtbar sein. Das heißt, die standard Funktionen des
+Netzwerktreibers, Protokoll-Stacks, BPF's sollen nicht durch die Anwesenheit
+von \emph{ringmap} gestört werden. In einem \emph{default} Zustand sollen die
+standard Funktionen des Betriebssystem aktiviert werden.  Das Aktivieren des
+\emph{ringmap} soll z.B. über ein Systemaufruf realisiert werden. Dabei im
+\emph{ringmap}-Modus können Protokoll-Stack und standard Packet-Capturing-Stack
+deaktiviert werden. Das zurücksetzen des System in den default-Mode soll auch
+ohne Rekompilation und ohne System-Neustart möglich sein.\\\\
+%
+Standard-FreeBSD-Capturing-Stack die empfangene Pakete den Userspace-Prozessen
+zur Verfügung stellt, müssen die Userspace-Prozesse anders auf die Pakete
+zugreifen. Um der neue Stack einsetzbar zu machen soll am besten die
+Libpcap-Library für ihn angepasst werden, sodass für alle
 Capturing-Anwendungen, die auf Libpcap basieren, keine Änderungen benötigt
 werden. 
-
-\subsubsection{Namenskonventionen}
-Um die Unverständlichkeiten mit den Bezeichnungen zu vermeiden, geben wir 
-hier die Namen, unter denen die standard FreeBSD-Capturing-Stack und 
-der neuen im Rahmen der Diplomarbeit entwickelten Capturing-Stack in den 
-Weiteren Abschnitten auftauchen werden: 
-\begin{description}
-	\item[ringmap]: Wird als Bezeichnung für die im Rahmen der Diplomarbeit 
-		entwickelte Capturing-Software benutzt. 
-	\item [generic]: Wird als Bezeichnung für die FreeBSD-\textbf{7.x}-Standard-
-		Capturing-Software benutzt.
-\end{description}
-
 
 \begin{figure}
 	\begin{center}
 	\includegraphics[width=4.9in]{bilder/1copy}
 	\end{center}
-	\caption{Der neue ringmap-Capturing-Stack. Ziel der Diplomarbeit}
+	\caption{Der neue ringmap-Capturing-Stack. Ziel des Projektes}
 	\label{img:new_stack}
 \end{figure}
 

@@ -4,14 +4,15 @@
 \label{img:test_aufbau}
 \end{figure}
 In diesem Kapitel werden die Ergebnisse des Leistungsvergleichs zwischen den
-\emph{generischen} und den im Rahmen der Diplomarbeit entwickelten
+\emph{generischen} und den im Rahmen des Projektes entwickelten
 \emph{ringmap}-Packet-Capturing-Stacks dargestellt. Für die Tests wurde ein
 Netzwerk mit drei Hosts aufgebaut. Das Netzwerkdiagramm der Testsumgebung ist
-in Abbildung \ref{img:test_aufbau} dargestellt. Auf dem \emph{Paketgenerator}
+in Abbildung \ref{img:test_aufbau} dargestellt. Auf dem \textbf{Paketgenerator}
 wurde Verkehr mit unterschiedlichen Charakteristiken erzeugt und auf dem
-Zielsystem (\emph{FreeBSD}) erfasst. Dabei werden die Paketverluste und die
-Systemlast während der Datenerfassung gemessen. \\\\
+\textbf{Capturer} erfasst. Dabei werden die Paketverluste und die
+Systemlast während der Datenerfassung gemessen.
 %
+\ifthenelse{\boolean{BRIEF}}{}{   
 Das \emph{ringmap}-Stack wird nicht nur mit unterschiedlichen Verkehrsmustern
 untersucht. Für die Teststabläufe werden verschiedene Konfigurationsparameter
 für das Betriebssystem und den Treiber eingesetzt, mit dem Ziel eine optimale
@@ -23,23 +24,21 @@ wissenschaftlichen Experimenten untersucht~\cite{fabian_da, pcin10gb_paper,
 perfev_paper}. Aus diesem Grund werden mit dem \emph{generischen}-Stack nur
 wenige Experimente durchgeführt, um die Performance von \emph{ringmap} und
 \emph{generic} vergleichen zu können.
+}
 
 \subsection{Messaufbau}\label{sec:messaufbau}
 Im Folgenden beschreibe ich die für Tests eingesetzten Knoten (Abbildung
 \ref{img:test_aufbau}): 
-\begin{enumerate}
-	\item Paketgenerator \\ \emph{Linux-SMP}:
+\begin{itemize}
+	\item Paketgenerator \\ \emph{OS: Linux-SMP}
 		\begin{itemize}
-			\item Ein leistungsfähigen Rechner zum Generieren des Test-Verkehrs:
-				\begin{itemize}
-					\item \textbf{CPU:} 8 x Intel(R) Xeon(R) CPU 2.50GHz
-					\item \textbf{Netzwerkadapter:} PCIe, Intel PRO/1000 EB Ethernet Adapter
-					\item \textbf{Betriebssystem:} Linux Debian Lenny, Kernel 2.6.26-2-686, SMP
-				\end{itemize}
+			\item Ein leistungsfähigen Rechner zum Generieren des Test-Verkehrs.
+			\item Linux Kernal Packet generator wird für die Generierung des
+				Netzverkehrs benutzt.
 		\end{itemize}
-	\item Capturing-Host \\ \emph{FreeBSD}: 
+	\item Capturing-Host \\ \emph{OS: FreeBSD}
 		\begin{itemize}
-			\item Während der Experimente erden für das Capturing zwei Rechner eingesetzt: 
+			\item Während der Experimente werden für das Capturing zwei Rechner eingesetzt: 
 				\begin{enumerate}
 					\item FreeBSD-1:
 						\begin{itemize}
@@ -63,11 +62,12 @@ Im Folgenden beschreibe ich die für Tests eingesetzten Knoten (Abbildung
 						\end{itemize}
 				\end{itemize}
 		\end{itemize}
-	\item Teststeuerungssystem \\ \emph{Cheetah}:
+	\item Teststeuerungssystem \\ \emph{OS: Linux}
 		\begin{itemize}
 			\item Virtuelle Maschine für die Teststeuerung.
 		\end{itemize}
-\end{enumerate}
+\end{itemize}
+\ifthenelse{\boolean{BRIEF}}{}{  
 \begin{figure} 
 \centering \includegraphics[width=6.5in]{bilder/Test_Zeit_Ablauf}
 \caption{Testablauf}
@@ -115,6 +115,7 @@ Jeder Test wird fünf mal wiederholt. Für die gemessenen Werte wird das
 Arithmetisches Mittel und Standardabweichung berechnet, welche auf den Grafiken
 in den folgenden Abschnitten dargestellt sind.
 
+}
 \subsubsection{Erzeugung von Verkehr}
 Der Verkehr für die Tests wird mit
 \emph{Linux-Kernel-Packet-Generator}(\emph{pktgen})~\cite{linux_pktgen} erzeugt.
@@ -129,12 +130,15 @@ erzeugt werden kann. Diese Eigenschaft ist deshalb sehr wichtig für uns, weil
 wir die möglichst hohe Daten-Rate bei unseren Experimenten im Testdatenfluss
 erzeugen wollen, um den \emph{ringmap}-Capturing-Stack zu testen und ihn mit
 dem \emph{generic}-Capturing-Stack im Bezug auf Capturing-Performance zu
-vergleichen. \\\\
+vergleichen.
 %
+\ifthenelse{\boolean{BRIEF}}{}{  
 Um eine hohe Paket-Rate bei Intel Ethernet Gigabit Adapter zu erzeugen, müssen
 einige Eigenschaften des Netzwerkadapters beachtet werden, und zwar,
 handelt es sich um \emph{Flow-Control}-Mechanismus.
+}
 %
+\ifthenelse{\boolean{BRIEF}}{}{   
 \subsubsection*{Flow-Control}
 Unter dem Begriff \emph{Flow-Control} verstecken sich unterschiedliche 
 Verfahren, die es erlauben, die Datenübertragung in einem Netz, die nicht synchron 
@@ -171,6 +175,7 @@ void ringmap_disable_flowcontr(struct adapter *adapter)
 }
 \end{lstlisting}	
 %
+}
 \subsubsection{Messung der CPU-Auslastung und der Paketverluste beim Capturing}
 Auf dem FreeBSD-Host werden beim Test-Ablauf die auf dem Linux-SMP-Host
 generierten und gesendeten Pakete erfasst. Dabei wird die Anzahl der
@@ -205,22 +210,13 @@ Beim Präsentieren der Tests-Ergebnisse wird aber nicht die volle CPU-Last, die
 aus den \verb+user+- \verb+nice+- \verb+syst+- \verb+intr+- \verb+idle+-Load
 besteht, sondern lediglich die \textbf{Systemload} (\verb+syst+) angegeben.  Da
 die Implementierung des neuen Stack hauptsächlich Kernel-Code betrifft,
-interessiert uns vor allem die Systemload (\verb+syst+).  Die Messung der
-Userload (\verb+user+, \verb+nice+) liegt deshalb außerhalb unserer Interessen,
-weil der größte Teil der Funktionalität zur Paketbearbeitung (z.B.
-Paketfilterung) im neuen Stack in den Userspace verschoben wurde. Dadurch ist
-die Userload jetzt komplett von den Paketbearbeitung-Aufgaben, fur welche sich
-der Userspace-Prozess entscheidet, abhängig. Daraus folgt, dass man, um eine
-sinnvolle Userload-Messung machen zu können, zuerst konkrete Szenarien für das
-Verhalten des Userspace-Prozesses erarbeiten muss, was aber nicht das Ziel
-dieser Diplomarbeit ist. Unser Ziel ist die Eliminierung der Engstellen im
-Capturing-Stack, die sich im Kernelspace befanden, wofür ein Entwurf erarbeitet
-wurde. Und der Absicht der Tests ist das Prüfen, ob unsere Entwurf-Ansätze
-korrekt sind, und ob sie zu dem gewünschten Ziel führen. Anders gesagt, zu
-prüfen, ob die Ausführung des Kernel-Codes vom neuen
-\emph{ringmap}-Capturing-Stack eine niedrigere Systemlast als beim alten
-\emph{generic}-Capturing-Stack verursacht. \\\\
+interessiert uns vor allem die Systemload (\verb+syst+).  Der Absicht der Tests
+ist das Prüfen, ob unsere Entwurf-Ansätze korrekt sind, und ob sie zu dem
+gewünschten Ziel führen. Anders gesagt, zu prüfen, ob die Ausführung des
+Kernel-Codes vom neuen \emph{ringmap}-Capturing-Stack eine niedrigere
+Systemlast als beim alten \emph{generic}-Capturing-Stack verursacht.
 %
+\ifthenelse{\boolean{BRIEF}}{}{   
 Im System-Mode wird auch die Interrupt-Service-Routine(ISR) des Netzwerkadapters
 ausgeführt (siehe Abschnitt \ref{sec:intr_behandlung}). Weil bei allen Tests
 für die Interrupt-Rate-Steuerung \emph{Interrupt-Throttling} (siehe
@@ -331,11 +327,11 @@ die anderen aber nur als Makrodefinitionen im Source-Code.
 				gesetzt. 
 		\end{itemize}
 \end{description}
+}
 \subsection{Ergebnisse}\label{sec:test_ergebnisse}
-In diesem Kapitel werden die Ergebnisse der im Rahmen der Diplomarbeit
+In diesem Kapitel werden die Ergebnisse der im Rahmen des Projektes
 durchgeführten Experimente dargestellt. Der erste Abschnitt stellt die
-Ergebnisse der Experimente mit dem neuen im Rahmen des praktischen Teil der
-Diplomarbeit implementierten \emph{ringmap}-Packet-Capturing-Stacks dar. Es
+Ergebnisse der Experimente mit dem neuen \emph{ringmap}-Packet-Capturing-Stacks dar. Es
 werden die Systemload und Paketverluste beim Capturing in Abhängigkeit von der
 Paket-Rate und den der Einstellung der Treiber-Parameter dargestellt. Durch die
 Analyse der Ergebnisse werden dabei Parameter für den neuen
@@ -350,36 +346,31 @@ Capturing-Stack quantitativ zu bestimmen.
 Bei diesen Experimenten wurde die Capturing-Performance des \emph{ringmap}-Capturing-Stack
 im Abhängigkeit von den folgenden Parameter gemessen: 
 \begin{itemize}
+\ifthenelse{\boolean{BRIEF}}{}{   
 	\item Treiber-Konfigurationsparameter: \verb+rx_processing_limit+, \verb+SLOTS_NUMBER+.
+}
 	\item Daten-Rate des erfassten Verkehr.
 	\item FreeBSD-Kernel-Parameter: SMP-Kern vs. single-CPU-Kern.
 	\item Type des Bussystems: PCI vs. PCIe.
 \end{itemize}
 
-\subsubsection*{Performance in Abhängigkeit von der Anzahl der Slots im  Paket-Ringpuffer: SLOTS\_NUMBER}
-Die Anzahl der Slots in unserem Paket-Ringpuffer entspricht der Anzahl der
-(DMA-~)Deskriptoren (siehe Abschnitt \ref{sec:memmap_pr}). Sie ist abhängig vom
-Modell des Netzwerkadapters und darf nur auf Zweierpotenz-Werte gesetzt
-werden, wobei $4096$der größtmögliche Wert ist~\cite{e1000_sdm}.\\\\
-%
+\subsubsection*{Performance in Abhängigkeit von der Anzahl der Slots im  Paket-Ringpuffer}
 \textbf{Das Ziel} dieses Experimentes ist es, die optimale Werte für die 
-Anzahl der Slots (\verb+SLOTS_NUMBER+) im Paket-Ringpuffer zu finden, 
-bei welchen die Paketverluste und die Systemload minimal sind.\\\\
+Anzahl der Slots im Paket-Ringpuffer zu finden, 
+bei welchen die Paketverluste und die Systemload minimal sind.
 %
-Konfiguration auf dem Capturer (\verb+FreeBSD+-Host): 
 \begin{itemize}
-	\item \textbf{Hardware:} FreeBSD-2\footnote{siehe Beschreibung im Abschnitt \ref{sec:messaufbau}}
+\item Konfiguration auf dem Capturer (\verb+FreeBSD+-Host): 
+\begin{itemize}
+	\item \textbf{Hardware:} FreeBSD-2 (PCIe)
 	\item \textbf{Betriebssystem:} FreeBSD \textbf{7.2}, \textbf{single-CPU-Kernel}
-	\item \textbf{Treiber:} 
-		\begin{itemize}
-			\item Maximale Anzahl der Pakete pro Kernel-Thread: \\ \verb+rx_processing_limit+$=200$
-		\end{itemize}
 \end{itemize}
-Verkehrsparameter:
+\item Verkehrsparameter:
 \begin{itemize}
 	\item Paketlänge: 64-Bytes
 	\item Paketmenge: 15000000
 	\item Bit-Rate: etwa $696MB/sec$
+\end{itemize}
 \end{itemize}
 \begin{figure} 
 \centering \includegraphics[width=5.5in]{plots/graphs/pktlos_single_bufsize.eps}
@@ -387,9 +378,11 @@ Verkehrsparameter:
 \label{img:plot_pktlos_puffs}
 \end{figure}
 %
+\ifthenelse{\boolean{BRIEF}}{}{   
 Beil allen durchgeführten Tests wird der Wert von \verb+rx_processing_limit+
 auf $200$ gesetzt und der Wert \verb+SLOTS_NUMBER+ zwischen 8 und 4096
 geändert. 
+}
 % 
 \paragraph*{Paketverluste:}
 In Abbildung \ref{img:plot_pktlos_puffs} sind die Paketverluste dargestellt.
@@ -412,6 +405,7 @@ vollkommen ausreichende Performanz für den Transport unseres Verkehrs in den
 RAM. Die Paketverlusten werden möglicher Weise aufgrund der geringen Größe des
 Paket-Puffer auf dem Netzwerkadapter (20K) entstehen. 
 %
+\ifthenelse{\boolean{BRIEF}}{}{   
 \subsubsection*{Performance in Abhängigkeit von der maximalen Anzahl der pro Kernel-
 Thread-Ablauf bearbeitende Paketen: rx\_processing\_limit}
 \textbf{Das Ziel} dieses Experimentes ist es, die optimale Werte für die
@@ -438,13 +432,13 @@ Verkehrsparameter:
 \caption{Systemload in Abhängigkeit von der maximalen Anzahl der pro Kernel-Thread-Ablauf
 bearbeitende Pakete}
 \label{img:plot_sysload_kts}
-\end{figure}
+\end{figure} 
 Bei Experimenten wird der wert von \verb+rx_processing_limit+ zwischen 1 und 300 
 geändert.
 \paragraph*{Paketverluste:} 
 Bei allen durchgeführten Experimenten ergibt sich ein sehr kleiner Paketverlust
 geringer als $0.02\%$ aller generierten Pakete.
-\paragraph*{Systemload:}
+\paragraph*{Soystemload:}
 Die Ergebnisse des Systemload-Messungs-Experimentes sind in Abbildung
 \ref{img:plot_sysload_kts} dargestellt.  Auf der X-Achse werden die Werte der
 Variable \verb+rx_processing_limit+ dargestellt, auf der Y-Achse die Systemload
@@ -452,41 +446,42 @@ bei der Verkehrserfassung. Eine hohe Anzahl von Paketen pro Ablauf des
 Kernel-Threads verursacht eine geringe Systemlast. Unsere Messungen zeigen dass
 bei einer Einstellung $>50$ die Systemlast relativ Konstant unter $12\%$ bleibt. 
 Die weitere Erhöhung des Wertes bringt keinen Gewinn mehr.
-
-\subsubsection*{Performance in Abhängigkeit von Paketlänge}
-\textbf{Das Ziel} des Experimentes ist es, die maximalen Werte für die
-Systemload und Paketverluste beim Capturing herauszufinden. Dabei wird auch
-versucht zu analysieren, von welchen Bedingungen die Systemload während der
-Verkehrserfassung abhängt.\\\\
+}
+\subsubsection*{Performance in Abhängigkeit von Paketlänge und Bit-Rate}
+\textbf{Das Ziel} des Experimentes ist es, die Abhängigkeit der
+Capturing-Performance von der Paketsgröße im Netzverkehr
+herauszufinden.
 %
-Konfiguration auf dem Capturer (\verb+FreeBSD+-Host): 
+\begin{itemize}
+\item Konfiguration auf dem Capturer (\verb+FreeBSD+-Host): 
 \begin{itemize}
 	\item \textbf{Hardware:} FreeBSD-2
 	\item \textbf{Betriebssystem:} FreeBSD \textbf{7.2}, \textbf{single-CPU-Kernel}
 	\item \textbf{Treiber:} 
 		\begin{itemize}
-			\item Maximale Anzahl der Pakete pro Kernel-Thread: \verb+rx_processing_limit+$=200$
-			\item Paket-Ringpuffer-Größe: \verb+SLOTS_NUMBER+$=1024$
+			\item Paket-Ringpuffer-Größe: 1024 Slots
 		\end{itemize}
 \end{itemize}
-Verkehrsparameter:
+\item Verkehrsparameter:
 \begin{itemize}
 	\item Paketlängen: 64- , 200-, 300-Bytes
 	\item Paketmengen: 5000000, 10000000, 15000000
 \end{itemize}
-
+\end{itemize}
+%
 \paragraph*{Paketverluste:} Bei allen Experimenten ergibt sich für Paketgrößen
 über 200 Bytes die Paketerfassungsrate $100\%$. Nur in den Experimenten mit der
 kleinsten Paketgröße von 64-Bytes und nur bei der höchsten erreichte Bit-Rate
 von $627 MB/sec$ ergibt sich ein sehr kleines Paketverlust geringer als
 $0.02\%$ aller generierten Pakete.
-
+%
 \paragraph*{Systemload:}
 Die Ergebnisse der Systemload-Messung werden in den Abbildungen
 \ref{img:plot_sysload_mbs} und \ref{img:plot_sysload_pps} dargestellt. Die
 maximal erreichte Systemload beim Capturing in allen Experimenten liegt unter
 $12\%$ und wird erreicht beim Capturing des Verkehrs mit den kleinsten
 64-Bytes-Paketen.\\\\
+%
 In Abbildung \ref{img:plot_sysload_pps}, wird die Systemload in Abhängigkeit
 der Paket-Rate dargestellt. Bei diesen Ergebnissen kann man deutlich sehen,
 dass die Systemload beim Capturing von der Paket-Rate und nicht von der
@@ -497,7 +492,7 @@ gleich sind.\\\\
 Dies lässt sich einfach erklären. Im neuen \emph{ringmap}-Treiber wurden alle
 Paket-Kopie-Operationen und Paket-Filterung entfernt. Der Userspace-Prozess
 bekommt den Zugriff auf die Pakete sofort nach dem DMA-Transfer in den RAM. Aus
-diesen Gründen kann keine größere Systemload entstehen, beim Capturing mit dem
+diesen Gründen kann keine größere Systemload entstehen. Beim Capturing mit dem
 \emph{ringmap}-Treiber wird im Kernelspace die geringstmögliche Arbeit erledigt,
 die pro Paket-Puffer skaliert und nicht von der Paket-Größe abhängt.
 %
@@ -522,8 +517,7 @@ Konfiguration auf dem Capturer (\verb+FreeBSD+-Host):
 	\item \textbf{Betriebssystem:} FreeBSD \textbf{7.2}, \textbf{single-CPU-Kernel}, \textbf{SMP}-Kernel
 	\item \textbf{Treiber:} 
 		\begin{itemize}
-			\item Maximale Anzahl der Pakete pro Kernel-Thread: \verb+rx_processing_limit+$=200$
-			\item Paket-Ringpuffer-Größe: \verb+SLOTS_NUMBER+$=1024$
+			\item Paket-Ringpuffer-Größe: 1024 Slots
 		\end{itemize}
 \end{itemize}
 Verkehrsparameter:
@@ -569,8 +563,7 @@ Konfiguration auf dem Capturer (\verb+FreeBSD+-Host):
 	\item \textbf{Betriebssystem:} FreeBSD \textbf{7.2}, \textbf{single-CPU-Kernel}
 	\item \textbf{Treiber:} 
 		\begin{itemize}
-			\item Maximale Anzahl der Pakete pro Kernel-Thread: \verb+rx_processing_limit+$=200$
-			\item Paket-Ringpuffer-Größe: \verb+SLOTS_NUMBER+$=1024$
+			\item Paket-Ringpuffer-Größe: 1024 Slots
 		\end{itemize}
 \end{itemize}
 Verkehrsparameter:
@@ -626,7 +619,6 @@ Konfiguration auf dem Capturer (\verb+FreeBSD+-Host):
 	\item \textbf{Betriebssystem:} FreeBSD \textbf{7.2}, \textbf{single-CPU-Kernel}
 	\item \textbf{Treiber:} 
 		\begin{itemize}
-			\item Maximale Anzahl der Pakete pro Kernel-Thread: \verb+rx_processing_limit+$=200$
 			\item Paket-Ringpuffer-Größe: \verb+SLOTS_NUMBER+$=1024$
 			\item BPF-Puffer-Größe: 10MB
 		\end{itemize}

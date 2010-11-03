@@ -165,9 +165,10 @@ Berlin, den \today
 }
 \input{section/Grundlagen.tex}
 \newpage
-
+\ifthenelse{\boolean{BRIEF}}{}{
 \section{Entwurf}\label{sec:Entwurf}
 \input{section/Entwurf.tex}
+}
 \newpage
 \ifthenelse{\boolean{BRIEF}}{}{ 
 \section{Implementierung}
