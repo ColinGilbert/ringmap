@@ -56,10 +56,9 @@ The main idea for solving this problem is eliminating packet copy operations by 
 = Work in Progress =
  * Support for hardware timestamping
  * Writing packets to the disc from within the kernel
- * Enabling TCP/IP Stack
  * 10-GbE-Packet-Capturing:
   * Multiqueue support
-  * Extending to support hardware packet filtering
+  * Extending _ringmap_ to support hardware packet filtering
  * Extending _ringmap_ for packet transmission
 
 
