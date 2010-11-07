@@ -1,0 +1,65 @@
+﻿#summary About Project.
+#labels Phase-Requirements,Phase-Design
+#sidebar TableOfContents
+<wiki:toc max_depth="1" />
+
+
+
+= Introduction =
+Packet capturing in high-speed networks is not an easy task due to the system limitations like RAM and system bus throughput. Unfortunately, at line-rate speeds, it is often impossible to capture every packet arriving at a network interface. Hardware may not be the only bottleneck, however, as inefficient software is also to blame for poor resources usage and resulting packet loss during capture. Within the context of this project the new software components will be developed in order to improve the performance of packet capturing in [http://www.freebsd.org FreeBSD].
+
+
+
+= Project Goal =
+Implementation the new software components for efficient packet capturing at 1Gb and 10Gb in _FreeBSD_. The new software should make it possible to minimize packet loss and CPU load during packet capture. These software components have to be realized as the new *ringmap* FreeBSD packet capturing stack and have to be based on:
+ * generic network drivers: 
+  * currently supported drivers: 
+   * [http://www.freebsd.org/cgi/man.cgi?query=em&manpath=FreeBSD+7.0-RELEASE em] for 1GbE and [http://www.freebsd.org/cgi/man.cgi?query=ixgbe&manpath=FreeBSD+8.0-RELEASE ixgbe] for 10G capturing
+ * _libpcap_
+  * the new functions have to be developed for _libpcap_ to accessing packets by using _ringmap_. 
+Also the system calls have to be implemented in order to control the sniffing process. The new implemented software must be transparent for user-space applications. Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with the new _ringmap_ network driver and new modified _libpcap_. 
+
+
+
+= Definitions = 
+*Packet capturing stack:* the software used for capturing packets 
+ * Network adapter driver
+ * Software to analyze and filter received packets
+  * [http://en.wikipedia.org/wiki/Berkeley_Packet_Filter Berkeley Packet Filter]
+ * Software to  access received packets from user-space
+  * mostly based on _[http://www.tcpdump.org/ libpcap]_ library 
+
+
+
+= Approach =
+Our goal, as mentioned above, is to enhance the packet capturing performance in FreeBSD  Operating System. To this aim, some issues from standard packet capturing software that can cause packet loss and high CPU load should be eliminated.
+
+There are operations that are most expensive in terms of CPU cycles. Among others, these are:
+ * System calls
+ * Copy operations
+ * Memory allocations 
+
+All above listed functions are used in the standard packet capturing software in FreeBSD. The memory buffers are allocated by the network driver for each packet received at the network interface. Also packets are filtered and one or more times copied within the RAM during capturing. These operations can cause high system load and packet loss while capturing at bit-rates close to 1Gb/sec or greater ([http://ringmap.googlecode.com/files/ringmap_slides.pdf see results chapter in the ringmap presentation]).
+
+The main idea of our solution to this problem is eliminating packet copy operations by using shared memory buffers and eliminating memory allocations by using ring buffers.
+
+Our solution is to map DMA packet-buffers into the space of user process. This allows user space process to access the captured packets directly in its own address space without any additional overhead. Thus the user-space process has the access to all packets received from the network immediately. Ringmap is also able to filter the packets by using _BPF_. The packet filtering can be accomplished by both kernel- and _libpcap-BPF_. If _BPF_ is not compiled in kernel the _libpcap-BPF_ is used automatically.
+
+
+
+= Supported Hardware ==
+ * Gigabit Ethernet adapters based on the following Intel controller chips:
+  * _8254x, 8257x, 8259x_
+
+
+
+= Work in Progress =
+ * Support for hardware timestamping
+ * Writing packets to the disc from within the kernel
+ * Enabling TCP/IP Stack
+ * 10-GbE-Packet-Capturing:
+  * Multiqueue support
+  * Extending to support hardware packet filtering
+ * Extending *ringmap* for packet transmission
+= Details and Results =
+[http://ringmap.googlecode.com/files/ringmap_slides.pdf See presentation]
