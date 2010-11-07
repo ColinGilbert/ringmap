@@ -5,11 +5,11 @@
 \end{figure}
 In diesem Kapitel werden die Ergebnisse des Leistungsvergleichs zwischen den
 \emph{generischen} und den im Rahmen des Projektes entwickelten
-\emph{ringmap}-Packet-Capturing-Stacks dargestellt. Für die Tests wurde ein
+\emph{ringmap}-Packet-Capturing-Stacks dargestellt. Für die Tests ist ein
 Netzwerk mit drei Hosts aufgebaut. Das Netzwerkdiagramm der Testsumgebung ist
 in Abbildung \ref{img:test_aufbau} dargestellt. Auf dem \textbf{Paketgenerator}
-wurde Verkehr mit unterschiedlichen Charakteristiken erzeugt und auf dem
-\textbf{Capturer} erfasst. Dabei werden die Paketverluste und die
+ist Verkehr mit unterschiedlichen Charakteristiken erzeugt und auf dem
+\textbf{Capturer} erfasst. Dabei sind die Paketverluste und die
 Systemlast während der Datenerfassung gemessen.
 %
 \ifthenelse{\boolean{BRIEF}}{}{   
@@ -30,15 +30,24 @@ wenige Experimente durchgeführt, um die Performance von \emph{ringmap} und
 Im Folgenden beschreibe ich die für Tests eingesetzten Knoten (Abbildung
 \ref{img:test_aufbau}): 
 \begin{itemize}
-	\item Paketgenerator \\ \emph{OS: Linux-SMP}
+	\item Paketgenerator
 		\begin{itemize}
 			\item Ein leistungsfähigen Rechner zum Generieren des Test-Verkehrs.
-			\item Linux Kernal Packet generator wird für die Generierung des
-				Netzverkehrs benutzt.
+			\item OS: Linux-SMP
+			\item Linux Kernal Packet generator~\cite{linux_pktgen} wird für
+				die Generierung des Netzverkehrs benutzt.
 		\end{itemize}
-	\item Capturing-Host \\ \emph{OS: FreeBSD}
+	\item Capturer
 		\begin{itemize}
-			\item Während der Experimente werden für das Capturing zwei Rechner eingesetzt: 
+			\item OS: FreeBSD mit \emph{generic} und \emph{ringmap}
+				\begin{itemize}
+					\item FreeBSD-7.2, i386-Kernel (32 Bit)
+					\item Interrupt-Throttling default Parameter:
+						\begin{itemize}
+							\item 8000 Interrupts pro Sekunde maximal
+						\end{itemize}
+				\end{itemize}
+			\item Hardware:
 				\begin{enumerate}
 					\item FreeBSD-1:
 						\begin{itemize}
@@ -51,20 +60,11 @@ Im Folgenden beschreibe ich die für Tests eingesetzten Knoten (Abbildung
 							\item \textbf{Netzwerkadapter:} PCIe, Intel HP NC360T PCIe DP Gigabit Server Adapter	 
 						\end{itemize}
 				\end{enumerate}
-				\begin{itemize}
-					\item auf beiden Rechnern: FreeBSD-7.2, i386-Kernel (32 Bit)
-					\item auf beiden Netzwerkadaptern wurde für
-						Interrupt-Throttling\footnote{Die Details
-						zur Interrupt-Throttling finden sich im  Abschnitt
-						\ref{sec:intr_coal}} eingesetzt:
-						\begin{itemize}
-							\item 8000 Interrupts pro Sekunde maximal
 						\end{itemize}
-				\end{itemize}
-		\end{itemize}
-	\item Teststeuerungssystem \\ \emph{OS: Linux}
+	\item Teststeuerungssystem
 		\begin{itemize}
-			\item Virtuelle Maschine für die Teststeuerung.
+			\item OS: Linux
+			\item Scripte zur Teststeuerung.
 		\end{itemize}
 \end{itemize}
 \ifthenelse{\boolean{BRIEF}}{}{  
@@ -177,16 +177,15 @@ void ringmap_disable_flowcontr(struct adapter *adapter)
 %
 }
 \subsubsection{Messung der CPU-Auslastung und der Paketverluste beim Capturing}
-Auf dem FreeBSD-Host werden beim Test-Ablauf die auf dem Linux-SMP-Host
+Auf dem FreeBSD-Host werden beim Test-Ablauf die auf dem Paketgenerator
 generierten und gesendeten Pakete erfasst. Dabei wird die Anzahl der
-empfangenen Pakete und die Systemload beim Capturing auf dem FreeBSD-Host
-gemessen.
+empfangenen Pakete und die Systemload beim Capturing auf dem Capturer gemessen.
 %
 \subsubsection*{Messung von Paketverlusten}
 Für das Packet-Capturing wird eine einfache Anwendung implementiert, die für den
 Paketzugriff die Bibliothek \emph{Libpcap} benutzt. In dieser Capturing-Anwendung ist
 ein \emph{callback}-Funktion enthalten, die für jedes empfangene Paket
-aufgerufen wird, und derer Aufgabe unter anderem ist es, die Pakete zu zählen.
+aufgerufen wird, und derer Aufgabe ist es, die empfangene Pakete zu zählen.
 Das Paketverlust (\begin{math}P_{los}\end{math}) wird als Differenz zwischen 
 den Anzahl der empfangenen (\begin{math}P_{rcv}\end{math}) und
 der gesendeten Pakete (\begin{math}P_{send}\end{math}) berechnet:
@@ -214,7 +213,7 @@ interessiert uns vor allem die Systemload (\verb+syst+).  Der Absicht der Tests
 ist das Prüfen, ob unsere Entwurf-Ansätze korrekt sind, und ob sie zu dem
 gewünschten Ziel führen. Anders gesagt, zu prüfen, ob die Ausführung des
 Kernel-Codes vom neuen \emph{ringmap}-Capturing-Stack eine niedrigere
-Systemlast als beim alten \emph{generic}-Capturing-Stack verursacht.
+Systemlast als beim \emph{generic}-Capturing-Stack verursacht.
 %
 \ifthenelse{\boolean{BRIEF}}{}{   
 Im System-Mode wird auch die Interrupt-Service-Routine(ISR) des Netzwerkadapters
@@ -333,18 +332,16 @@ In diesem Kapitel werden die Ergebnisse der im Rahmen des Projektes
 durchgeführten Experimente dargestellt. Der erste Abschnitt stellt die
 Ergebnisse der Experimente mit dem neuen \emph{ringmap}-Packet-Capturing-Stacks dar. Es
 werden die Systemload und Paketverluste beim Capturing in Abhängigkeit von der
-Paket-Rate und den der Einstellung der Treiber-Parameter dargestellt. Durch die
-Analyse der Ergebnisse werden dabei Parameter für den neuen
-\emph{ringmap}-Treiber ermittelt, die es erlauben, die Capturing-Performance zu
-maximieren (Abschnitt \ref{sec:erg_ringmap_stack}). \\\\
+Date-Rate des Verkehrs und der anderen Parameter dargestellt.\\\\
 % 
 Im Abschnitt \ref{sec:erg_verg} vergleichen wir die Performance des ringmap-
 mit dem generic-Capturing-Stack, um den Performance-Gewinn durch den neuen
 Capturing-Stack quantitativ zu bestimmen.
 
 \subsubsection{Ringmap-Paket-Capturing-Stack}\label{sec:erg_ringmap_stack}
-Bei diesen Experimenten wurde die Capturing-Performance des \emph{ringmap}-Capturing-Stack
-im Abhängigkeit von den folgenden Parameter gemessen: 
+In diesem Abschnitt sind die Ergebnisse der Experimenten mit \emph{ringmap}-Capturing-Stack
+dargestellt. Das Ziel der Experimenten die Capturing-Performance des \emph{ringmap}-Stacks 
+in Abhängigkeit von den folgenden Parameter herauszufinden:
 \begin{itemize}
 \ifthenelse{\boolean{BRIEF}}{}{   
 	\item Treiber-Konfigurationsparameter: \verb+rx_processing_limit+, \verb+SLOTS_NUMBER+.
