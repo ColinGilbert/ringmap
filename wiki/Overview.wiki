@@ -21,18 +21,6 @@ Implementation the new software components for efficient packet capturing at 1Gb
 Also the system calls have to be implemented in order to control the sniffing process. The new implemented software must be transparent for user-space applications. 
 Namely, each application that uses _libpcap_ for packet capturing shouldn't require modification in order to run with the new _ringmap_ network driver and new modified _libpcap_. 
 
-
-
-= Definitions = 
-*Packet capturing stack* (the software used for capturing packets): 
- * Network adapter driver
- * Software to analyze and filter received packets
-  * [http://en.wikipedia.org/wiki/Berkeley_Packet_Filter Berkeley Packet Filter]
- * Software to  access received packets from user-space
-  * mostly based on _[http://www.tcpdump.org/ libpcap]_ library 
-
-
-
 = Approach =
 Our goal, as mentioned above, is to enhance the packet capturing performance in FreeBSD  Operating System. To this aim, some issues from standard packet capturing software that can cause packet loss and high CPU load should be eliminated.
 
@@ -41,7 +29,7 @@ There are operations that are most expensive in terms of CPU cycles. Among other
  * Copy operations
  * Memory allocations 
 
-All above listed functions are used in the standard packet capturing software in FreeBSD. The memory buffers are allocated by the network driver for each packet received at the network interface. Also packets are filtered by BPF and then one or more times copied within the RAM. The user-space process gets access to the received packets using system call, what results in a context switch and in an additional copy operation. These operations can cause high system load and packet loss while capturing at bit-rates close to 1Gb/sec or greater ([http://ringmap.googlecode.com/files/ringmap_slides.pdf see results chapter in the ringmap presentation]).
+All above listed functions are used in the standard packet capturing software in FreeBSD. The memory buffers are allocated by the network driver for each packet received at the network interface. Then packets are filtered by BPF and then one or more times copied within the RAM. The user-space process gets access to the received packets using system call, what results in a context switch and in an additional copy operation. These operations can cause high system load and packet loss while capturing at bit-rates close to 1Gb/sec or greater ([http://ringmap.googlecode.com/files/ringmap_slides.pdf see results chapter in the ringmap presentation]).
 
 The main idea for solving this problem is eliminating packet copy operations by using shared memory and eliminating memory allocations by using ring buffers. Our solution is to map DMA packet-buffers into the space of user process. This allows user space process to access the captured packets directly in its own address space without any additional overhead. Thus the user-space process has the access to all packets received from the network immediately. Ringmap is also able to filter the packets by using _BPF_. The packet filtering can be accomplished by both kernel- and _libpcap-BPF_. If _BPF_ is not compiled into the kernel the _libpcap-BPF_ is used automatically.
 
