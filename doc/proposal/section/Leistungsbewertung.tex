@@ -336,7 +336,7 @@ Date-Rate des Verkehrs und der anderen Parameter dargestellt.\\\\
 % 
 Im Abschnitt \ref{sec:erg_verg} vergleichen wir die Performance des ringmap-
 mit dem generic-Capturing-Stack, um den Performance-Gewinn durch den neuen
-Capturing-Stack quantitativ zu bestimmen.
+\emph{ringmap}-Capturing-Stack quantitativ zu bestimmen.
 
 \subsubsection{Ringmap-Paket-Capturing-Stack}\label{sec:erg_ringmap_stack}
 In diesem Abschnitt sind die Ergebnisse der Experimenten mit \emph{ringmap}-Capturing-Stack
@@ -346,15 +346,16 @@ in Abhängigkeit von den folgenden Parameter herauszufinden:
 \ifthenelse{\boolean{BRIEF}}{}{   
 	\item Treiber-Konfigurationsparameter: \verb+rx_processing_limit+, \verb+SLOTS_NUMBER+.
 }
+	\item Paket-Ringpuffer-Größe
 	\item Daten-Rate des erfassten Verkehr.
-	\item FreeBSD-Kernel-Parameter: SMP-Kern vs. single-CPU-Kern.
-	\item Type des Bussystems: PCI vs. PCIe.
 \end{itemize}
 
-\subsubsection*{Performance in Abhängigkeit von der Anzahl der Slots im  Paket-Ringpuffer}
-\textbf{Das Ziel} dieses Experimentes ist es, die optimale Werte für die 
-Anzahl der Slots im Paket-Ringpuffer zu finden, 
-bei welchen die Paketverluste und die Systemload minimal sind.
+\subsubsection*{Paketverluste in Abhängigkeit von der Anzahl der Slots im  Paket-Ringpuffer}
+\textbf{Das Ziel} dieses Experimentes ist es, die Abhängigkeit der Paketverluste
+während Capturing von der Größe des Paket-Ringpuffers (Ring-Buffer)
+herauszufinden. In diesem Experiment ist eine Reihe von Tests durchgeführt. Für
+alle Tests ist der Verkehr mit den kleinsten 64-Bytes Pakete und mit der maximal
+erreichbaren Bit-Rate (c.a. $700Mbit/sec$) generiert.
 %
 \begin{itemize}
 \item Konfiguration auf dem Capturer (\verb+FreeBSD+-Host): 
@@ -382,25 +383,12 @@ geändert.
 }
 % 
 \paragraph*{Paketverluste:}
-In Abbildung \ref{img:plot_pktlos_puffs} sind die Paketverluste dargestellt.
-Auf der X-Achse wird die Anzahl der Slots dargestellt. Auf der Y-Achse die
-prozentuelle Anzahl der Paketverluste.  In allen durchgeführten Experimenten
-mit 256 oder mehr Slots sind die Paketverluste relativ konstant und liegen
-unter $0.02\%$, d.h. die Erhöhung der Anzahl der Slots ab 256 bringt keinen
-weiteren Gewinn mehr. 
-
-\paragraph*{Systemload:}
-Bei allen durchgeführten Experimenten ist die Systemload unter $12\%$. Bei den
-Puffer-Größen unter 256 Slots hat die Systemload auch niedrigere Werte. Das
-lässt sich dadurch erklären, dass durch die Paketverlusten, die bei der
-geringeren Slotsanzahl entstanden haben, war das System auch weniger belastet.
-
-\paragraph*{Ergebnis-Analyse.}
-Die Gründe für die Paketverluste bei so einer geringen Systemload ($>12\%$)
-liegen nicht in der Software, sondern eher bei Hardware.  PCIe-BUS hat eine
-vollkommen ausreichende Performanz für den Transport unseres Verkehrs in den
-RAM. Die Paketverlusten werden möglicher Weise aufgrund der geringen Größe des
-Paket-Puffer auf dem Netzwerkadapter (20K) entstehen. 
+In Abbildung \ref{img:plot_pktlos_puffs} sind die Paketverluste während
+Capturing dargestellt.  Auf der X-Achse wird die Anzahl der Slots dargestellt.
+Auf der Y-Achse die prozentuelle Anzahl der Paketverluste. In allen
+durchgeführten Experimenten mit 256 oder mehr Paket-Slots sind die Paketverluste
+relativ konstant und liegen unter $0.02\%$, d.h. die Erhöhung der Anzahl der
+Slots ab 256 bringt keinen weiteren Gewinn mehr. 
 %
 \ifthenelse{\boolean{BRIEF}}{}{   
 \subsubsection*{Performance in Abhängigkeit von der maximalen Anzahl der pro Kernel-
@@ -446,7 +434,7 @@ Die weitere Erhöhung des Wertes bringt keinen Gewinn mehr.
 }
 \subsubsection*{Performance in Abhängigkeit von Paketlänge und Bit-Rate}
 \textbf{Das Ziel} des Experimentes ist es, die Abhängigkeit der
-Capturing-Performance von der Paketsgröße im Netzverkehr
+Capturing-Performance von der Paketsgröße und Daten-Rate im Netzverkehr
 herauszufinden.
 %
 \begin{itemize}
@@ -462,7 +450,7 @@ herauszufinden.
 \item Verkehrsparameter:
 \begin{itemize}
 	\item Paketlängen: 64- , 200-, 300-Bytes
-	\item Paketmengen: 5000000, 10000000, 15000000
+	\item Paketmengen: 15000000
 \end{itemize}
 \end{itemize}
 %
@@ -480,18 +468,17 @@ $12\%$ und wird erreicht beim Capturing des Verkehrs mit den kleinsten
 64-Bytes-Paketen.\\\\
 %
 In Abbildung \ref{img:plot_sysload_pps}, wird die Systemload in Abhängigkeit
-der Paket-Rate dargestellt. Bei diesen Ergebnissen kann man deutlich sehen,
-dass die Systemload beim Capturing von der Paket-Rate und nicht von der
-Paket-Größe beeinflusst wird. Drei Verkehrsströme mit unterschiedlichen
-Paketlängen verursachen fast identisch gleiche Systemload (die Unterschiede
-sind geringer als $0.5\%$) wenn die Paketraten in diesen drei Verkehrsströmen
-gleich sind.\\\\
+der Paket-Rate dargestellt. Bei diesen Ergebnissen kann man deutlich sehen, dass
+die Systemload beim Capturing von der Paket-Rate und nicht von der Paket-Größe
+beeinflusst wird. Drei Verkehrsströme mit unterschiedlichen Paketlängen
+verursachen fast identisch gleiche Systemload (die Unterschiede sind geringer
+als $0.5\%$) wenn die Paketraten in diesen drei Verkehrsströmen gleich sind.
 Dies lässt sich einfach erklären. Im neuen \emph{ringmap}-Treiber wurden alle
-Paket-Kopie-Operationen und Paket-Filterung entfernt. Der Userspace-Prozess
-bekommt den Zugriff auf die Pakete sofort nach dem DMA-Transfer in den RAM. Aus
-diesen Gründen kann keine größere Systemload entstehen. Beim Capturing mit dem
-\emph{ringmap}-Treiber wird im Kernelspace die geringstmögliche Arbeit erledigt,
-die pro Paket-Puffer skaliert und nicht von der Paket-Größe abhängt.
+Paket-Kopie-Operationen und Speicherallozierungen entfernt. Der
+Userspace-Prozess bekommt den Zugriff auf die Pakete sofort nach dem
+DMA-Transfer. Aus diesen Gründen wird beim Capturing mit dem
+\emph{ringmap}-Treiber im Kernelspace die geringstmögliche Arbeit erledigt, die
+pro Paket-Puffer skaliert und nicht von der Paket-Größe abhängt.
 %
 \begin{figure} 
 \centering \includegraphics[width=5.5in]{plots/graphs/sysload_single_CPU_pcie_mbs}
@@ -504,6 +491,7 @@ die pro Paket-Puffer skaliert und nicht von der Paket-Größe abhängt.
 \label{img:plot_sysload_pps}
 \end{figure}
 %
+\ifthenelse{\boolean{BRIEF}}{}{   
 \subsubsection*{Performance in Abhängigkeit von der Anzahl der CPU's}
 \textbf{Das Ziel} des Experiments ist es, die Paketverluste beim Capturing 
 in Abhängigkeit von der Anzahl der CPUs auf dem Capturing-System zu messen.\\\\
@@ -549,14 +537,13 @@ problemlos das Capturing des Verkehrs bis 1Gbit schafft.
 \label{img:plot_pktlos_single_vs_smp_mbs}
 \end{figure}
 
-\subsubsection*{Capturing-Performance beim konventionellen PCI}
-\textbf{Das Ziel} des Tests ist es die Capturing-Performance des
-\emph{ringmap}-Stack in Abhängigkeit von PCI-BUS-Variante des Capturing-Systems
-zu messen.\\\\
+\subsubsection*{Performance in Abhängigkeit von der PCI-Bus-Variante}
+\textbf{Das Ziel} des Experimentes ist es die Capturing-Performance des
+\emph{ringmap}-Stacks beim konventionellen PCI zu messen.\\\\
 %
 Konfiguration auf dem Capturer (\verb+FreeBSD+-Host): 
 \begin{itemize}
-	\item \textbf{Hardware:} FreeBSD-1 vs. FreeBSD-2 
+	\item \textbf{Hardware:} FreeBSD-1
 	\item \textbf{Betriebssystem:} FreeBSD \textbf{7.2}, \textbf{single-CPU-Kernel}
 	\item \textbf{Treiber:} 
 		\begin{itemize}
@@ -566,7 +553,7 @@ Konfiguration auf dem Capturer (\verb+FreeBSD+-Host):
 Verkehrsparameter:
 \begin{itemize}
 	\item Paketlänge: 64-Bytes
-	\item Paketmengen: 5000000, 1000000, 15000000
+	\item Paketmengen: 15000000
 \end{itemize}
 \paragraph*{Paketverluste:}
 Die Ergebnisse des Tests sind in Abbildung \ref{img:plot_pktlos_pci_mbs} zu
@@ -604,7 +591,7 @@ wahrscheinlich der Grund dafür.
 \caption{Systemload in Abhängigkeit von Bit-Rate beim Capturing. Konventioneller PCI-Bus}
 \label{img:plot_sysload_pci_mbs}
 \end{figure}
-
+}
 \subsubsection{Vergleich generic- mit ringmap-Paket-Capturing-Stack}\label{sec:erg_verg}
 \textbf{Das Ziel} dieses Testes ist es, die Capturing-Performance von 
 \emph{ringmap}-Capturing-Stack mit dem \emph{generic}-Capturing-Stack

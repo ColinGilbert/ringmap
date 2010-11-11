@@ -27,7 +27,7 @@ Operationen ausführt, als zur Lösung des Problems nötig wären, dann erzeugt 
 einen unnötig hohe Systemlast und reduziert damit die Datenmengen, die es in
 einem Zeitintervall bearbeiten könnte.  \\\\
 %
-Das Ziel dieser Arbeit ist es, die für Capturing relevante Komponente des
+\textbf{Das Ziel} dieser Arbeit ist es, die für Capturing relevante Komponente des
 Betriebssystem FreeBSD zu untersuchen, die potentiellen ``Engstellen'' in der
 Software, die zu den Datenverlusten führen können,  herauszufinden, und
 effiziente Algorithmen zur Erhöhung des Datendurchsatzes und Reduzierung der
@@ -79,11 +79,12 @@ Software ~vorausgesetzt:
  	\item \textbf{Hardware:}
 		\begin{itemize}
 			\item PC: \textbf{x86}-Architektur
- 			\item Intel 1 und 10GbE \textbf{825xx} Controller.
+ 			\item Intel 1GbE und 10GbE \textbf{825xx} Controllers.
 		\end{itemize}
 	\item \textbf{Software:}
 		\begin{itemize}
 			\item Betriebssystem: FreeBSD~\textbf{-CURRENT, -STABLE}
+			\item Netzwerktreiber: \emph{em, lem, ixgbe}
 		\end{itemize}
 \end{itemize}
 Die vorausgesetzte Hardware hat keine besonderen Ansprüche und ist überall zu

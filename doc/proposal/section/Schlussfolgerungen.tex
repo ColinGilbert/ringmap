@@ -1,10 +1,11 @@
-Das Ziel dieser Diplomarbeit ist es, die für Capturing relevante Software des
+Das Ziel des Projektes ist es, die für Capturing relevante Software des
 Betriebssystem FreeBSD zu untersuchen, die Probleme, die zur Reduzierung der
 Capturing-Performance führen, herauszufinden und aufgrund der gefundenen
 Problemen den neuen (ringmap)-FreeBSD-Packet-Capturing-Stack zu erarbeiten,
-zu implementieren und auszuwerten. Die neue Lösung basiert auf der für die Diplomarbeit
-vorausgesetzte Hardware (siehe Abschnitt \ref{sec:hwsw_voraus}).\\\\
+zu implementieren und auszuwerten. Die neue Lösung basiert auf der für das 
+Projekt vorausgesetzte Hardware (siehe Abschnitt \ref{sec:hwsw_voraus}).
 %
+\ifthenelse{\boolean{BRIEF}}{}{   
 Die Diplomarbeit ist in drei Phasen abgelaufen: Einarbeitung, Implementierung
 und Testen.  Während der \textbf{Einarbeitungszeit} habe ich viele neue
 Kenntnise in Themen, die über das normales Informatiksstudium hinausgehen,
@@ -52,12 +53,12 @@ Leistungsbewertung). Für die Tests wurden \emph{Shell}-Skripte implementiert
 die sowohl alle Testablüfe gesteuert haben als auch die Testergebnisse
 ausgewertet und in Form von Tabellen und \emph{gnuplot}-Grafiken gespeichert
 haben. 
-
+}
 \subsection{Erreichte Ziele}
 
 \subsubsection{Verbesserung der Capturing-Performance}
-Beim Einsatz des im Rahmen der Diplomarbeit implementierten
-\emph{ringmap}-Stack wird die Capturing-Performance unter gleichen Bedingungen
+Beim Einsatz des im Rahmen des Projektes implementierten
+\emph{ringmap}-Stacks wird die Capturing-Performance unter gleichen Bedingungen
 höher als beim \emph{generic}-Stack. Die \textbf{Systemload} beim Capturing mit
 dem \emph{ringmap}-Stack ist deutlich geringer als mit dem \emph{generic}-Stack.
 Bei allen durchgeführten Experimenten war die Systemload beim Capturing mit dem
@@ -72,7 +73,12 @@ verursachten höheren Paketraten, $> 450000 pkts/sec$, verliert der
 \emph{generic}-Stack (mit 10MB BPF-Puffer-Größe) bis zu $100\%$ aller der
 generierten Pakete. Selbst bei maximaler Belastung verliert der \emph{ringmap}-Stack 
 weniger als $0.02\%$ der Pakete.
-
+%
+\subsubsection{Transparenz}
+Alle auf \emph{libpcap} basierte Anwendungen wie \emph{tcpdump, wireshark,
+etc\ldots} benötigen keine Änderungen um mit dem \emph{ringmap}-Stack die Pakete
+zu erfassen. 
+\ifthenelse{\boolean{BRIEF}}{}{   
 \subsubsection{Stabilität und Benutzbarkeit}\label{sec:stab_und_func}
 Der \emph{ringmap}-Capturing-Stack hat in der Tests-Phase (insgesamt mehr als
 100 000 Tests mit den unterschiedlichen Treiber-Parameter) weder
@@ -99,24 +105,16 @@ Die \emph{PCI-Device-ID} des Adapter wird als Makrodefinition \verb+DEV_ID+ in d
 Datei \verb+fiveg_da.h+ eingegeben. Dadurch ist es möglich \emph{ringmap}- und 
 \emph{generic}-Software auf einem System gleichzeitig zu benutzen.
 
+}
 \subsection{Einschränkungen des ringmap-Packet-Capturing-Stack}\label{sec:einschr}
 Die Benutzung der \emph{ringmap}-Software verursacht auf dem Capturing-System
 (bzw. für die Ausgewählte Adapter) folgende Einschränkungen:
 \begin{description}
-	\item [Kein TCP/IP Protokollstack:] Der \emph{ringmap}-Adapter-Treiber
-		besitzt zur Zeit keine Verbindung mit den TCP/IP-Protokoll-Stack-Funktionen.
-		Das heißt, dass ein Netzwerk-Interface, das  mit dem
-		\emph{ringmap}-Treiber gesteuert wird, zu diesem Zeitpunkt ausschliesslich für
-		Paket-Capturing benutzt werden kann. Wenn aber im System mehrere
-		Netzwerk-Adapter mit den unterschiedlichen \emph{Device-ID's} vorhanden
-		sind, dann ist es möglich den Protokoll-Stack über das andere
-		Netzwerkinterface zu benutzen (siehe Abschnitt
-		\ref{sec:stab_und_func}).
-	\item [Keine Paketfilterung im Userspace:] Die Paket-Filterung mit  BPF
-		im Userspace ist derzeit nicht möglich. Das Benutzen von
-		BPF-Filter sollte aber keine aufwendige Aufgabe zu sein, denn auch die  Libpcap hat eine 
-		Implementierung für BPF. Daher kann Filtern mit den
-		Libpcap-Funktionen umgesetzt werden.
+	\item [Kein TCP/IP Protokollstack während Capturing:] Für das 
+		Capturing mit dem \emph{ringmap} muss das Netzwerk-Interface in
+		Monitoring-Mode gesetzt werden. Aus diesem Grund besteht keine 
+		Möglichkeit, das gleiche Interface gleichzeitig für Capturing 
+		und Kommunikation zu nutzen.
 	\item [Libpcap Einschränkungen:] Für das Anpassen der Libpcap an den \emph{ringmap}-Stack wurden einige Code-Stücke im
 		Libpcap-Quell-Code auskommentiert oder ersetzt. Dadurch ist die
 		Funktionalität der neuen \emph{ringmap}-Libpcap ist nicht mit
