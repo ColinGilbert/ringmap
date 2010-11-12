@@ -492,8 +492,8 @@ Da die Interruptbehandlung mit der höchsten Priorität ausgeführt wird, sind
 alle derzeit laufenden Prozesse auf der aktuellen CPU unterbrochen. Dies kann
 das Capturing-Performance negativ beeinflussen, wenn die Interruptbehandlung zu
 große  Ausführungszeit hat. Die andere Software-Komponenten, die auf die
-empfangene Pakete zugreifen wollen, können in dem Fall nicht genügend
-CPU-Zyklen bekommen.  Dies kann zu den vollen Paket-Puffer und als Ergebnis zu
+empfangene Pakete zugreifen wollen, können in diesem Fall nicht genügend
+CPU-Zyklen bekommen.  Dies kann zu den vollen Puffern und als Ergebnis zu
 den Paketverlusten führen~\cite{elim_recv_lock}. Deshalb ist es sehr wichtig,
 dass die Interruptbehandlung-Funktionen effizient implementiert sind und
 dadurch möglichst kurze Ausführungszeiten haben.\\\\
@@ -501,14 +501,26 @@ dadurch möglichst kurze Ausführungszeiten haben.\\\\
 Die Interruptbehandlung wird in zwei Phasen ausgeführt: die eigentliche ISR und
 \emph{delayed-ISR}. Die ISR dient nur zum Herausfinden der Ursache des
 Interrupts und Planen der delayed-ISR. Die größte Rechenaufwand bei der
-Interruptbehandlung findet während der Ausführung des \emph{delayed-ISR}
-statt. Von allen Aufgaben, die der \emph{delayed-ISR} erledigt,
-sind die Speicher-Allozierungen, wahrscheinlich, diejenigen die den Großteil
-der CPU-Zeit beanspruchen. Während des Paket-Empfangs wird im Kontext von
+Interruptbehandlung findet während der Ausführung des \emph{delayed-ISR} statt.
+Von allen Aufgaben, die der \emph{delayed-ISR} erledigt, sind die
+Speicher-Allozierungen, wahrscheinlich, diejenigen die den Großteil der
+CPU-Zeit beanspruchen. Während des Paket-Empfangs wird im Kontext von
 \emph{delayed-ISR} für jedes empfangene Paket einen neuen Paket-Puffer
 alloziert. Dies rettet die bevor empfangene Pakete von Überschreibung hat aber
-einen Nachteil, der sich in Vergrößerung des pro-Paket Overhead zeigt,
-denn Speicherallozierung ist eine relativ ``teure'' Operation.
+einen Nachteil, der sich in Vergrößerung des pro-Paket Overhead zeigt, denn
+Speicherallozierung ist eine relativ ``teure'' Operation, die höhe Systemlast
+und damit die Paketverluste während Capturing verursachen kann.
+%
+\paragraph{Eine mögliche Lösung:}
+Die Speicherallozierungen lassen sich durch die Anwendung von dem Ring-Buffer
+ersetzen. Der Ring-Buffer ist eine Datenstruktur, die ein Array mit den zwei
+Zeiger: \emph{HEAD} and \emph{TAIL} präsentiert. Das Besondere am Ring-Buffer
+ist es, dass er eine feste Größe hat und die Speicherbereiche die er verwaltet,
+nur ein mal alloziert und dann ein nach einander beschrieben und gelesen
+werden. Dabei, zeigt \emph{HEAD} auf den nächsten freien Speicherbereich, der
+beschrieben wird. \emph{TAIL} zeigt auf den zuletzt gelesenen Bereich. Im
+Unterschied zum normalen Array werden die ältesten Inhalte überschrieben, wenn
+der Ring-Buffer voll ist und weitere Elemente abgelegt werden.
 %
 \ifthenelse{\boolean{BRIEF}}{}{
 %
@@ -613,10 +625,18 @@ längere Ausführungszeiten. Deshalb eliminiert das möglichst frühe Ausführen
 Filterung  das unnötiges Kopieren von Daten, die anhand der vorhandenen
 Filterregeln nicht akzeptiert wurden.\\\\
 %
-Der Performance-Nachteil des klassischen BPF-Models besteht darin, dass es die
-``teure'' Paket-Kopier-Operationen im Kernelspace hat und für den Übertragung
-der Pakete in den Userspace die Systemaufrufe anfordert, was eine
+Der Performance-Nachteil des vorgestellten BPF-Models besteht darin, dass es
+die ``teure'' Paket-Kopier-Operationen im Kernelspace hat und für den
+Übertragung der Pakete in den Userspace die Systemaufrufe anfordert, was eine
 Kopier-Operation mit dem Ausführung-Kontextwechsel beeinflusst.
+%
+\paragraph{Eine mögliche Lösung:}
+Die Kopier-Operationen und Systemaufruf lassen sich durch die Memory-Mapping
+eliminieren. Wenn die Paket-Puffer in den Address-Raum einer
+Capturing-Anwendung eingeblendet werden, dann braucht diese Anwendung keine
+Kopier-Operationen und keine Systemaufrufe mehr, um auf die Pakete zugreifen zu
+können. Dafür muss aber ein Synchronisation-Verfahren erarbeitet werden, wenn
+die mehrere Prozesse auf den gleichen Paket-Puffer zugreifen wollen.
 
 \subsubsection{Libpcap}\label{sec:libpcap}
 Libpcap ist eine Programm-Bibliothek, die eine Menge von Funktionen zum
@@ -682,7 +702,7 @@ Puffer liegen, erarbeitet werden.
 Betrachten wir noch mal den in Abbildung~\ref{bsd_cap_stack} dargestellten
 Capturing-Stack des aktuellen FreeBSD. Stellen wir uns den Fall vor, wenn alle
 Pakete durch die BPF-Filterung akzeptiert sind. Dann gibt es pro Paket drei
-Kopier-Operationen:
+Kopier-Vorgänge:
 \begin{enumerate}
 \item DMA Transfer in den RAM
 	\begin{itemize}
@@ -695,7 +715,7 @@ Kopier-Operationen:
 \item Kopieren in Userspace
 	\begin{itemize}
 		\item ist durch den Systemaufruf \emph{read(2)} erledigt, und verursacht damit
-			ein Ausführungskontext-Wechsel
+			ein Kontext-Wechsel
 	\end{itemize}
 \end{enumerate}
 Die erste Kopier-Operation, die durch DMA-Transfer erledigt wird, ist
@@ -707,24 +727,15 @@ Kontext-Wechsel stellen ein Flaschenhals im Capturing-System, falls die Rate
 der ankommenden Pakete nah zu $1GBit/sec$ oder höher steigt (siehe Abschnitt
 \ref{sec:test_ergebnisse}~Ergebnisse).\\\\
 %
-Die Kopier-Operationen lassen sich durch die Memory-Mapping eliminieren. Wenn
-die Paket-Puffer in den Address-Raum einer Capturing-Anwendung eingeblendet
-werden, dann braucht diese Anwendung keine Kopier-Operationen und keine
-Systemaufrufe mehr, um auf die Pakete zugreifen zu können. Dafür muss aber ein
-Synchronisation-Verfahren erarbeitet werden, wenn die mehrere Prozesse auf den
-gleichen Paket-Puffer zugreifen wollen.\\\\
-%
-Die Speicherallozierungen lassen sich durch die Anwendung von dem Ring-Buffer
-ersetzen. Der Ring-Buffer ist eine Datenstruktur, die ein Array mit den zwei
-Zeiger: \emph{HEAD} and \emph{TAIL} präsentiert. Das Besondere am Ring-Buffer
-ist es, dass er eine feste Größe hat und die Speicherbereiche die er verwaltet,
-nur ein mal alloziert und dann ein nach einander beschrieben und gelesen
-werden. Dabei, zeigt \emph{HEAD} auf den nächsten freien Speicherbereich, der
-beschrieben wird. \emph{TAIL} zeigt auf den zuletzt gelesenen Bereich. Im
-Unterschied zum normalen Array werden die ältesten Inhalte überschrieben, wenn
-der Ring-Buffer voll ist und weitere Elemente abgelegt werden.
-%
-
+Die bestehende Probleme lassen sich durch die Anwendung von
+\textbf{Memory-Mapped}-Buffers und \textbf{Ring-Buffer} eliminieren.
+Memory-Mapping eliminiert die Notwendigkeit der Kopier-Operationen und der
+Systemaufrufe.  Die Anwendung des Ring-Buffer eliminiert die
+Speicherallozierungen. Da die Kopier-Operationen, Systemaufrufe und
+Speicherallozierungen, sind die Operationen, welche mit dem Unterschied zu den
+anderen sehr große Menge von System-Ressourcen anfordern, soll die Eliminierung
+dieser Operationen die Capturing-Performance erhöhen (siehe Ergebnisse der 
+Messungen~\ref{sec:test_ergebnisse}).
 \newpage
 \ifthenelse{\boolean{BRIEF}}{
 \section{Anforderungen für den neuen Capturing-Stack}\label{sec:anf_for_entwurf}
@@ -732,19 +743,20 @@ der Ring-Buffer voll ist und weitere Elemente abgelegt werden.
 \subsubsection{Anforderungen für den Entwurf}\label{sec:anf_for_entwurf}
 }
 \subsection{Eliminierung der Kopier-Operationen}
-Die zwei Paket-Kopie-Operationen, vom Paket-Puffer in den BPF-Puffer und vom
+Die zwei Paket-Kopier-Operationen, vom Paket-Puffer in den BPF-Puffer und vom
 BPF-Puffer in den Puffer des Userspace-Anwendung, sollen eliminiert werden
 (Abbildung \ref{img:new_stack}) Die Pakete sollen sofort nach dem DMA-Transfer
 im virtuellen Speicher des User-Capturing-Prozesses zugreifbar sein. Dafür
-sollen die Paket-Puffer in den Adressraum der Capturing-Anwendung eingeblendet
+müssen die Paket-Puffer in den Adressraum der Capturing-Anwendung eingeblendet
 werden. Das entsprechende Synchronisationssverfahren muss für den Zugriff auf 
-Paket-Puffer und auf $HEAD/TAIL$-Pointers erarbeitet werden.
+Paket-Puffer erarbeitet werden.
 %
 \subsection{Eliminierung der Speicherallozierungen}
 Keine neue Paket-Puffer sollen für die neue ankommende Pakete alloziert werden. 
 Alle Speicherbereiche für die Pakete und \emph{mbuf}'s sollen als Ring-Buffer 
-verwaltet werden. Die ältere Inhalte sollen mit den neuen Daten überschrieben 
+verwaltet werden. Die ältere Inhalte werden mit den neuen Daten überschrieben 
 werden, wenn der Ring-Buffer voll ist. 
+
 \subsection{Keine Systemaufrufe für den Zugriff auf Pakete}
 Es sollen möglichst keine Systemaufrufe während Capturing auftreten, denn die
 Systemaufrufe verursachen den Ausführungs-Kontextwechsel, was relativ zu den
@@ -778,19 +790,18 @@ receive-queue, ausgeführt werden}
 Die Funktionalität des neuen Capturing-Stacks soll für die standard Anwendungen
 möglichst unsichtbar sein. Das heißt, die standard Funktionen des
 Netzwerktreibers, Protokoll-Stacks, BPF's sollen nicht durch die Anwesenheit
-von \emph{ringmap} gestört werden. In einem \emph{default} Zustand sollen die
-standard Funktionen des Betriebssystem aktiviert werden.  Das Aktivieren des
-\emph{ringmap} soll z.B. über ein Systemaufruf realisiert werden. Dabei im
-\emph{ringmap}-Modus können Protokoll-Stack und standard Packet-Capturing-Stack
-deaktiviert werden. Das zurücksetzen des System in den default-Mode soll auch
-ohne Rekompilation und ohne System-Neustart möglich sein.\\\\
+von \emph{ringmap} gestört werden. Das Aktivieren des \emph{ringmap} soll z.B.
+über ein Systemaufruf realisiert werden. Dabei im \emph{ringmap}-Modus können
+Protokoll-Stack und standard Packet-Capturing-Stack deaktiviert werden. Das
+zurücksetzen des System in den default-Mode soll auch ohne Rekompilation und
+ohne System-Neustart möglich sein.\\\\
 %
-Standard-FreeBSD-Capturing-Stack die empfangene Pakete den Userspace-Prozessen
-zur Verfügung stellt, müssen die Userspace-Prozesse anders auf die Pakete
-zugreifen. Um der neue Stack einsetzbar zu machen soll am besten die
-Libpcap-Library für ihn angepasst werden, sodass für alle
-Capturing-Anwendungen, die auf Libpcap basieren, keine Änderungen benötigt
-werden. 
+Da der \emph{ringmap} anders als der standard FreeBSD-Capturing-Stack die
+empfangene Pakete den Userspace-Prozessen zur Verfügung stellen sollte, müssen
+die Userspace-Prozesse anders auf die Pakete zugreifen. Um der neue Stack
+einsetzbar zu machen soll am besten die Libpcap-Library für ihn angepasst
+werden, sodass für alle Capturing-Anwendungen, die auf Libpcap basieren, keine
+Änderungen benötigt werden. 
 
 \begin{figure}
 	\begin{center}
