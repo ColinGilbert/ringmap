@@ -462,18 +462,18 @@ erlaubt, für die Threads-Gruppen eine bestimmte CPU zu zuweisen.
 }
 \subsection{Softwareaspekte beim Capturing}\label{subsec:sw_cap}
 In FreeBSD besteht der Capturing-Stack aus mehreren Komponenten.  Das sind der
-Netzwerk-Treiber, die Software für die Paketfilterung und die
+Netzwerk-Treiber, die Software für die Paketfilterung (BPF\footnote{Berkley
+Packet Filter~\cite{bpf_wiki, man_bpf, man_kernel_bpf}}) und die
 User-Anwendungen, die ggf.  Libpcap-Funktionen für den Zugriff auf empfangene
 Pakete benutzen (siehe Abbildung \ref{bsd_cap_stack}).\\\\
 %
 Beim Capturing wird jedes aus dem Netz empfangene Paket zuerst in den internen
 Speicher des Netzwerk-Adapters kopiert. Sobald es möglich ist, macht der
 Adapter den DMA-Transfer der vorhandenen Pakete in den RAM und meldet dies
-durch ein Interrupt. Weiter werden die Paket-Daten von der Paketfilter-Software
-(BPF\footnote{Berkley Packet Filter~\cite{bpf_wiki, man_bpf, man_kernel_bpf}})
-bearbeitet. Nach der Bearbeitung bzw.  Filterung werden die Pakete von einer
-Userspace-Anwendung geholt, weiterbearbeitet und eventuell auf der Festplatte
-gespeichert oder ggf. auf dem Terminal dargestellt.
+durch ein Interrupt. Weiter werden die Paket-Daten vom BPF bearbeitet. Nach der
+Bearbeitung bzw.  Filterung werden die Pakete von einer Userspace-Anwendung
+geholt, weiterbearbeitet und eventuell auf der Festplatte gespeichert oder ggf.
+auf dem Terminal dargestellt.
 \begin{figure}
 \centering \includegraphics[width=5.1in]{bilder/3copy}
 \caption{FreeBSD Packet Capturing Stack}
@@ -484,32 +484,31 @@ gespeichert oder ggf. auf dem Terminal dargestellt.
 Die erste Komponente des Packet-Capturing Stacks (siehe Abbildung
 \ref{bsd_cap_stack}) ist der Netzwerk-Treiber. Für jedes empfangene Packet wird
 beim Treiber einen neuen Paket-Puffer im RAM alloziert. Nachdem ein Paket vom
-Netzwerk-Adapter in den Paket-Puffer kopiert wurde, meldet der Adapter
+Netzwerk-Controller in den Paket-Puffer kopiert wurde, meldet der Controller
 die Anwesenheit von neuen Daten im RAM durch ein Interrupt, und verursacht damit den
 Aufruf der \emph{Interrupt-Service-Routine} (ISR).\\\\ 
 %
-Da die Interruptbehandlung mit der höchste Priorität ausgeführt wird, sind alle
-derzeit laufenden Prozesse auf der aktuellen CPU unterbrochen. Dies kann das
-Capturing-Performance negativ beeinflussen, wenn die Interruptbehandlung zu
+Da die Interruptbehandlung mit der höchsten Priorität ausgeführt wird, sind
+alle derzeit laufenden Prozesse auf der aktuellen CPU unterbrochen. Dies kann
+das Capturing-Performance negativ beeinflussen, wenn die Interruptbehandlung zu
 große  Ausführungszeit hat. Die andere Software-Komponenten, die auf die
 empfangene Pakete zugreifen wollen, können in dem Fall nicht genügend
-CPU-Zyklen bekommen, denn sie mit der geringeren Priorität ausgeführt sind.
-Dies kann zu den vollen Paket-Puffer und als Ergebnis zu den Paketverlusten
-führen~\cite{elim_recv_lock}. Deshalb ist es für die Vermeidung von
-Paketverlusten sehr wichtig, dass die Interruptbehandlung-Funktionen effizient
-implementiert sind und dadurch möglichst kurze Ausführungszeiten haben.\\\\
+CPU-Zyklen bekommen.  Dies kann zu den vollen Paket-Puffer und als Ergebnis zu
+den Paketverlusten führen~\cite{elim_recv_lock}. Deshalb ist es sehr wichtig,
+dass die Interruptbehandlung-Funktionen effizient implementiert sind und
+dadurch möglichst kurze Ausführungszeiten haben.\\\\
 %
 Die Interruptbehandlung wird in zwei Phasen ausgeführt: die eigentliche ISR und
 \emph{delayed-ISR}. Die ISR dient nur zum Herausfinden der Ursache des
 Interrupts und Planen der delayed-ISR. Die größte Rechenaufwand bei der
 Interruptbehandlung findet während der Ausführung des \emph{delayed-ISR}
-(Kernel-Thread) statt. Von allen Aufgaben, die der \emph{delayed-ISR} erledigt,
+statt. Von allen Aufgaben, die der \emph{delayed-ISR} erledigt,
 sind die Speicher-Allozierungen, wahrscheinlich, diejenigen die den Großteil
 der CPU-Zeit beanspruchen. Während des Paket-Empfangs wird im Kontext von
 \emph{delayed-ISR} für jedes empfangene Paket einen neuen Paket-Puffer
 alloziert. Dies rettet die bevor empfangene Pakete von Überschreibung hat aber
 einen Nachteil, der sich in Vergrößerung des pro-Paket Overhead zeigt,
-denn Speicherallozierung ist relativ ``teure'' Operation.
+denn Speicherallozierung ist eine relativ ``teure'' Operation.
 %
 \ifthenelse{\boolean{BRIEF}}{}{
 %
@@ -595,16 +594,14 @@ Der BPF ist die nächste Komponente des FreeBSD Packet-Capturing-Stacks. Der BPF
 registriert im System für jeden Prozess, der die Pakete erfassen will ein
 symbolisches Device: \verb+/dev/bpf[0-9]+, und bietet dazu eine Menge von
 Systemaufrufen (read, ioctl, etc\ldots) für den Zugriff auf die Pakete und zur
-Steuerung der Paketfilterung.  Außerdem stellt BPF eine Menge von
-Kernel-Funktionen zur Verfügung, die aus dem Treiber aufgerufen werden und die
-eigentliche Filterung und Weiterleitung des Paketes durch Capturing-Stack zum
-User-Prozess ausführen~\cite{man_kernel_bpf, man_bpf, bpf_paper}.\\\\
+Steuerung der Paketfilterung~\cite{man_kernel_bpf, man_bpf, bpf_paper}.\\\\
 %
-Die Pakete werden vom BPF gefiltert, und diejenigen, die durch die Filterregeln
-akzeptiert wurden, werden in den STORE-HOLD-Puffer kopiert (siehe Abbildung
-\ref{bsd_cap_stack}).  Aus dem STORE-HOLD-Puffer werden die Pakete durch den
-\emph{read}-Systemaufruf in Userspace übertragen\footnote{Die genaue Beschreibung
-ist in \emph{bpf(9)} Manual~\cite{man_kernel_bpf} und in den Papers von Fabian
+Die in den Paket-Puffern befindliche Pakete werden vom BPF gefiltert, und
+diejenigen, die durch die Filterregeln akzeptiert wurden, werden in den
+STORE-HOLD-Puffer kopiert (siehe Abbildung \ref{bsd_cap_stack}).  Aus dem
+STORE-HOLD-Puffer werden die Pakete durch den \emph{read}-Systemaufruf in
+Userspace übertragen\footnote{Die genaue Beschreibung ist in \emph{bpf(9),
+bpf(4)} Manuals~\cite{man_kernel_bpf, man_bpf} und in den Papers von Fabian
 Schneider~\cite{fabian_da, pcin10gb_paper} zu finden.}.\\\\
 %
 Der BPF wird auf dem aktuellen FreeBSD vollkommen in Kernelspace ausgeführt.
@@ -628,12 +625,12 @@ bekannte Sniffer wie \emph{tcpdump} oder \emph{Wireshark} benutzen Libpcap für
 Packet-Capturing.  Auf FreeBSD benutzen die Libpcap-Funktionen  selber
 BPF-Systemaufrufe für die Paketfilterung und für Zugriff auf gefilterte Pakete,
 und stellen den User-Anwendungen eine bequeme und einfache Schnittstelle für
-Capturing.\\\\
+den Paketenzugriff.\\\\
 %
 Während Packet-Capturing sind die Aufgaben der Libpcap-Funktionen, die Pakete in den
 Userspace zu holen und den Anwendungen, die auf die Pakete zugreifen wollen einen
 Pointer auf Paketpuffer zu übergeben. Dabei besteht keinen großen Overhead, der 
-sich deutlich reduzieren lässt. 
+sich deutlich reduzieren lässt.
 
 
 \subsection{Namenskonventionen}
@@ -689,7 +686,7 @@ Kopier-Operationen:
 \begin{enumerate}
 \item DMA Transfer in den RAM
 	\begin{itemize}
-		\item ist mit Hilfe der Hardware erledigt
+		\item ist mit Hilfe der Hardware realisiert
 	\end{itemize}
 \item Kopieren in STORE-HOLD-Puffer
 	\begin{itemize}
@@ -704,7 +701,7 @@ Kopier-Operationen:
 Die erste Kopier-Operation, die durch DMA-Transfer erledigt wird, ist
 unvermeidlich und nicht optimierbar\footnote{Eigentlich lässt sich der
 DMA-Transfer der Paket-Daten in den RAM durch bestimmte Interrupt-Moderation
-Einstellungen begrenzt optimieren~\cite{e1000_sdm}}. Aber die restlichen zwei
+Einstellungen begrenzt optimieren~\cite{e1000_sdm}}. Die restlichen zwei
 Kopier-Operationen, ständiges Speicherallozierung für jedes neue Paket und der
 Kontext-Wechsel stellen ein Flaschenhals im Capturing-System, falls die Rate
 der ankommenden Pakete nah zu $1GBit/sec$ oder höher steigt (siehe Abschnitt
@@ -715,17 +712,17 @@ die Paket-Puffer in den Address-Raum einer Capturing-Anwendung eingeblendet
 werden, dann braucht diese Anwendung keine Kopier-Operationen und keine
 Systemaufrufe mehr, um auf die Pakete zugreifen zu können. Dafür muss aber ein
 Synchronisation-Verfahren erarbeitet werden, wenn die mehrere Prozesse auf den
-gleichen Paket-Puffer zugreifen werden.\\\\
+gleichen Paket-Puffer zugreifen wollen.\\\\
 %
 Die Speicherallozierungen lassen sich durch die Anwendung von dem Ring-Buffer
-ersetzen. Der Ring-Buffer präsentiert eine constante Menge der preallozierten
-Speicherbereichen und zwei Zeiger: \emph{HEAD} and \emph{TAIL}. Das Besondere am
-Ring-Buffer ist es, dass er eine feste Größe hat und die Speicherbereiche die er
-verwaltet, nur ein mal alloziert und dann ein nach einander beschrieben und
-gelesen werden. Dabei, zeigt \emph{HEAD} auf den nächsten freien
-Speicherbereich, der beschrieben wird. \emph{TAIL} zeigt auf den zuletzt
-gelesenen Bereich. Im Unterschied zum normalen Array werden die ältesten Inhalte
-überschrieben, wenn der Ring-Buffer voll ist und weitere Elemente abgelegt werden.
+ersetzen. Der Ring-Buffer ist eine Datenstruktur, die ein Array mit den zwei
+Zeiger: \emph{HEAD} and \emph{TAIL} präsentiert. Das Besondere am Ring-Buffer
+ist es, dass er eine feste Größe hat und die Speicherbereiche die er verwaltet,
+nur ein mal alloziert und dann ein nach einander beschrieben und gelesen
+werden. Dabei, zeigt \emph{HEAD} auf den nächsten freien Speicherbereich, der
+beschrieben wird. \emph{TAIL} zeigt auf den zuletzt gelesenen Bereich. Im
+Unterschied zum normalen Array werden die ältesten Inhalte überschrieben, wenn
+der Ring-Buffer voll ist und weitere Elemente abgelegt werden.
 %
 
 \newpage
