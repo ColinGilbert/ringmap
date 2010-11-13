@@ -464,12 +464,12 @@ erlaubt, für die Threads-Gruppen eine bestimmte CPU zu zuweisen.
 In FreeBSD besteht der Capturing-Stack aus mehreren Komponenten.  Das sind der
 Netzwerk-Treiber, die Software für die Paketfilterung (BPF\footnote{Berkley
 Packet Filter~\cite{bpf_wiki, man_bpf, man_kernel_bpf}}) und die
-User-Anwendungen, die ggf.  Libpcap-Funktionen für den Zugriff auf empfangene
+Userspace-Anwendungen, die ggf.  Libpcap-Funktionen für den Zugriff auf empfangene
 Pakete benutzen (siehe Abbildung \ref{bsd_cap_stack}).\\\\
 %
 Beim Capturing wird jedes aus dem Netz empfangene Paket zuerst in den internen
-Speicher des Netzwerk-Adapters kopiert. Sobald es möglich ist, macht der
-Adapter den DMA-Transfer der vorhandenen Pakete in den RAM und meldet dies
+Speicher des Netzwerkcontrollers kopiert. Sobald es möglich ist, macht der
+Controller den DMA-Transfer der vorhandenen Pakete in den RAM und meldet dies
 durch ein Interrupt. Weiter werden die Paket-Daten vom BPF bearbeitet. Nach der
 Bearbeitung bzw.  Filterung werden die Pakete von einer Userspace-Anwendung
 geholt, weiterbearbeitet und eventuell auf der Festplatte gespeichert oder ggf.
@@ -481,12 +481,12 @@ auf dem Terminal dargestellt.
 \end{figure}
 %
 \subsubsection{Interruptbehandlung}\label{sec:intr_behandlung}
-Die erste Komponente des Packet-Capturing Stacks (siehe Abbildung
-\ref{bsd_cap_stack}) ist der Netzwerk-Treiber. Für jedes empfangene Packet wird
-beim Treiber einen neuen Paket-Puffer im RAM alloziert. Nachdem ein Paket vom
-Netzwerk-Controller in den Paket-Puffer kopiert wurde, meldet der Controller
-die Anwesenheit von neuen Daten im RAM durch ein Interrupt, und verursacht damit den
-Aufruf der \emph{Interrupt-Service-Routine} (ISR).\\\\ 
+Die erste Komponente des Packet-Capturing Stacks ist der Netzwerk-Treiber
+(siehe Abbildung \ref{bsd_cap_stack}). Für jedes empfangene Packet wird beim
+Treiber einen neuen Paket-Puffer im RAM alloziert. Nachdem ein Paket vom
+Netzwerkcontroller in den Paket-Puffer kopiert wurde, meldet der Controller
+die Anwesenheit von neuen Daten im RAM durch ein Interrupt, und verursacht
+damit den Aufruf der \emph{Interrupt-Service-Routine} (ISR).\\\\ 
 %
 Da die Interruptbehandlung mit der höchsten Priorität ausgeführt wird, sind
 alle derzeit laufenden Prozesse auf der aktuellen CPU unterbrochen. Dies kann
@@ -511,7 +511,7 @@ einen Nachteil, der sich in Vergrößerung des pro-Paket Overhead zeigt, denn
 Speicherallozierung ist eine relativ ``teure'' Operation, die höhe Systemlast
 und damit die Paketverluste während Capturing verursachen kann.
 %
-\paragraph{Eine mögliche Lösung:}
+\paragraph*{Eine mögliche Lösung:}
 Die Speicherallozierungen lassen sich durch die Anwendung von dem Ring-Buffer
 ersetzen. Der Ring-Buffer ist eine Datenstruktur, die ein Array mit den zwei
 Zeiger: \emph{HEAD} and \emph{TAIL} präsentiert. Das Besondere am Ring-Buffer
@@ -630,7 +630,7 @@ die ``teure'' Paket-Kopier-Operationen im Kernelspace hat und für den
 Übertragung der Pakete in den Userspace die Systemaufrufe anfordert, was eine
 Kopier-Operation mit dem Ausführung-Kontextwechsel beeinflusst.
 %
-\paragraph{Eine mögliche Lösung:}
+\paragraph*{Eine mögliche Lösung:}
 Die Kopier-Operationen und Systemaufruf lassen sich durch die Memory-Mapping
 eliminieren. Wenn die Paket-Puffer in den Address-Raum einer
 Capturing-Anwendung eingeblendet werden, dann braucht diese Anwendung keine
@@ -725,7 +725,7 @@ Einstellungen begrenzt optimieren~\cite{e1000_sdm}}. Die restlichen zwei
 Kopier-Operationen, ständiges Speicherallozierung für jedes neue Paket und der
 Kontext-Wechsel stellen ein Flaschenhals im Capturing-System, falls die Rate
 der ankommenden Pakete nah zu $1GBit/sec$ oder höher steigt (siehe Abschnitt
-\ref{sec:test_ergebnisse}~Ergebnisse).\\\\
+\ref{sec:erg_verg}~Ergebnisse).\\\\
 %
 Die bestehende Probleme lassen sich durch die Anwendung von
 \textbf{Memory-Mapped}-Buffers und \textbf{Ring-Buffer} eliminieren.
@@ -735,10 +735,10 @@ Speicherallozierungen. Da die Kopier-Operationen, Systemaufrufe und
 Speicherallozierungen, sind die Operationen, welche mit dem Unterschied zu den
 anderen sehr große Menge von System-Ressourcen anfordern, soll die Eliminierung
 dieser Operationen die Capturing-Performance erhöhen (siehe Ergebnisse der 
-Messungen~\ref{sec:test_ergebnisse}).
+Messungen~\ref{sec:erg_verg}).
 \newpage
 \ifthenelse{\boolean{BRIEF}}{
-\section{Anforderungen für den neuen Capturing-Stack}\label{sec:anf_for_entwurf}
+\section{Anforderungen für den neuen ringmap Capturing-Stack}\label{sec:anf_for_entwurf}
 }{
 \subsubsection{Anforderungen für den Entwurf}\label{sec:anf_for_entwurf}
 }
@@ -777,14 +777,14 @@ anderen Operationen, eine sehr große Menge von System-Ressourcen anfordert.
 				Paketen für das Blockieren des auf die Pakete wartenden
 				Prozesses erlaubt. 
 		\end{itemize}
-\subsection{Eine Userspace-Capturing-Anwendung pro Netzwerk-Interface}
-Wir begrenzen uns auf nur eine gleichzeitig aktive
-Userspace-Capturing-Anwendung pro Netzwerk-Interface, um den Entwurf und die
-Implementierung einfach zu halten. Außerdem, die Vergrösserung der Menge der
-Anwendungen, welche von dem gleichen Interface die Pakete erfassen, erhöht
-nicht die Capturing-Performance\footnote{Mit der Ausnahme eines Multi-queue
-Controllers, wenn es mehrere Anwendungen parallel, eine Anwendung per
-receive-queue, ausgeführt werden}
+% \subsection{Eine Userspace-Capturing-Anwendung pro Netzwerk-Interface}
+% Wir begrenzen uns auf nur eine gleichzeitig aktive
+% Userspace-Capturing-Anwendung pro Netzwerk-Interface, um den Entwurf und die
+% Implementierung einfach zu halten. Außerdem, die Vergrösserung der Menge der
+% Anwendungen, welche von dem gleichen Interface die Pakete erfassen, erhöht
+% nicht die Capturing-Performance\footnote{Mit der Ausnahme eines Multi-queue
+% Controllers, wenn es mehrere Anwendungen parallel, eine Anwendung per
+% receive-queue, ausgeführt werden}
 
 \subsection{Transparenz}
 Die Funktionalität des neuen Capturing-Stacks soll für die standard Anwendungen
@@ -793,7 +793,7 @@ Netzwerktreibers, Protokoll-Stacks, BPF's sollen nicht durch die Anwesenheit
 von \emph{ringmap} gestört werden. Das Aktivieren des \emph{ringmap} soll z.B.
 über ein Systemaufruf realisiert werden. Dabei im \emph{ringmap}-Modus können
 Protokoll-Stack und standard Packet-Capturing-Stack deaktiviert werden. Das
-zurücksetzen des System in den default-Mode soll auch ohne Rekompilation und
+zurücksetzen des System in den default-Mode soll auch ohne Rekompilieren und
 ohne System-Neustart möglich sein.\\\\
 %
 Da der \emph{ringmap} anders als der standard FreeBSD-Capturing-Stack die

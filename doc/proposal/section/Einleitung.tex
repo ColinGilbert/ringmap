@@ -52,11 +52,6 @@ Software-Voraussetzungen für die Diplomarbeit angeben.
 \item[Packet-Capturing] nennen wir den Prozess des Empfangens, Filterns und ggf.
 	Darstellens des Datenverkehrs aus einem Netzwerk.
 
-\item [Capturing-System] ist ein Rechnersystem mit der Software, die für
-	Packet-Capturing benötigt wird. \ifthenelse{\boolean{BRIEF}}{}{  In der Abbildung \ref{img:Cap-Sys} sind
-	die Hardware-Komponente eines Capturing-Systems dargestellt.} Das sind:
-	Netzwerkadapter, RAM, CPU, Hintergrundspeicher und Terminal. 
-
 \item [Packet-Capturing-Stack] ist die Software, die für Capturing benötigt
 	wird. Sie kann  aus mehreren Komponenten bestehen. Im Betriebssystem
 	FreeBSD sind diese Komponenten sowohl im Kern des Betriebssystem
@@ -64,12 +59,18 @@ Software-Voraussetzungen für die Diplomarbeit angeben.
 	Programm-Bibliotheken wie \emph{libpcap}~\cite{man_pcap}
 	implementiert.
 
+\item [Capturing-System] ist ein Rechnersystem mit der Software, die für
+	Packet-Capturing benötigt wird. \ifthenelse{\boolean{BRIEF}}{}{  In der Abbildung \ref{img:Cap-Sys} sind
+	die Hardware-Komponente eines Capturing-Systems dargestellt. Das sind:
+	Netzwerkadapter, RAM, CPU, Hintergrundspeicher und Terminal.} 
+
 \item [Capturing-Performance] ist die Anzahl von Paketen, die das
 	Capturing-System pro einer bestimmten Zeiteinheit aufnehmen, bearbeiten,
 	und speichern kann.
 
 \end{description}
 
+\newpage
 \subsection{Hardware- und Software-Voraussetzungen} \label{sec:hwsw_voraus}
 \ifthenelse{\boolean{BRIEF}}{
 Für das Projekt sind folgende Hardware und Software vorausgesetzt:

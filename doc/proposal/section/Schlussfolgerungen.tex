@@ -57,14 +57,14 @@ haben.
 \subsection{Erreichte Ziele}
 
 \subsubsection{Verbesserung der Capturing-Performance}
-Beim Einsatz des im Rahmen des Projektes implementierten
-\emph{ringmap}-Stacks wird die Capturing-Performance unter gleichen Bedingungen
-höher als beim \emph{generic}-Stack. Die \textbf{Systemload} beim Capturing mit
-dem \emph{ringmap}-Stack ist deutlich geringer als mit dem \emph{generic}-Stack.
-Bei allen durchgeführten Experimenten war die Systemload beim Capturing mit dem
-\emph{ringmap} kleiner als $12\%$. Die Systemload bei der Verwendung von
-\emph{generic}-Stack variiert von $13\%$ bis $100\%$. Bezüglich der
-Systemload zeigt der \emph{ringmap} einen deutlichen Gewinn.\\\\
+Beim Einsatz des im Rahmen des Projektes implementierten \emph{ringmap}-Stacks
+wird die Capturing-Performance unter gleichen Bedingungen höher als beim
+\emph{generic}-Stack\ref{sec:erg_verg}. Die \textbf{Systemload} beim Capturing
+mit dem \emph{ringmap}-Stack ist deutlich geringer als mit dem
+\emph{generic}-Stack.  Bei allen durchgeführten Experimenten war die Systemload
+beim Capturing mit dem \emph{ringmap} kleiner als $12\%$. Die Systemload bei
+der Verwendung von \emph{generic}-Stack variiert von $13\%$ bis $100\%$.
+Bezüglich der Systemload zeigt der \emph{ringmap} einen deutlichen Gewinn.\\\\
 %
 Anders sieht es mit den \textbf{Paketverlusten} aus. Beide Stacks zeigen
 identisch gute ($100\%$) Paketerfassungsrate für den Fall wenn die Paketgröße
@@ -115,17 +115,13 @@ Die Benutzung der \emph{ringmap}-Software verursacht auf dem Capturing-System
 		Monitoring-Mode gesetzt werden. Aus diesem Grund besteht keine 
 		Möglichkeit, das gleiche Interface gleichzeitig für Capturing 
 		und Kommunikation zu nutzen.
-	\item [Libpcap Einschränkungen:] Für das Anpassen der Libpcap an den \emph{ringmap}-Stack wurden einige Code-Stücke im
-		Libpcap-Quell-Code auskommentiert oder ersetzt. Dadurch ist die
-		Funktionalität der neuen \emph{ringmap}-Libpcap ist nicht mit
-		der \emph{generic}-Libpcap identisch. Aus der
-		\emph{generic}-Libpcap sind die Funktionalität entfernt, welche den
-		BPF im Kernelspace anfordern. Außerdem wurde der
-		\verb+to_ms+-Parameter~\cite{man_pcap} für die
-		\verb+pcap_open_live()+-Funktion deaktiviert, aber aus 
-		Kompatibilitätsgründen geblieben. Beim
-		Capturing mit dem \emph{ringmap}-Stack blockiert der Userspace-Prozess wenn
-		es keine neue Pakete mehr gibt, bis  weitere Pakete ankommen.
+	\item [Libpcap Einschränkungen:] Für das Anpassen der Libpcap an den
+		\emph{ringmap}-Stack wurden einige Code-Stücke im Libpcap-Quell-Code
+		modifiziert. Dadurch ist die Funktionalität der neuen
+		\emph{ringmap}-Libpcap ist nicht mit der \emph{generic}-Libpcap
+		identisch. Der \verb+to_ms+-Parameter~\cite{man_pcap} für die
+		\verb+pcap_open_live()+-Funktion ist deaktiviert, aber aus
+		Kompatibilitätsgründen geblieben.
 \end{description}
 Alle genannte Einschränkungen sind  in dem Sinne nicht kritisch, dass 
 sie sich eliminieren oder, für bestimmte Anforderungen, anpassen lassen. 
@@ -135,18 +131,15 @@ Weiterentwicklung des Projektes habe ich großes Interesse und biete meine Hilfe
 
 \subsection{Zukünftige Themen}
 \subsubsection{Performance-Vergleich mit dem Zero-Copy-BPF-Buffers}
-Im Lauf der Test-Phase der Diplomarbeit, war der \emph{Zero-Copy-BPF-Buffers}
+Im Lauf der Test-Phase des Projektes, war der \emph{Zero-Copy-BPF-Buffers}
 Projekt noch im alpha-Stadium und nicht bereit für das Testen (siehe Abschnitt
 \ref{sec:verw_bpf}). Inzwischen ist der Zero-Copy-BPF-Buffers in der neusten
 FreeBSD-8.0-Version vorhanden und soll stabil sein. Daher soll die Auswertung 
 von Zero-Copy-BPF-Buffers der nächste Schritt sein.
 \subsubsection{10Gbit Capturing}
-Der Source-Code des \textbf{ixgbe}-Adapter-Treibers~\cite{10gbit_adapter_bsd}
-für 10-Gigabit-Netzwerkanschlüsse\footnote{\textbf{ixgbe} - Treiber für Intel
-10-Gigabit-Netzwerkadapter} hat eine ähnliche Struktur wie der Source-Code des
-\textbf{em}-Treiber. Deshalb sollte die \emph{ringmap}-Software einfach für den
-10-Gigabit-Treiber anpassbar sein. Dafür muss aber eine Arbeit vom in
-FreeBSD-Kernel-Programming kompetenten Spezialisten geleistet werden, denn
-beide Treiber sind nicht vollkommen identisch, und deshalb sollte dem
-Softwareentwickler alle Details von BSD-Treiber-Programming bekannt werden, um
-die Portierung auf 10Gbit zu machen. Auch hierzu biete ich meine Hilfe an.\\\\
+Die moderne 10GbE Netzwerkadapter besitzen auf dem Chip mehrere \emph{queues} für die
+ankommende und gesendete Pakete. Sie sind auch in der Lage die Trafik zu filtern und 
+die Pakete mit den spezifischen Mustern zu einer oder mehreren \emph{queues} zu zuordnen.\\\\
+%
+Der weitere Schritt des Projektes ist die Erweiterung der ringmap-Funktionalität für die Anwendung 
+auf 10GbE \emph{multi-queue} Controller.
