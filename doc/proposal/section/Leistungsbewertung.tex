@@ -352,7 +352,7 @@ in Abhängigkeit von den folgenden Parameter herauszufinden:
 \end{itemize}
 
 \subsubsection*{Paketverluste in Abhängigkeit von der Anzahl der Slots im  Paket-Ringpuffer}
-\textbf{Das Ziel} dieses Experimentes ist es, die Abhängigkeit der Paketverluste
+\textbf{Das Ziel} dieses Experiments ist es, die Abhängigkeit der Paketverluste
 während Capturing von der Größe des Paket-Ringpuffers (Ring-Buffer)
 herauszufinden. In diesem Experiment ist eine Reihe von Tests durchgeführt. Für
 alle Tests ist der Verkehr mit den kleinsten 64-Bytes Pakete und mit der maximal
@@ -395,7 +395,7 @@ mehr.
 \ifthenelse{\boolean{BRIEF}}{}{   
 \subsubsection*{Performance in Abhängigkeit von der maximalen Anzahl der pro Kernel-
 Thread-Ablauf bearbeitende Paketen: rx\_processing\_limit}
-\textbf{Das Ziel} dieses Experimentes ist es, die optimale Werte für die
+\textbf{Das Ziel} dieses Experiments ist es, die optimale Werte für die
 Variable \verb+rx_processing_limit+ zu finden, bei welchen die Paketverluste
 und die Systemload minimal sind.\\\\
 %
@@ -435,12 +435,12 @@ bei einer Einstellung $>50$ die Systemlast relativ Konstant unter $12\%$ bleibt.
 Die weitere Erhöhung des Wertes bringt keinen Gewinn mehr.
 }
 \subsubsection*{Performance in Abhängigkeit von Paketlänge, Bit-Rate und Paket-Rate}
-\textbf{Das Ziel} des Experimentes ist es, die Abhängigkeit der
+\textbf{Das Ziel} des Experiments ist es, die Abhängigkeit der
 Capturing-Performance von der Paketsgröße und Daten-Rate im Netzverkehr
 herauszufinden.
 %
 \begin{itemize}
-\item Konfiguration auf dem Capturer (\verb+FreeBSD+-Host): 
+\item Konfiguration auf dem Capturer: 
 \begin{itemize}
 	\item \textbf{Hardware:} FreeBSD-2
 	\item \textbf{Betriebssystem:} FreeBSD \textbf{7.2}, \textbf{non-SMP Kernel}
@@ -595,17 +595,17 @@ wahrscheinlich der Grund dafür.
 \end{figure}
 }
 \subsubsection{Vergleich generic- mit ringmap-Paket-Capturing-Stack}\label{sec:erg_verg}
-\textbf{Das Ziel} dieses Testes ist es, die Capturing-Performance von 
+\textbf{Das Ziel} dieses Experiments ist es, die Capturing-Performance von 
 \emph{ringmap}-Capturing-Stack mit dem \emph{generic}-Capturing-Stack
 zu vergleichen.\\\\
 %
-Konfiguration auf dem Capturer (\verb+FreeBSD+-Host): 
+Konfiguration auf dem Capturer: 
 \begin{itemize}
 	\item \textbf{Hardware:} FreeBSD-2 
 	\item \textbf{Betriebssystem:} FreeBSD \textbf{7.2}, \textbf{non-SMP Kernel}
 	\item \textbf{Treiber:} 
 		\begin{itemize}
-			\item Paket-Ringpuffer-Größe: \verb+SLOTS_NUMBER+$=1024$
+			\item Paket-Ringpuffer-Größe: 1024 Slots
 			\item BPF-Puffer-Größe: 10MB
 		\end{itemize}
 \end{itemize}
