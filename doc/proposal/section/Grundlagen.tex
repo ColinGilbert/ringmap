@@ -1,9 +1,9 @@
 %
 In diesem Kapitel werden die für Capturing relevante Aspekte  dargestellt. Es
-wird dabei analysiert bei welchen Capturing-Komponenten unter welchen Umständen
+wird dabei analysiert bei welchen Capturing-Software-Komponenten unter welchen Umständen
 Engpässe bei der Paketerfassung auftretten können. Anhand der herausgefundenen
 Problemen werden Anforderungen und Ansätze für den Entwurf der neuen
-Capturing-Software formuliert.  Zu beachten ist, dass die dargestellten Aspekte
+Capturing-Software formuliert (siehe Kapitel \ref{sec:anf_for_entwurf}).  Zu beachten ist, dass die dargestellten Aspekte
 sich vollkomen auf die für die Arbeit vorausgesetzten Hardware und Software
 beziehen (siehe Abschnitt \ref{sec:hwsw_voraus}).
 %
@@ -466,7 +466,7 @@ FreeBSD-Packet-Capturing-Stack.  In FreeBSD besteht der Capturing-Stack aus
 mehreren Komponenten.  Das sind der \textbf{Netzwerk-Treiber}, die Software für
 die Paketfilterung (\textbf{BPF}\footnote{Berkley Packet Filter~\cite{bpf_wiki,
 man_bpf, man_kernel_bpf}}) und die \textbf{Userspace-Anwendungen}, die ggf.
-Libpcap-Funktionen für den Zugriff auf empfangene Pakete benutzen.\\\\
+\textbf{Libpcap-Funktionen} für den Zugriff auf empfangene Pakete benutzen.\\\\
 %
 Beim Capturing wird jedes aus dem Netz empfangene Paket zuerst in den internen
 Speicher des Netzwerkcontrollers kopiert. Sobald es möglich ist, macht der
@@ -474,14 +474,19 @@ Controller den DMA-Transfer der vorhandenen Pakete in den RAM und meldet dies
 durch ein Interrupt. Weiter werden die Pakete vom BPF gefiltert. Nach der
 Filterung werden die Pakete von einer Userspace-Anwendung geholt,
 weiterbearbeitet und eventuell auf der Festplatte gespeichert oder ggf.  auf
-dem Terminal dargestellt.
+dem Terminal dargestellt.\\\\
+%
+Im weiteren werden die Komponente des standard Packet-Capturing-Stacks einzeln 
+betrachtet und analysiert.
+
+
 \begin{figure}
 \centering \includegraphics[width=5.1in]{bilder/3copy}
 \caption{FreeBSD Packet Capturing Stack}
 \label{bsd_cap_stack}
 \end{figure}
 %
-\subsubsection{Interruptbehandlung}\label{sec:intr_behandlung}
+\subsubsection{Netzwerkl-Treiber: Interruptbehandlung}\label{sec:intr_behandlung}
 Die erste Komponente des Packet-Capturing Stacks ist der Netzwerk-Treiber
 (siehe Abbildung \ref{bsd_cap_stack}). Für jedes empfangene Packet wird der
 Treiber einen neuen \textbf{Paket-Puffer} im RAM allozieren. Nachdem ein Paket
@@ -650,10 +655,10 @@ BPF-Systemaufrufe für die Paketfilterung und für Zugriff auf gefilterte Pakete
 und stellen den Userspace-Anwendungen eine bequeme und einfache Schnittstelle für
 den Paketenzugriff.\\\\
 %
-Während Packet-Capturing sind die Aufgaben der Libpcap-Funktionen, die Pakete in den
-Userspace zu holen und den Anwendungen, die auf die Pakete zugreifen wollen einen
-Pointer auf Paketpuffer zu übergeben. Dabei besteht keinen großen Overhead, der 
-sich deutlich reduzieren lässt.
+Während Packet-Capturing sind die Aufgaben der Libpcap-Funktionen, die Pakete
+in den Userspace zu holen und den Anwendungen, die auf die Pakete zugreifen
+wollen einen Pointer auf Paketpuffer zu übergeben. Dabei besteht keinen großen
+Overhead, der sich deutlich reduzieren lässt.
 
 
 \subsection{Namenskonventionen}
@@ -724,14 +729,14 @@ Kopier-Vorgänge:
 Die erste Kopier-Operation, die durch DMA-Transfer erledigt wird, ist
 unvermeidlich und nicht optimierbar\footnote{Eigentlich lässt sich der
 DMA-Transfer der Paket-Daten in den RAM durch bestimmte Interrupt-Moderation
-Einstellungen begrenzt optimieren~\cite{e1000_sdm}}. Die restlichen zwei
+Einstellungen begrenzt optimieren~\cite{intrr_mod, e1000_sdm}}. Die restlichen zwei
 Kopier-Operationen, ständiges Speicherallozierung für jedes neue Paket und der
 Kontext-Wechsel stellen ein Flaschenhals im Capturing-System, falls die Rate
 der ankommenden Pakete nah zu $1GBit/sec$ oder höher steigt (siehe Abschnitt
 \ref{sec:erg_verg}~Ergebnisse).\\\\
 %
 Die bestehende Probleme lassen sich durch die Anwendung von
-\textbf{Memory-Mapped}-Buffers und \textbf{Ring-Buffer} eliminieren.
+\textbf{Memory-Mapped-Buffers} und \textbf{Ring-Buffer} eliminieren.
 Memory-Mapping eliminiert die Notwendigkeit der Kopier-Operationen und der
 Systemaufrufe.  Die Anwendung des Ring-Buffer eliminiert die
 Speicherallozierungen. Da die Kopier-Operationen, Systemaufrufe und
