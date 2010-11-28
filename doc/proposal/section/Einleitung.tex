@@ -24,7 +24,7 @@ Aber nicht nur die Hardware stellt einen Flaschenhals für die Datenbearbeitung
 in einem Rechnersystem dar. Die Hardwareressourcen können von der Software
 ineffektiv benutzt werden. Zum Beispiel: wenn ein Programm wesentlich mehr
 Operationen ausführt, als zur Lösung des Problems nötig wären, dann erzeugt es
-einen unnötig hohe Systemlast und reduziert damit die Datenmengen, die es in
+eine unnötig hohe Systemlast und reduziert damit die Datenmengen, die es in
 einem Zeitintervall bearbeiten könnte.  \\\\
 %
 \textbf{Das Ziel} dieser Arbeit ist es, die für Capturing relevante Komponente des
@@ -114,11 +114,10 @@ es keine Kopier-Operationen und keine Systemaufrufe für den Paketzugriff mehr
 gebraucht. Da diese Operationen besonders viele CPU Zyklen für ihrer Ausführung
 brauchen, verbessert Zero-Copy-Model die Capturing-Performance.\\\\
 %
-Das Benutzen von Memory-Mapped-Buffers erfordert allerdings ein neues
-Konzept für den Zugriff auf Daten. Deshalb wurden im Rahmen des Projektes auch
-die Libpcap-Funktionen für den Zugriff auf Pakete im Shared-Buffer angepasst.
-Dadurch sind für Capturing-Anwendungen, die auf Libpcap basieren (wie
-\emph{tcpdump}), keine Änderungen erforderlich.
+Das Benutzen von Memory-Mapped-Buffers erfordert allerdings ein neues Konzept
+für den Zugriff auf Daten from Userspace. Deshalb wurden im Rahmen des
+\emph{Zero-Copy} Projektes auch die Libpcap-Funktionen für den Zugriff auf
+Pakete im Shared-Buffer angepasst.
 
 %\begin{figure}
 %	\begin{center}
