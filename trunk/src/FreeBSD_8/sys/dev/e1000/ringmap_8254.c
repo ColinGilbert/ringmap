@@ -8,7 +8,7 @@
 #include <net/if_types.h>
 #include <net/if_media.h>
 
-#include <net/ringmap.h>
+#include "../../net/ringmap.h"
 
 #include "e1000_api.h"
 #include "if_lem.h"

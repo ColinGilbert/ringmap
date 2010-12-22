@@ -7,14 +7,12 @@ then
 	echo "Installing ringmap for FreeBSD-STABLE..."
 	echo
 	sleep 1
-	RINGMAP_BUILD_DIR=../stable_8/sys/modules/ringmap/
-	LIBPCAP_BUILD_DIR=../stable_8/lib/libpcap/
+	RINGMAP_BUILD_DIR=../sys/modules/ringmap/
+	LIBPCAP_BUILD_DIR=../lib/libpcap/
+	LIBPCAP_GENERIC_DIR=/usr/src/lib/libpcap/
 else 
-	echo "Installing ringmap for FreeBSD-CURRENT..."
-	echo
-	sleep 1
-	RINGMAP_BUILD_DIR=../current/sys/modules/ringmap/
-	LIBPCAP_BUILD_DIR=../current/lib/libpcap/
+	echo "Wrong OS"
+	exit 1;
 fi
 
 
