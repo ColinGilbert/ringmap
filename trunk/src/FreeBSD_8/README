@@ -1,0 +1,9 @@
+
+Directories:
+
+contrib		- 	userspace source code
+lib			-	libraries make files 
+scripts		-	scripts for installing ringmap
+sys			- 	kernel code
+
+To install ringmap go to scripts/ and read README
