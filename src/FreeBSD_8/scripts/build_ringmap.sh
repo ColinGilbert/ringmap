@@ -7,14 +7,11 @@ then
 	echo ; echo "Building ringmap for FreeBSD-STABLE..."
 	echo
 	sleep 1
-	RINGMAP_BUILD_DIR=../stable_8/sys/modules/ringmap/
-	LIBPCAP_BUILD_DIR=../stable_8/lib/libpcap/
+	RINGMAP_BUILD_DIR=../sys/modules/ringmap/
+	LIBPCAP_BUILD_DIR=../lib/libpcap/
 else 
-	echo ; 	echo "Building ringmap for FreeBSD-CURRENT..."
-	echo
-	sleep 1
-	RINGMAP_BUILD_DIR=../current/sys/modules/ringmap/
-	LIBPCAP_BUILD_DIR=../current/lib/libpcap/
+	echo "Wrong OS"
+	exit 1
 fi
 
 make_ringmap() {
