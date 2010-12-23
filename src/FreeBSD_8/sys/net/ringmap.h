@@ -6,7 +6,7 @@
 /* 
  * value for number of descriptors (a.k.a. slots in the ringbuffer)
  */
-#define SLOTS_NUMBER		64
+#define SLOTS_NUMBER		1024
 
 /* 
  * Prefix for name of device (for example /dev/ringmap_em0 will full name) 

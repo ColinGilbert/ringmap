@@ -1,23 +1,40 @@
 #!/usr/local/bin/bash
 
-# wich system release
-uname -r | grep STABLE | grep 8 1>/dev/null
-if [ $? -eq 0 ]
-then 
-	echo ; echo "Building ringmap for FreeBSD-STABLE..."
-	echo
-	sleep 1
-	RINGMAP_BUILD_DIR=../sys/modules/ringmap/
-	LIBPCAP_BUILD_DIR=../lib/libpcap/
-else 
-	echo "Wrong OS"
-	exit 1
-fi
+checkOS() {
+	uname -r | grep STABLE | grep 8 1>/dev/null
+	if [ $? -eq 0 ]
+	then 
+		# Check for sorces: Kernel
+		if [ -d /usr/src/sys ] 
+		then 
+			echo "Kernel source is present - Ok"
+		else 
+			echo "Error! Kernel source is missing! Please, download kernel source in /usr/src/"
+			exit 1;
+		fi
+
+		# Check versions
+		P=$(cat /usr/src/sys/sys/param.h | grep define | grep __FreeBSD_version | awk '{print $3}')
+		T=$(sysctl kern.osreldate | awk '{print $2}')
+		if [ ${P} -eq ${T} ] 
+		then 
+			echo "System Ok"
+		else 
+			echo "Error! Version mismatch! Installed OS does not relate  to the source in /usr/src/sys"
+			exit 1
+		fi 
+	else 
+		echo "Wrong OS"
+		exit 1
+	fi
+}
 
 make_ringmap() {
 	cd ${RINGMAP_BUILD_DIR}
 	make clean 
-	make DEBUG_FLAGS=-g || { echo "Error while compiling driver" ; return 1 ; }
+
+	#  For debugging use: make DEBUG_FLAGS=-g
+	make || { echo "Error while compiling driver" ; return 1 ; }
 	cd -
 }
 
@@ -32,6 +49,12 @@ make_libpcap() {
 ###################################
 ### 		S T A R T           ###
 ###################################
+
+RINGMAP_BUILD_DIR=../sys/modules/ringmap/
+LIBPCAP_BUILD_DIR=../lib/libpcap/
+
+# Check OS 
+checkOS
 
 # Build driver
 echo
