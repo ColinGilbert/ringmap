@@ -12,7 +12,7 @@ SRCS=	grammar.y tokdefs.h version.h pcap-bpf.c \
 	scanner.l version.c
 
 .if defined(LIBPCAP_RINGMAP)
-CFLAGS+=-g -DRINGMAP
+CFLAGS+=-DRINGMAP
 SRCS+=ringmap_pcap.c
 .endif 
 
