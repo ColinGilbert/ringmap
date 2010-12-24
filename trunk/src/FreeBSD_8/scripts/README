@@ -21,7 +21,7 @@ e.g. tcpdump, wireshark.
 
 It is very important to set interface into the "monitor" mode before 
 capturing. After, if you want to use the network interface for other
-things, first unset monitor mode. Then unload ringmap executing:
+things, first unset monitor mode, then unload ringmap executing:
 
 % sudo ./unload_ringmap.sh
 
