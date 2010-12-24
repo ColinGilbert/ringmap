@@ -18,9 +18,9 @@ checkOS() {
 		T=$(sysctl kern.osreldate | awk '{print $2}')
 		if [ ${P} -eq ${T} ] 
 		then 
-			echo "System Ok"
+			echo "Systemversion -  Ok"
 		else 
-			echo "Error! Version mismatch! Installed OS does not relate  to the source in /usr/src/sys"
+			echo "Error! Version mismatch! Installed OS does not relate to the source in /usr/src/sys"
 			exit 1
 		fi 
 	else 
