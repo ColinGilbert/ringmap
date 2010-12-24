@@ -24,5 +24,9 @@ Before you start there are few steps you have to do in your system:
 	or 
 	b. tarball: http://code.google.com/p/ringmap/downloads/list
 
-4. Change to the scripts/ directory. There are scripts for building, installing the ringmap.
+4. Put folowing lines into the /etc/make.conf:
+	EM_RINGMAP=yes
+	LIBPCAP_RINGMAP=yes
+
+5. Change to the scripts/ directory. There are scripts for building, installing the ringmap.
 Read the README in that directory for further information.
