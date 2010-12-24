@@ -1,4 +1,3 @@
-
 Directories:
 
 contrib		- 	userspace source code
@@ -6,4 +5,24 @@ lib			-	libraries make files
 scripts		-	scripts for installing ringmap
 sys			- 	kernel code
 
-To install ringmap go to scripts/ and read README
+Before you start to install ringmap, be sure you are familiar with: 
+- Updating and Upgrading FreeBSD:
+	http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/updating-upgrading.html
+ 
+- Building and Installing a Custom Kernel:
+	http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig.html
+	
+Before you start there are few steps you have to do in your system:
+1. Be sure you have in /usr/src the base system and the kernel code. 
+
+2. Recompile your kernel without em driver: 
+	- remove from the kernel config file the line "device em"
+	- compile and install the kernel
+
+3. Get the ringmap source code from
+	a. SVN: svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
+	or 
+	b. tarball: http://code.google.com/p/ringmap/downloads/list
+
+4. Change to the scripts/ directory. There are scripts for building, installing the ringmap.
+Read the README in that directory for further information. 
