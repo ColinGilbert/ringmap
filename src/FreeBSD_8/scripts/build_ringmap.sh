@@ -30,7 +30,18 @@ checkOS() {
 }
 
 make_ringmap() {
+	# Check variables in /etc/make.conf
+	cat /etc/make.conf | grep EM_RINGMAP 1>/dev/null
+	if [ $? -eq 0 ]
+	then 
+		echo "make.conf - checked"
+	else 
+		echo "Set EM_RINGMAP variable in /etc/make.conf"
+		return 1
+	fi 
+
 	cd ${RINGMAP_BUILD_DIR}
+
 	make clean 
 
 	#  For debugging use: make DEBUG_FLAGS=-g
@@ -39,6 +50,17 @@ make_ringmap() {
 }
 
 make_libpcap() {
+	# Check variables in /etc/make.conf
+	cat /etc/make.conf | grep LIBPCAP_RINGMAP 1>/dev/null
+	if [ $? -eq 0 ]
+	then 
+		echo "make.conf - checked"
+	else 
+		echo "Set LIBPCAP_RINGMAP variable in /etc/make.conf"
+		return 1
+	fi 
+
+
 	cd ${LIBPCAP_BUILD_DIR}
 	make clean
 	make || { echo "Error by compiling driver" ; return 1 ; }
