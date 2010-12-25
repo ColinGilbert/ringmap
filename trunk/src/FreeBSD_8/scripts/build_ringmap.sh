@@ -50,6 +50,7 @@ make_ringmap() {
 }
 
 make_libpcap() {
+
 	# Check variables in /etc/make.conf
 	cat /etc/make.conf | grep LIBPCAP_RINGMAP 1>/dev/null
 	if [ $? -eq 0 ]
@@ -60,11 +61,11 @@ make_libpcap() {
 		return 1
 	fi 
 
-
 	cd ${LIBPCAP_BUILD_DIR}
 	make clean
 	make || { echo "Error by compiling driver" ; return 1 ; }
 	cd -
+
 }
 
 
