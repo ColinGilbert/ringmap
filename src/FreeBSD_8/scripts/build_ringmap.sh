@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/bin/sh
 
 checkOS() {
 	uname -r | grep STABLE | grep 8 1>/dev/null
