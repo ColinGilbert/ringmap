@@ -1,6 +1,11 @@
-unload_ringmap.sh	-	unload ringmap kernel moduile and install generic libpcap
-build_ringmap.sh	-	builds the kernel code and libpcap
-set_ringmap.sh		- 	loads the driver module and installs libpcap
+unload_ringmap.sh	-	to unload ringmap kernel module and 
+						install generic libpcap
+
+build_ringmap.sh	-	to build the kernel code and libpcap
+
+set_ringmap.sh		- 	to load the ringmap-driver module and 
+						install ringmap-libpcap
+
 
 In oder to install ringmap, first, you have to compile the source code: 
 
@@ -15,12 +20,12 @@ After the code is compiled do following steps:
 
 <IFACE> is a string that represent your network interface
 
-Now you can start any capturing application based on libpcap, 
+Now you can run any capturing application based on libpcap, 
 e.g. tcpdump, wireshark, etc...
 
 It is very important to set interface into the "monitor" mode before 
-capturing. After, if you want to use the network interface for other
-tasks, first unset monitor mode, then unload ringmap executing:
+capturing. Afterwards, if you want to use the network interface for other
+tasks, first unset monitor mode, then unload ringmap by executing:
 
 % sudo ./unload_ringmap.sh
 
