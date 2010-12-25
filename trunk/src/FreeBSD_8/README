@@ -28,5 +28,6 @@ Before you start there are few steps you have to do in your system:
 	EM_RINGMAP=yes
 	LIBPCAP_RINGMAP=yes
 
-5. Change to the scripts/ directory. There are scripts for building, installing the ringmap.
-Read the README in that directory for further information.
+5. Change to the scripts/ directory. There are scripts for building and
+installing the ringmap.  Read the README in that directory for further
+information.
