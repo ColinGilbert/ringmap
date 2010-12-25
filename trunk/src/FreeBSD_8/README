@@ -5,14 +5,14 @@ lib			-	libraries build directories
 scripts		-	scripts for installing ringmap
 sys			- 	kernel code
 
-Before you start to install ringmap, be sure you are familiar with: 
+Before you start to install ringmap, familiarize yourself with: 
 - Updating and Upgrading FreeBSD:
 	http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/updating-upgrading.html
  
 - Building and Installing a Custom Kernel:
 	http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig.html
 	
-Before you start there are few steps you have to do in your system:
+Following steps are required before you install ringmap:
 1. Be sure you have in /usr/src the base system and the kernel source. 
 
 2. Recompile your kernel without "em" driver: 
