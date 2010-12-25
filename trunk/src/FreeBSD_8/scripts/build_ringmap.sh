@@ -34,7 +34,7 @@ make_ringmap() {
 	cat /etc/make.conf | grep EM_RINGMAP 1>/dev/null
 	if [ $? -eq 0 ]
 	then 
-		echo "make.conf - checked"
+		echo ; echo "make.conf - checked" ; echo
 	else 
 		echo "Set EM_RINGMAP variable in /etc/make.conf"
 		return 1
@@ -54,7 +54,7 @@ make_libpcap() {
 	cat /etc/make.conf | grep LIBPCAP_RINGMAP 1>/dev/null
 	if [ $? -eq 0 ]
 	then 
-		echo "make.conf - checked"
+		echo ; echo "make.conf - checked" ; echo
 	else 
 		echo "Set LIBPCAP_RINGMAP variable in /etc/make.conf"
 		return 1
