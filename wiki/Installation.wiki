@@ -12,5 +12,25 @@ Before you start to install ringmap, familiarize yourself with:
  * [http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/updating-upgrading.html Updating and Upgrading FreeBSD]
  * [http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig.html Building and Installing a Custom Kernel]
   	
+Following steps are required before you install ringmap:
+ * Be sure you have in /usr/src the base system and the kernel source. 
+
+ * Recompile your kernel without "em" driver: 
+  * remove from the kernel config file the line "device em"
+  * compile and install the kernel
+
+ * Get the ringmap source code from
+  * SVN: svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
+	or 
+  * tarball: http://code.google.com/p/ringmap/downloads/list
+
+ * Put folowing lines into the /etc/make.conf:
+	EM_RINGMAP=yes
+	LIBPCAP_RINGMAP=yes
+
+ * Change to the scripts/ directory. There are scripts for building and
+installing the ringmap.  Read the README in that directory for further
+information.
+
 
 EMail: afiveg(at)freebsd.org
