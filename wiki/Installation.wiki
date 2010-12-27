@@ -28,9 +28,7 @@ Following steps are required before you install ringmap:
   * EM_RINGMAP=yes
   * LIBPCAP_RINGMAP=yes
 
- * Change to the scripts/ directory. There you'll find scripts for building and
-installing the ringmap.  Read the README in that directory for further
-information.
+ * Change to the scripts/ directory. There you'll find scripts for building and installing the ringmap.  Read the README in that directory for further information.
 
 
 EMail: afiveg(at)freebsd.org
