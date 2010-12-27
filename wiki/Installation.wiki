@@ -22,7 +22,7 @@ Following steps are required before you install ringmap:
  * Get the ringmap source code from
   * SVN: svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
 	or 
-  * tarball: http://code.google.com/p/ringmap/downloads/list
+  * http://code.google.com/p/ringmap/downloads/list
 
  * Put folowing lines into the /etc/make.conf:
 	EM_RINGMAP=yes
