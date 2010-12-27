@@ -6,7 +6,7 @@
 {{{
 svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
 }}}
-or tarball from the [http://code.google.com/p/ringmap/downloads/list download list]
+Or get the tarball from the [http://code.google.com/p/ringmap/downloads/list download list]
 
 = Installing ringmap =
 Before you start to install ringmap, familiarize yourself with: 
