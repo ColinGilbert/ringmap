@@ -21,6 +21,7 @@ Following steps are required before you install ringmap:
   * compile and install the kernel
 
  * Get the ringmap source code from SVN or [http://code.google.com/p/ringmap/downloads/list download list]
+
  * Put folowing lines into the /etc/make.conf:
   * EM_RINGMAP=yes
   * LIBPCAP_RINGMAP=yes
