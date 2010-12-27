@@ -8,6 +8,9 @@ svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
 }}}
 
 = Installing ringmap =
-Please contact me in order to get detailed instructions for installation: 
+Before you start to install ringmap, familiarize yourself with: 
+ * [http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/updating-upgrading.html Updating and Upgrading FreeBSD]
+ * [http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig.html Building and Installing a Custom Kernel]
+  	
 
 EMail: afiveg(at)freebsd.org
