@@ -9,11 +9,11 @@ svn checkout http://ringmap.googlecode.com/svn/trunk/ ringmap-read-only
 Or get the tarball from the [http://code.google.com/p/ringmap/downloads/list download list]
 
 = Installing ringmap =
+== Before you start ==
 Before you start to install ringmap, familiarize yourself with: 
  * [http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/updating-upgrading.html Updating and Upgrading FreeBSD]
  * [http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig.html Building and Installing a Custom Kernel]
   	
-== Before you start ==
 Following steps are required before you install ringmap:
  * Be sure you have in /usr/src the base system and the kernel source. 
 
@@ -42,5 +42,5 @@ Following steps are required before you install ringmap:
 % sudo ./set_ringmap.sh
 }}}
 
-== By questionts ==
+= By questionts =
 Mail me  afiveg(at)freebsd.org
