@@ -13,6 +13,7 @@ Before you start to install ringmap, familiarize yourself with:
  * [http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/updating-upgrading.html Updating and Upgrading FreeBSD]
  * [http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig.html Building and Installing a Custom Kernel]
   	
+== Before you start ==
 Following steps are required before you install ringmap:
  * Be sure you have in /usr/src the base system and the kernel source. 
 
@@ -28,5 +29,18 @@ Following steps are required before you install ringmap:
 
  * Change to the scripts/ directory. There you'll find scripts for building and installing the ringmap. Read the README in that directory for further information.
 
+== Compiling ==
+{{{
+% cd FreeBSD_8/scripts/
+% chmod 755 build_ringmap.sh
+% ./build_ringmap.sh
+}}}
 
-EMail: afiveg(at)freebsd.org
+== Installing ==
+{{{
+% chmod 755 set_ringmap.sh
+% sudo ./set_ringmap.sh
+}}}
+
+== By questionts ==
+Mail me  afiveg(at)freebsd.org
