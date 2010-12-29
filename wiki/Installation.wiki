@@ -37,6 +37,7 @@ Following steps are required before you install ringmap:
 }}}
 
 == Installing ==
+To do this you have to login as root or [http://linux-bsd-sharing.blogspot.com/2009/03/howto-using-sudo-on-freebsd.html add your user account to the sudoers].
 {{{
 % chmod 755 set_ringmap.sh
 % sudo ./set_ringmap.sh
