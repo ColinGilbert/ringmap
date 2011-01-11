@@ -44,7 +44,7 @@ To do this you have to login as root or [http://linux-bsd-sharing.blogspot.com/2
 }}}
 Afterwards set the interface into the monitor mode:
 {{{
-sodu ifconfig em0 monitor up
+sudo ifconfig em0 monitor up
 }}}
 
 = By questionts =
