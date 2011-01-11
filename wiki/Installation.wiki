@@ -42,6 +42,10 @@ To do this you have to login as root or [http://linux-bsd-sharing.blogspot.com/2
 % chmod 755 set_ringmap.sh
 % sudo ./set_ringmap.sh
 }}}
+Afterwards set the interface into the monitor mode:
+{{{
+sodu ifconfig em0 monitor up
+}}}
 
 = By questionts =
 Mail me  afiveg(at)freebsd.org
