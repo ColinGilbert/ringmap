@@ -309,18 +309,18 @@ struct pcap_ringmap {
 
 #define PACKET_ADDR_DEB(ring, i)	\
 	if (__RINGMAP_DEB) {							\
-		printf("=+= packet.user=0x%X, packet.phys=0x%X, packet.kern=0x%X\n",\
-		(unsigned int)ring->slot[i].packet.user, 	\
-		(unsigned int)ring->slot[i].packet.phys, 	\
-		(unsigned int)ring->slot[i].packet.kern);	\
+		printf("=+= packet.user=%p, packet.phys=%p, packet.kern=%p\n",\
+				(void *)ring->slot[i].packet.user, 	\
+				(void *)ring->slot[i].packet.phys, 	\
+				(void *)ring->slot[i].packet.kern);	\
 	};
 
 #define PRINT_MBUF_ADDR(ring, i)	\
 	do {							\
-		printf("=+= mbuf.user=0x%X, mbuf.phys=0x%llX, mbuf.kern=0x%X\n",  \
-		(unsigned int)ring->slot[i].mbuf.user,			\
-		(long long unsigned int)ring->slot[i].mbuf.phys,\
-		(unsigned int)ring->slot[i].mbuf.kern);			\
+		printf("=+= mbuf.user=%p, mbuf.phys=%p, mbuf.kern=%p\n",  \
+				(void *)ring->slot[i].mbuf.user,			\
+				(void *)ring->slot[i].mbuf.phys,			\
+				(void *)ring->slot[i].mbuf.kern);			\
 	} while (0);
 
 #define PRINT_SLOT(ring, i)												\
