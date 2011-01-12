@@ -160,8 +160,8 @@ struct ringmap_functions {
 		if (co != NULL) {									\
 			printf("\n===  co->td->proc->pid: %d\n", 		\
 					co->td->td_proc->p_pid);				\
-			printf("===  Ring Kernel Addr:0x%X\n", 			\
-					(unsigned int)co->ring);				\
+			printf("===  Ring Kernel Addr: %p\n", 			\
+					(void *)co->ring);				\
 			PRINT_RING_PTRS(co->ring);						\
 		} else {											\
 			RINGMAP_WARN(NULL pointer: capturing object);	\
