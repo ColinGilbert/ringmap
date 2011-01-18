@@ -17,7 +17,7 @@ Before you start to install ringmap, familiarize yourself with:
 Following steps are required before you install ringmap:
  * Be sure you have in /usr/src the base system and the kernel source. 
 
- * Recompile your kernel without "em" driver: 
+ * [http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig-building.html Recompile the kernel] without "em" driver: 
   * remove from the kernel config file the line "device em"
   * compile and install the kernel
 
@@ -42,10 +42,13 @@ To do this you have to login as root or [http://linux-bsd-sharing.blogspot.com/2
 % chmod 755 set_ringmap.sh
 % sudo ./set_ringmap.sh
 }}}
-Afterwards set the interface into the monitor mode:
+
+== Using ==
+To use _ringmap_ set the interface into the monitor mode:
 {{{
 sudo ifconfig em0 monitor up
 }}}
+Afterwards start an application that based on libpcap, e.g. _tcpdump_, _Wireshark_, etc...
 
 = By questionts =
 Mail me  afiveg(at)freebsd.org
